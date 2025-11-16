@@ -23,12 +23,12 @@ Result: Everything looks the same color! 😱
 
 # Simulate data with outlier
 set.seed(123)
-data <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
-data[5, 5] <- 20  # One extreme outlier
+expr_matrix <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
+expr_matrix[5, 5] <- 20  # One extreme outlier
 
 # Default heatmap - terrible!
 library(pheatmap)
-pheatmap(data)  # All data compressed to narrow range
+pheatmap(expr_matrix)  # All data compressed to narrow range
 ```
 
 ::: {.fragment}
@@ -77,7 +77,7 @@ pheatmap(data)  # All data compressed to narrow range
 #| eval: false
 
 # This looks correct but is misleading!
-heatmap.2(data, scale = "column")
+heatmap.2(expr_matrix, scale = "column")
 
 # Dendrograms calculated on RAW data
 # Colors displayed on SCALED data
@@ -93,7 +93,7 @@ heatmap.2(data, scale = "column")
 library(massageR)  # or source the function
 
 # Pre-scale data AND calculate dendrograms on scaled data
-z <- heat.clust(data,
+z <- heat.clust(expr_matrix,
                 scaledim = "column",  # Scale by column
                 zlim = c(-3, 3),      # Cap at ±3
                 reorder = c("column", "row"))
@@ -117,13 +117,13 @@ Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps
 #| code-line-numbers: "|2-3|5-6"
 
 # Cap at ±2 SD
-mean_val <- mean(data, na.rm = TRUE)
-sd_val <- sd(data, na.rm = TRUE)
+mean_val <- mean(expr_matrix, na.rm = TRUE)
+sd_val <- sd(expr_matrix, na.rm = TRUE)
 
-data_capped <- pmin(pmax(data, mean_val - 2*sd_val),
+expr_capped <- pmin(pmax(expr_matrix, mean_val - 2*sd_val),
                     mean_val + 2*sd_val)
 
-pheatmap(data_capped,
+pheatmap(expr_capped,
          main = "Values capped at ±2 SD")
 ```
 
@@ -136,12 +136,12 @@ Most common: ±2 or ±3 SD cutoff
 #| eval: false
 
 # Cap at 5th and 95th percentiles
-lower <- quantile(data, 0.05, na.rm = TRUE)
-upper <- quantile(data, 0.95, na.rm = TRUE)
+lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
+upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
 
-data_capped <- pmin(pmax(data, lower), upper)
+expr_capped <- pmin(pmax(expr_matrix, lower), upper)
 
-pheatmap(data_capped,
+pheatmap(expr_capped,
          main = "Values capped at 5-95 percentiles")
 ```
 
@@ -156,7 +156,7 @@ Robust to extreme outliers
 # Define your own color breaks
 breaks <- seq(-3, 3, length.out = 100)
 
-pheatmap(data,
+pheatmap(expr_matrix,
          breaks = breaks,
          main = "Custom breaks: -3 to +3")
 
@@ -174,13 +174,13 @@ Full control over color mapping
 #| eval: false
 
 # Log transform data
-data_log <- log10(data + 1)  # +1 to handle zeros
+expr_log <- log10(expr_matrix + 1)  # +1 to handle zeros
 
-pheatmap(data_log,
+pheatmap(expr_log,
          main = "Log10 transformed")
 
 # Or with ggplot2
-ggplot(df, aes(x, y, fill = value)) +
+ggplot(heatmap_df, aes(x, y, fill = value)) +
   geom_tile() +
   scale_fill_viridis_c(trans = "log10")
 ```
@@ -196,9 +196,9 @@ ggplot(df, aes(x, y, fill = value)) +
 library(ComplexHeatmap)
 
 # Create annotation for outliers
-outliers <- data > 3 | data < -3
+outliers <- expr_matrix > 3 | expr_matrix < -3
 
-Heatmap(data_capped,
+Heatmap(expr_capped,
         name = "Expression",
         cell_fun = function(j, i, x, y, width, height, fill) {
           if(outliers[i, j]) {
@@ -229,7 +229,7 @@ Heatmap(data_capped,
 # When zero is meaningful (fold-change, difference, etc.)
 library(RColorBrewer)
 
-pheatmap(data_capped,
+pheatmap(expr_capped,
          color = colorRampPalette(
            brewer.pal(11, "RdBu")
          )(100),
@@ -299,10 +299,10 @@ Heatmap(log2FC_capped,
 library(patchwork)
 
 # Before: with outlier
-p1 <- pheatmap(data, main = "Uncapped: Pattern lost", silent = TRUE)
+p1 <- pheatmap(expr_matrix, main = "Uncapped: Pattern lost", silent = TRUE)
 
 # After: outlier capped
-p2 <- pheatmap(data_capped, main = "Capped at ±2 SD", silent = TRUE)
+p2 <- pheatmap(expr_capped, main = "Capped at ±2 SD", silent = TRUE)
 
 # Side-by-side comparison
 p1[[4]] | p2[[4]]

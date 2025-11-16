@@ -59,14 +59,19 @@ Makes sense!
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Specify levels explicitly
-data$category <- factor(data$category,
+category_df <- data.frame(
+  category = c("Low", "Medium", "High", "Very High", "Low", "High"),
+  value = c(10, 20, 15, 30, 12, 25)
+)
+
+category_df$category <- factor(category_df$category,
                        levels = c("Low", "Medium", "High", "Very High"))
 
 # Now plots will use this order!
-ggplot(data, aes(x = category, y = value)) +
+ggplot(category_df, aes(x = category, y = value)) +
   geom_col()
 ```
 
@@ -83,9 +88,9 @@ Full control over order
 library(forcats)
 
 # Reorder by another variable (e.g., median)
-data %>%
-  mutate(group = fct_reorder(group, value, .fun = median)) %>%
-  ggplot(aes(group, value)) +
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg, .fun = median)) %>%
+  ggplot(aes(cyl_group, mpg)) +
   geom_boxplot()
 
 # Boxplots now ordered by median value!
@@ -98,9 +103,13 @@ data %>%
 #| eval: false
 
 # Order categories by mean of values
-data %>%
-  mutate(category = fct_reorder(category, value, mean)) %>%
-  ggplot(aes(x = category, y = value, fill = category)) +
+mtcars %>%
+  mutate(cyl_group = factor(cyl)) %>%
+  group_by(cyl_group) %>%
+  summarise(mean_mpg = mean(mpg)) %>%
+  ungroup() %>%
+  mutate(cyl_group = fct_reorder(cyl_group, mean_mpg, mean)) %>%
+  ggplot(aes(x = cyl_group, y = mean_mpg, fill = cyl_group)) +
   geom_col() +
   coord_flip()  # Horizontal bars easier to read
 ```
@@ -114,9 +123,9 @@ Bars ordered by height!
 #| eval: false
 
 # Order by how common each level is
-ggplot(data, aes(x = fct_infreq(category))) +
+ggplot(mtcars, aes(x = fct_infreq(factor(cyl)))) +
   geom_bar() +
-  labs(x = "Category") +
+  labs(x = "Cylinders") +
   coord_flip()
 
 # Most common category first!
@@ -131,9 +140,9 @@ Great for survey data
 #| eval: false
 
 # Sometimes you want reverse order
-data %>%
-  mutate(category = fct_reorder(category, value) %>% fct_rev()) %>%
-  ggplot(aes(x = category, y = value)) +
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg) %>% fct_rev()) %>%
+  ggplot(aes(x = cyl_group, y = mpg)) +
   geom_col()
 
 # Now highest values first instead of last
@@ -145,13 +154,13 @@ data %>%
 #| echo: true
 #| eval: false
 
-# Move "Control" to front, keep others in order
-data %>%
-  mutate(treatment = fct_relevel(treatment, "Control")) %>%
-  ggplot(aes(treatment, response)) +
+# Move "4" to front for cylinders
+mtcars %>%
+  mutate(cyl_group = fct_relevel(factor(cyl), "4")) %>%
+  ggplot(aes(cyl_group, mpg)) +
   geom_boxplot()
 
-# Control always shown first
+# 4-cylinder always shown first
 ```
 
 Common in experimental data!
@@ -163,16 +172,17 @@ Common in experimental data!
 #| eval: false
 
 # Calculate summary statistics
-summary_data <- data %>%
-  group_by(name) %>%
-  summarise(mean_value = mean(value))
+summary_data <- mtcars %>%
+  mutate(cyl_group = factor(cyl)) %>%
+  group_by(cyl_group) %>%
+  summarise(mean_mpg = mean(mpg), .groups = "drop")
 
 # Plot with bars ordered by height
 ggplot(summary_data,
-       aes(x = fct_reorder(name, mean_value), y = mean_value)) +
+       aes(x = fct_reorder(cyl_group, mean_mpg), y = mean_mpg)) +
   geom_col(fill = "steelblue") +
   coord_flip() +  # Horizontal bars
-  labs(x = "", y = "Mean Value") +
+  labs(x = "Cylinders", y = "Mean MPG") +
   theme_minimal()
 ```
 
@@ -184,14 +194,20 @@ Much easier to read than alphabetical!
 #| echo: true
 #| eval: false
 
+# Create data with months
+month_data <- data.frame(
+  month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+  value = c(10, 15, 12, 18, 20, 17)
+)
+
 # Months in calendar order (not alphabetical!)
 months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
-data$month <- factor(data$month, levels = months)
+month_data$month <- factor(month_data$month, levels = months)
 
 # Now plots show Jan, Feb, Mar... not alphabetical!
-ggplot(data, aes(month, value)) +
+ggplot(month_data, aes(month, value)) +
   geom_line(group = 1)
 ```
 
@@ -201,12 +217,13 @@ ggplot(data, aes(month, value)) +
 #| echo: true
 #| eval: false
 
-# Order legend by maximum y value of each group
-ggplot(data, aes(x = time,
-                 y = value,
-                 color = fct_reorder(group, value, max, .desc = TRUE))) +
-  geom_line(linewidth = 1) +
-  labs(color = "Group") +
+# Order legend by maximum mpg of each cylinder group
+mtcars$cyl_group <- factor(mtcars$cyl)
+ggplot(mtcars, aes(x = wt,
+                 y = mpg,
+                 color = fct_reorder(cyl_group, mpg, max, .desc = TRUE))) +
+  geom_point(size = 2) +
+  labs(color = "Cylinders") +
   theme_minimal()
 
 # Legend now shows groups in order of importance!
@@ -218,12 +235,12 @@ ggplot(data, aes(x = time,
 #| echo: true
 #| eval: false
 
-# Order facets by median value
-data %>%
-  mutate(category = fct_reorder(category, value, median)) %>%
-  ggplot(aes(x = subcategory, y = value)) +
+# Order facets by median mpg for each cylinder
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg, median)) %>%
+  ggplot(aes(x = factor(cyl), y = mpg)) +
   geom_boxplot() +
-  facet_wrap(~category) +
+  facet_wrap(~cyl_group) +
   theme_minimal()
 
 # Facet panels in meaningful order!
@@ -253,6 +270,7 @@ fct_explicit_na(f)       # Make NA a visible level
 #| eval: false
 
 # Likert scale survey responses
+set.seed(42)
 survey <- data.frame(
   response = sample(c("Strongly Disagree", "Disagree", "Neutral",
                      "Agree", "Strongly Agree"), 100, replace = TRUE)
@@ -278,7 +296,8 @@ ggplot(survey, aes(x = response)) +
 
 library(forcats)
 
-# Clinical trial data
+# Clinical trial data simulation
+set.seed(123)
 clinical <- data.frame(
   treatment = rep(c("Placebo", "Low Dose", "Medium Dose", "High Dose"), each = 25),
   response = rnorm(100, mean = rep(c(10, 12, 15, 18), each = 25), sd = 3)
@@ -301,18 +320,16 @@ ggplot(clinical, aes(treatment, response)) +
 #| eval: false
 
 # Combine multiple forcats functions
-data %>%
+mtcars %>%
   mutate(
-    # 1. Make NA explicit
-    category = fct_explicit_na(category),
-    # 2. Lump rare categories
-    category = fct_lump_n(category, n = 5),
-    # 3. Order by frequency
-    category = fct_infreq(category),
-    # 4. Reverse so most common at top
-    category = fct_rev(category)
+    # 1. Convert to factor
+    cyl_group = factor(cyl),
+    # 2. Order by frequency
+    cyl_group = fct_infreq(cyl_group),
+    # 3. Reverse so most common at top
+    cyl_group = fct_rev(cyl_group)
   ) %>%
-  ggplot(aes(category)) +
+  ggplot(aes(cyl_group)) +
   geom_bar()
 ```
 
@@ -367,9 +384,9 @@ ggplot(msleep,
 #| echo: true
 #| eval: false
 
-data %>%
-  count(category) %>%
-  ggplot(aes(x = fct_reorder(category, n), y = n)) +
+mtcars %>%
+  count(cyl) %>%
+  ggplot(aes(x = fct_reorder(as.character(cyl), n), y = n)) +
   geom_col() +
   coord_flip()
 ```
@@ -380,23 +397,23 @@ data %>%
 #| echo: true
 #| eval: false
 
-data %>%
-  mutate(group = fct_relevel(group, "Control")) %>%
-  ggplot(aes(group, value)) +
+mtcars %>%
+  mutate(group = fct_relevel(factor(cyl), "4")) %>%
+  ggplot(aes(group, mpg)) +
   geom_boxplot()
 ```
 
-### Pattern 3: Chronological facets
+### Pattern 3: Chronological grouping
 
 ```{r}
 #| echo: true
 #| eval: false
 
-data %>%
-  mutate(year = fct_reorder(as.character(year), year_numeric)) %>%
-  ggplot(aes(x, y)) +
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), cyl)) %>%
+  ggplot(aes(wt, mpg)) +
   geom_point() +
-  facet_wrap(~year)
+  facet_wrap(~cyl_group)
 ```
 
 ## Debugging Factor Issues
@@ -406,16 +423,16 @@ data %>%
 #| eval: false
 
 # Check current levels
-levels(data$category)
+levels(mtcars$cyl)
 
 # Check level order
-data$category %>% levels()
+factor(mtcars$cyl) %>% levels()
 
 # See factor structure
-str(data$category)
+str(factor(mtcars$cyl))
 
 # Convert to character if needed
-data$category <- as.character(data$category)
+mtcars$cyl_char <- as.character(mtcars$cyl)
 ```
 
 ## Recommendations
@@ -441,7 +458,8 @@ library(ggplot2)
 library(dplyr)
 library(forcats)
 
-# Gene expression data by tissue type
+# Create simulated gene expression data by tissue type
+set.seed(123)
 expr_data <- data.frame(
   tissue = rep(c("Brain", "Heart", "Liver", "Lung", "Kidney"), each = 50),
   expression = c(rnorm(50, 100, 15), rnorm(50, 50, 10),

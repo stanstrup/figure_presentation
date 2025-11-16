@@ -89,8 +89,8 @@ theme_ipsum()       # Modern professional typography
 theme_set(theme_bw(base_size = 12))
 
 # Now all plots use theme_bw
-ggplot(data, aes(x, y)) + geom_point()
-ggplot(data2, aes(a, b)) + geom_line()
+ggplot(mtcars, aes(wt, mpg)) + geom_point()
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
 # Both use theme_bw automatically!
 ```
 
@@ -112,7 +112,7 @@ my_pub_theme <- theme_classic(base_size = 11) +
   )
 
 # Apply to plot
-ggplot(data, aes(x, y)) + geom_point() + my_pub_theme
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + my_pub_theme
 ```
 
 ## Font Considerations
@@ -159,9 +159,9 @@ pub_theme <- theme_classic(base_size = 11)
 theme_set(pub_theme)
 
 # Create multiple plots with same style
-p1 <- ggplot(data1, aes(x, y)) + geom_point()
-p2 <- ggplot(data2, aes(a, b)) + geom_line()
-p3 <- ggplot(data3, aes(c, d)) + geom_col()
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
+p3 <- ggplot(faithful, aes(eruptions)) + geom_histogram()
 
 # Combine into multi-panel figure
 library(patchwork)

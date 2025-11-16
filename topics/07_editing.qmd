@@ -106,8 +106,8 @@ Illustrator/Inkscape = Final polish only
 #| eval: false
 
 # 1_analysis.R - Data analysis and initial plots
-p1 <- ggplot(data, aes(x, y)) + geom_point()
-p2 <- ggplot(data, aes(a, b)) + geom_line()
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
 
 # 2_export_figures.R - Standardized export
 ggsave("figures/panel_a.pdf", p1, width = 3.5, height = 3)
@@ -233,13 +233,13 @@ Fully reproducible!
 #| eval: false
 
 # Create 4 plots in R
-p1 <- ggplot(data, aes(x, y)) + geom_point() +
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
       theme_classic(base_size = 10)
-p2 <- ggplot(data, aes(a, b)) + geom_line() +
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line() +
       theme_classic(base_size = 10)
-p3 <- ggplot(data, aes(m, n)) + geom_col() +
+p3 <- ggplot(faithful, aes(eruptions)) + geom_histogram() +
       theme_classic(base_size = 10)
-p4 <- ggplot(data, aes(p, q)) + geom_boxplot() +
+p4 <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot() +
       theme_classic(base_size = 10)
 
 # Export each

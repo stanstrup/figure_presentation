@@ -166,7 +166,7 @@ Critical settings:
 #| eval: false
 
 # For widescreen, plot might be ~8" wide
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 4) +  # Larger for projection
   theme_classic(base_size = 18)  # Readable from back
 
@@ -202,7 +202,7 @@ ggsave("slide_plot.pdf", p, width = 8, height = 6)
 #| eval: false
 
 # Presentation version: large text, bold elements
-p_present <- ggplot(data, aes(x, y, color = group)) +
+p_present <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 5) +  # Larger points
   geom_smooth(linewidth = 1.5, se = FALSE) +
   scale_color_brewer(palette = "Set1") +
@@ -213,7 +213,7 @@ p_present <- ggplot(data, aes(x, y, color = group)) +
     axis.title = element_text(size = 22, face = "bold"),
     plot.title = element_text(size = 24, face = "bold")
   ) +
-  labs(title = "Clear, Bold Title")
+  labs(title = "Fuel Efficiency", color = "Cylinders")
 
 ggsave("presentation.pdf", p_present, width = 10, height = 7)
 ```
@@ -227,7 +227,7 @@ ggsave("presentation.pdf", p_present, width = 10, height = 7)
 #| eval: false
 
 # Step 1: Just data
-p1 <- ggplot(data, aes(x, y)) + geom_point()
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ggsave("step1.pdf", p1, width = 8, height = 6)
 
 # Step 2: Add regression line
@@ -235,7 +235,7 @@ p2 <- p1 + geom_smooth(method = "lm")
 ggsave("step2.pdf", p2, width = 8, height = 6)
 
 # Step 3: Add annotation
-p3 <- p2 + annotate("text", x = 5, y = 10, label = "Key finding!")
+p3 <- p2 + annotate("text", x = 3.5, y = 25, label = "Key finding!")
 ggsave("step3.pdf", p3, width = 8, height = 6)
 
 # Import all, stack on one slide, use animations
@@ -250,7 +250,7 @@ ggsave("step3.pdf", p3, width = 8, height = 6)
 #| eval: false
 
 # Make plot background transparent
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_minimal() +
   theme(
