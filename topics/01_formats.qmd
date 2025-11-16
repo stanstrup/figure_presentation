@@ -308,6 +308,66 @@ ggsave("figure.eps",
 - Many medical journals: ✓ EPS preferred over PDF
 :::
 
+## Vector Screenshots from Websites
+
+::: {.callout-tip}
+## Capturing Website Content as Vector Graphics
+
+**Google Chrome has a built-in feature to save web pages as PDF (vector format)!**
+
+### Method 1: Print to PDF (Recommended)
+
+1. Open the webpage in Google Chrome
+2. Press `Ctrl+P` (Windows/Linux) or `Cmd+P` (Mac)
+3. Select **"Save as PDF"** as the destination
+4. Adjust settings:
+   - Uncheck "Headers and footers" for cleaner output
+   - Set margins as needed
+   - Choose "Background graphics" if you want colors
+5. Click "Save"
+
+**Result:** Vector-based PDF that can be zoomed infinitely!
+
+### Method 2: Chrome DevTools (For Specific Elements)
+
+1. Open Chrome DevTools (`F12` or `Ctrl+Shift+I`)
+2. Right-click on the element you want to capture
+3. Select "Capture node screenshot" (saves as PNG)
+4. For vector: Use Print to PDF method instead
+
+### Why This Matters
+
+- **Text stays crisp** - Perfect for including web-based figures
+- **Smaller file size** - Vector PDF is compact
+- **Editable** - Can extract or edit elements in PDF editor
+- **Publication quality** - No pixelation when zoomed
+:::
+
+### Use Cases
+
+```r
+# After saving webpage as PDF, you can include in your document
+# Or extract specific figures using PDF tools
+```
+
+**Examples:**
+
+- Capture ColorBrewer website for reference
+- Save interactive plot demonstrations
+- Document online data visualization examples
+- Include web-based tools in presentations
+
+::: {.callout-note}
+## Alternative: Browser Extensions
+
+For more control:
+- **Awesome Screenshot** - Can save as PDF
+- **Full Page Screen Capture** - Saves entire page
+- **FireShot** - Multiple format options including PDF
+
+But Chrome's built-in Print to PDF is usually sufficient!
+:::
+
 ## Recommendations
 
 ::: {.callout-tip}

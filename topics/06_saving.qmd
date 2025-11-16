@@ -25,12 +25,25 @@ pdf("myplot.pdf", width = 7, height = 5)
 dev.off()  # CRITICAL! Must close device
 ```
 
+::: {.callout-note}
+## dev.off() Works with ALL R Plots
+
+The `dev.off()` approach works for:
+- Base R plots (`plot()`, `hist()`, `barplot()`, etc.)
+- Lattice plots
+- ggplot2 plots
+- Any R graphics output
+
+**It's universal** - not limited to any specific plotting system!
+:::
+
 ::: {.fragment}
-**Problems:**
+**Problems with manual device management:**
 
 - Easy to forget `dev.off()`
 - Verbose
 - Not intuitive
+- Must manage device lifecycle manually
 :::
 
 ## Modern Way: ggsave()
@@ -261,24 +274,63 @@ ggsave("figures/figure1.png", p1, width = 7, height = 5, dpi = 300)
 # Save both vector and raster versions!
 ```
 
-## Saving Base R Plots
+## Saving Base R Plots (and ALL Non-ggplot2 Graphics)
+
+::: {.callout-important}
+## dev.off() is the Universal Approach
+
+The device approach works for **ALL** R plotting systems:
+- Base R graphics
+- Lattice
+- ggplot2 (though ggsave() is easier)
+- Grid graphics
+- Custom plotting functions
+:::
 
 ```{r}
 #| echo: true
 #| eval: false
 
 # For non-ggplot2 plots, use device functions
+# ALWAYS works, regardless of plotting system
 cairo_pdf("baseplot.pdf", width = 7, height = 5)
   plot(x, y)
   abline(lm(y ~ x))
-dev.off()
+  # Can have multiple plotting commands here
+  points(x2, y2, col = "red")
+  legend("topright", legend = c("Data", "Fit"), col = c("black", "blue"))
+dev.off()  # Close device - file is now saved
 
 # Or for PNG
 png("baseplot.png", width = 7, height = 5,
     units = "in", res = 300, type = "cairo")
   plot(x, y)
+  # Multiple commands work here too
+  lines(lowess(x, y), col = "blue", lwd = 2)
+dev.off()
+
+# For lattice plots
+library(lattice)
+pdf("lattice_plot.pdf", width = 6, height = 4)
+  print(xyplot(mpg ~ wt, data = mtcars))  # Note: print() needed for lattice
 dev.off()
 ```
+
+::: {.callout-tip}
+## When to Use dev.off() vs ggsave()
+
+**Use ggsave():**
+- When working with ggplot2 objects
+- Cleaner syntax
+- No need to manage device lifecycle
+
+**Use dev.off():**
+- Base R plots
+- Lattice plots
+- Complex multi-plot layouts with par() or layout()
+- When you need fine control over device settings
+- When combining multiple plot types in one figure
+:::
 
 ## Checking Output Quality
 

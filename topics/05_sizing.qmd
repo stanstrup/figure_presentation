@@ -27,9 +27,107 @@
 **Correct approach:**
 
 - Set final dimensions first
-- Adjust text sizes explicitly
-- Maintain proper proportions
+- Use width/height to scale ALL elements
+- Let dimensions control text size
 :::
+:::
+
+## Key Concept: Width/Height Controls Text Scaling
+
+::: {.callout-note}
+## The Smart Way to Size Text
+
+**You DON'T need to explicitly set text sizes!**
+
+Just use the `width` and `height` parameters in `ggsave()`:
+
+```r
+# Same plot, different dimensions = different text scaling
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+# Small figure → smaller text
+ggsave("small.pdf", p, width = 3, height = 2)
+
+# Large figure → larger text
+ggsave("large.pdf", p, width = 9, height = 6)
+```
+
+**Why this works:**
+- Width/height control the **canvas size**
+- Text scales proportionally with canvas
+- No explicit font size changes needed!
+:::
+
+## Vector Graphics: Absolute Size Doesn't Matter
+
+::: {.callout-important}
+## For Vector Formats (PDF, EPS, SVG)
+
+**The absolute dimensions (3" vs 9") don't actually matter!**
+
+What matters is:
+- **Aspect ratio** (width:height ratio)
+- **Relative proportions** of plot elements
+
+```r
+# These create IDENTICAL vector graphics (just different canvas sizes)
+ggsave("small.pdf", p, width = 3, height = 3)   # 3" × 3"
+ggsave("large.pdf", p, width = 9, height = 9)   # 9" × 9"
+
+# When you zoom either PDF to the same size, they look identical!
+```
+
+**For vectors:** Think of width/height as **scaling factors**, not absolute sizes.
+:::
+
+## DPI: Only for Raster Formats
+
+::: {.callout-warning}
+## DPI is ONLY relevant for raster images (PNG, JPEG, TIFF)
+
+**Vector formats (PDF, EPS) ignore DPI!**
+
+```r
+# For vectors - DPI has no effect
+ggsave("plot.pdf", p, width = 5, height = 4, dpi = 300)   # DPI ignored
+ggsave("plot.pdf", p, width = 5, height = 4, dpi = 72)    # Same result!
+
+# For raster - DPI controls pixel count
+ggsave("plot.png", p, width = 5, height = 4, dpi = 300)   # 1500 × 1200 pixels
+ggsave("plot.png", p, width = 5, height = 4, dpi = 72)    # 360 × 288 pixels
+```
+
+**DPI = Dots (pixels) Per Inch**
+- Higher DPI = more pixels = higher resolution raster
+- Vector graphics have **infinite resolution** regardless of DPI
+:::
+
+## The Practical Approach
+
+::: {.callout-tip}
+## Simplified Workflow
+
+**For vectors (recommended for publications):**
+
+1. Set a comfortable working size: `width = 6, height = 4`
+2. Adjust `base_size` if text feels too large/small
+3. Save as PDF - dimensions are just a starting point
+4. Journal/editor can scale the PDF as needed without quality loss
+
+**For raster (if required):**
+
+1. Find required dimensions from journal
+2. Set `width` and `height` to those exact dimensions
+3. Set `dpi = 300` (or journal requirement)
+4. This ensures correct pixel count for print quality
+
+```r
+# Vector approach (flexible)
+ggsave("figure.pdf", p, width = 6, height = 4)
+
+# Raster approach (precise)
+ggsave("figure.png", p, width = 3.5, height = 3, dpi = 300, units = "in")
+```
 :::
 
 ## The Right Way
