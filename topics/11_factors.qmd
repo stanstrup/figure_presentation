@@ -61,6 +61,8 @@ Makes sense!
 #| echo: true
 #| eval: true
 
+library(ggplot2)
+
 # Specify levels explicitly
 category_df <- data.frame(
   category = c("Low", "Medium", "High", "Very High", "Low", "High"),
