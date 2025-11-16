@@ -26,25 +26,54 @@ figure_presentation/
 
 ## Rendering the Presentation
 
-### Render the complete presentation:
-```bash
-quarto render presentation.qmd
+### From R (Recommended)
+
+**First time setup:**
+```r
+# Install required packages
+source("install_packages.R")
+
+# Load rendering functions
+source("render.R")
 ```
 
-### Render individual topics (for debugging):
+**Test all topics to find errors:**
+```r
+# This will test each topic individually and report which ones fail
+results <- test_all_topics()
+```
+
+**Render individual topics:**
+```r
+# Test a specific topic by number
+render_topic(2)   # Test colors topic
+
+# Or use shortcuts
+test_colors()     # Topic 2
+test_heatmaps()   # Topic 4
+test_factors()    # Topic 11
+```
+
+**Render full presentation:**
+```r
+render_presentation()
+```
+
+**Preview with live reload:**
+```r
+preview_presentation()  # Opens in browser, auto-refreshes on changes
+```
+
+### From Command Line
+
 ```bash
+# Render the complete presentation
+quarto render presentation.qmd
+
 # Render a single topic
 quarto render topics/02_colors.qmd
 
-# Or loop through all topics to find errors
-for file in topics/*.qmd; do
-  echo "Rendering $file"
-  quarto render "$file" || echo "FAILED: $file"
-done
-```
-
-### Preview while editing:
-```bash
+# Preview while editing
 quarto preview presentation.qmd
 ```
 
