@@ -42,7 +42,7 @@
 # Step 1: Know your final dimensions
 # e.g., journal single column = 3.5 inches
 
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 3) +  # Explicit point size
   theme_classic(base_size = 14) +  # Base text size
   theme(
@@ -108,7 +108,7 @@ Use `base_size` as your starting point!
 #| echo: true
 #| eval: false
 
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 
 # Save at random size
@@ -126,7 +126,7 @@ ggsave("plot.pdf", p,
 #| echo: true
 #| eval: false
 
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_classic(base_size = 11)
 
@@ -146,7 +146,7 @@ ggsave("plot.pdf", p,
 #| eval: false
 
 # Create base plot
-p <- ggplot(data, aes(x, y)) + geom_point()
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 
 # For paper (small, high detail)
 p + theme_classic(base_size = 11)
@@ -194,10 +194,10 @@ Choose dimensions based on data structure!
 
 library(patchwork)
 
-p1 <- ggplot(data1, aes(x, y)) + geom_point() +
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
   theme_classic(base_size = 10)
 
-p2 <- ggplot(data2, aes(a, b)) + geom_line() +
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line() +
   theme_classic(base_size = 10)
 
 combined <- p1 + p2
@@ -259,10 +259,10 @@ Full control over every text element!
 # Set base_size to get 7pt minimum (axis.text = 0.8 × base)
 # 7 / 0.8 = 8.75, round to 9
 
-my_plot <- ggplot(data, aes(x, y)) +
+my_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_classic(base_size = 9) +
-  labs(title = "My Title")
+  labs(title = "Fuel Efficiency")
 
 ggsave("journal_fig.pdf", my_plot,
        width = 3.35, height = 4, units = "in", device = cairo_pdf)

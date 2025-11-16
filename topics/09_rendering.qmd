@@ -45,7 +45,7 @@ But when you print or open in Illustrator... **it's perfect!**
 #| eval: false
 
 # Very thin lines may not render on screen
-ggplot(data, aes(x, y)) +
+ggplot(mtcars, aes(wt, mpg)) +
   geom_line(linewidth = 0.1)  # Too thin!
 
 # Looks broken in preview
@@ -60,7 +60,7 @@ ggplot(data, aes(x, y)) +
 #| eval: false
 
 # Many semi-transparent points
-ggplot(large_data, aes(x, y)) +
+ggplot(mtcars, aes(wt, mpg)) +
   geom_point(alpha = 0.1, size = 1)
 
 # 10,000 points at 10% transparency
@@ -109,7 +109,7 @@ ggsave("plot.pdf", p, width = 7, height = 5, device = cairo_pdf)
 #| eval: false
 
 # Create plot with many elements
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 0.5, alpha = 0.5) +
   geom_density2d(linewidth = 0.3) +
   theme_classic(base_size = 9) +
@@ -136,7 +136,7 @@ ggsave("complex.pdf", p, width = 3.5, height = 3)
 #| eval: false
 
 # Heatmap with tiles
-ggplot(data, aes(x, y, fill = value)) +
+ggplot(mtcars, aes(wt, mpg, fill = hp)) +
   geom_tile()
 
 # May show white lines between tiles in viewer
@@ -274,7 +274,7 @@ Check journal requirements!
 #| eval: false
 
 # Create simplified version to test
-p_simple <- ggplot(data[1:100, ], aes(x, y)) +
+p_simple <- ggplot(head(mtcars, 20), aes(wt, mpg)) +
   geom_point(size = 3) +
   theme_classic(base_size = 12)
 

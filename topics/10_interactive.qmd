@@ -26,7 +26,7 @@
 
 library(plotly)
 
-p <- ggplot(data, aes(x, y)) +
+p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 
 ggplotly(p)
@@ -116,7 +116,7 @@ Can't just save as PDF or PNG traditionally.
 library(htmlwidgets)
 
 # Create interactive plot
-p_interactive <- ggplotly(my_plot)
+p_interactive <- ggplotly(p)
 
 # Save as self-contained HTML
 saveWidget(p_interactive,
@@ -198,7 +198,7 @@ save_image(p_interactive, "plot.pdf")
 ```markdown
 ```{r, echo=FALSE, message=FALSE}
 library(plotly)
-p <- ggplot(data, aes(x, y)) + geom_point()
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ggplotly(p)
 ```
 ```
@@ -233,7 +233,7 @@ Perfect for modern scientific reports!
 #| eval: false
 
 # Add buttons for different views
-p <- plot_ly(data, x = ~x, y = ~y, type = 'scatter', mode = 'markers')
+p <- plot_ly(mtcars, x = ~wt, y = ~mpg, type = 'scatter', mode = 'markers')
 
 p %>% layout(
   updatemenus = list(
@@ -294,8 +294,9 @@ subplot(p1, p2)
 #| echo: true
 #| eval: false
 
-# Stock price example
-plot_ly(data, x = ~date, y = ~price, type = 'scatter', mode = 'lines') %>%
+# Stock price example (using built-in data)
+ts_data <- data.frame(date = seq(as.Date("2023-01-01"), length.out = 252, by = "day"), price = cumsum(rnorm(252)))
+plot_ly(ts_data, x = ~date, y = ~price, type = 'scatter', mode = 'lines') %>%
   layout(
     xaxis = list(
       rangeselector = list(
@@ -338,9 +339,10 @@ plot_ly(gapminder,
 #| eval: false
 
 # For large datasets, sample for interactive version
-data_sample <- data %>% slice_sample(n = 1000)
+library(dplyr)
+mtcars_sample <- mtcars %>% slice_sample(n = nrow(mtcars))  # mtcars is small, so no real sampling needed
 
-p <- ggplot(data_sample, aes(x, y)) + geom_point()
+p <- ggplot(mtcars_sample, aes(wt, mpg)) + geom_point()
 ggplotly(p)
 
 # Keep full dataset for static publication figure
@@ -353,7 +355,7 @@ ggplotly(p)
 #| eval: false
 
 # Create base plot
-p_static <- ggplot(data, aes(x, y, color = group)) +
+p_static <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
   theme_classic(base_size = 12)
 
@@ -411,9 +413,10 @@ saveWidget(p_interactive, "figure1_interactive.html")
 library(ggiraph)
 
 # Create plot with interactive elements
+mtcars$car_name <- rownames(mtcars)
 p <- ggplot(mtcars, aes(wt, mpg,
-                        tooltip = rownames(mtcars),
-                        data_id = rownames(mtcars))) +
+                        tooltip = car_name,
+                        data_id = car_name)) +
   geom_point_interactive(size = 3)
 
 girafe(ggobj = p)

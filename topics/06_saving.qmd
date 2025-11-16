@@ -230,9 +230,9 @@ done
 
 # Create list of plots
 plots <- list(
-  p1 = ggplot(data1, aes(x, y)) + geom_point(),
-  p2 = ggplot(data2, aes(a, b)) + geom_line(),
-  p3 = ggplot(data3, aes(m, n)) + geom_col()
+  p1 = ggplot(mtcars, aes(wt, mpg)) + geom_point(),
+  p2 = ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line(),
+  p3 = ggplot(faithful, aes(eruptions)) + geom_histogram()
 )
 
 # Save all at once
