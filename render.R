@@ -44,7 +44,91 @@ render_topic <- function(topic_number) {
 }
 
 # ============================================================
-# Option 3: Test ALL topics (find which ones fail)
+# Option 3: Test ALL topics in PARALLEL (FASTER!)
+# ============================================================
+test_all_topics_parallel <- function(n_cores = NULL) {
+  topic_files <- list.files("topics", pattern = "\\.qmd$", full.names = TRUE)
+  topic_files <- sort(topic_files)
+
+  # Determine number of cores
+  if (is.null(n_cores)) {
+    n_cores <- max(1, parallel::detectCores() - 1)  # Leave one core free
+  }
+  n_cores <- min(n_cores, length(topic_files))
+
+  cat("Testing", length(topic_files), "topics in PARALLEL using", n_cores, "cores...\n")
+  cat(strrep("=", 60), "\n\n")
+
+  start_time <- Sys.time()
+
+  # Helper function to render one topic
+  render_one <- function(topic_file) {
+    tryCatch({
+      quarto::quarto_render(topic_file, quiet = TRUE)
+      return(list(file = topic_file, status = "PASS", error = NULL))
+    }, error = function(e) {
+      return(list(file = topic_file, status = "FAIL", error = conditionMessage(e)))
+    })
+  }
+
+  # Render in parallel
+  if (.Platform$OS.type == "windows") {
+    # Windows: use PSOCK cluster
+    cl <- parallel::makeCluster(n_cores)
+    parallel::clusterExport(cl, "render_one")
+    parallel::clusterEvalQ(cl, library(quarto))
+    results_list <- parallel::parLapply(cl, topic_files, render_one)
+    parallel::stopCluster(cl)
+  } else {
+    # Unix/Mac: use fork
+    results_list <- parallel::mclapply(topic_files, render_one, mc.cores = n_cores)
+  }
+
+  end_time <- Sys.time()
+  elapsed <- round(as.numeric(difftime(end_time, start_time, units = "secs")), 2)
+
+  # Convert to data frame
+  results <- do.call(rbind, lapply(results_list, function(r) {
+    data.frame(
+      topic = basename(r$file),
+      status = r$status,
+      error = ifelse(is.null(r$error), "", r$error),
+      stringsAsFactors = FALSE
+    )
+  }))
+
+  # Print results
+  cat("Results:\n")
+  cat(strrep("-", 60), "\n")
+  for (i in seq_len(nrow(results))) {
+    symbol <- if (results$status[i] == "PASS") "✓" else "❌"
+    cat(sprintf("%s %-40s %s\n", symbol, results$topic[i], results$status[i]))
+  }
+
+  cat(strrep("=", 60), "\n")
+  n_pass <- sum(results$status == "PASS")
+  n_fail <- sum(results$status == "FAIL")
+
+  cat(sprintf("Results: %d passed, %d failed (%.2f seconds)\n", n_pass, n_fail, elapsed))
+
+  if (n_fail > 0) {
+    cat("\nFailed topics:\n")
+    failed <- results[results$status == "FAIL", ]
+    for (i in seq_len(nrow(failed))) {
+      cat("  ❌", failed$topic[i], "\n")
+      if (nchar(failed$error[i]) > 0) {
+        cat("     Error:", failed$error[i], "\n")
+      }
+    }
+  } else {
+    cat("\n✓ All topics passed! Ready to render full presentation.\n")
+  }
+
+  return(results)
+}
+
+# ============================================================
+# Option 4: Test ALL topics SEQUENTIALLY (slower but shows progress)
 # ============================================================
 test_all_topics <- function() {
   topic_files <- list.files("topics", pattern = "\\.qmd$", full.names = TRUE)
@@ -135,25 +219,33 @@ Available commands:
    test_heatmaps()        # Shortcut for topic 4
    test_factors()         # Shortcut for topic 11
 
-3. Test all topics (find errors):
+3. Test all topics - PARALLEL (FASTER!):
+   results <- test_all_topics_parallel()
+   results <- test_all_topics_parallel(n_cores = 4)  # Specify cores
+
+4. Test all topics - Sequential (shows progress):
    results <- test_all_topics()
 
-4. Preview presentation (live reload):
+5. Preview presentation (live reload):
    preview_presentation()
 
-5. Install required R packages:
+6. Install required R packages:
    install.packages(c('ggplot2', 'patchwork', 'viridis',
                       'RColorBrewer', 'dplyr', 'forcats'))
 
 Example workflow:
-  # First, test all topics to find errors
-  results <- test_all_topics()
+  # First, test all topics in parallel (faster)
+  results <- test_all_topics_parallel()
 
   # Fix any errors, then test specific topic
   render_topic(2)
 
   # When all pass, render full presentation
   render_presentation()
+
+Parallel vs Sequential:
+  - Parallel: FASTER (uses multiple CPU cores)
+  - Sequential: Shows live progress for each topic
 
 ========================================
 ")
