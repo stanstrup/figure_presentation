@@ -144,7 +144,7 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
 
 ```{r}
 #| echo: true
-#| eval: true
+#| eval: false
 #| fig-width: 8
 #| fig-height: 5
 
@@ -178,7 +178,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 ```{r}
 #| echo: true
-#| eval: true
+#| eval: false
 #| fig-width: 8
 #| fig-height: 5
 
@@ -213,7 +213,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 
 ```{r}
 #| echo: true
-#| eval: true
+#| eval: false
 #| fig-width: 14
 #| fig-height: 10
 
@@ -250,6 +250,17 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
     theme = theme(plot.title = element_text(size = 18, face = "bold"))
   )
 ```
+
+::: {.callout-note}
+## Install Package to See Examples
+
+To see these themes in action, install the package:
+```r
+install.packages("ggthemes")
+```
+
+Then change `eval: false` to `eval: true` in the code chunk above.
+:::
 
 ## Modern Typography: hrbrthemes
 
