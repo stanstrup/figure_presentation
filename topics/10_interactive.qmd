@@ -115,7 +115,11 @@ Can't just save as PDF or PNG traditionally.
 
 library(htmlwidgets)
 
-# Create interactive plot
+# Create a plot and make it interactive
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  theme_minimal()
+
 p_interactive <- ggplotly(p)
 
 # Save as self-contained HTML
@@ -195,13 +199,13 @@ save_image(p_interactive, "plot.pdf")
 
 ## R Markdown Integration
 
-```markdown
+````markdown
 ```{r, echo=FALSE, message=FALSE}
 library(plotly)
 p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ggplotly(p)
 ```
-```
+````
 
 When you knit to HTML, plot is interactive!
 
@@ -209,7 +213,7 @@ When you knit to PDF, automatically becomes static.
 
 ## Quarto Integration
 
-```markdown
+````markdown
 ---
 title: "My Report"
 format: html
@@ -220,9 +224,15 @@ format: html
 #| fig-cap: "Interactive scatter plot"
 
 library(plotly)
-ggplotly(my_plot)
+library(ggplot2)
+
+# Create plot
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+# Make it interactive
+ggplotly(p)
 ```
-```
+````
 
 Perfect for modern scientific reports!
 
