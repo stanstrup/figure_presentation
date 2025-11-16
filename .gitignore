@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+topics/*.html
+topics/*_files
+*_files
+*.html
