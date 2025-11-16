@@ -1,0 +1,201 @@
+# Color Gradients {background-color="#e74c3c"}
+
+## The Rainbow Problem
+
+::: {.r-fit-text}
+🌈 Why is rainbow/jet so popular if it's so bad?
+:::
+
+## Interactive Activity: Sort These Colors
+
+**Task**: Arrange these colors from lowest to highest value
+
+::: {.fragment}
+🔴 Red | 🟡 Yellow | 🟢 Green | 🔵 Blue | 🟣 Purple | 🟠 Orange
+:::
+
+::: {.fragment}
+**Can you do it intuitively?**
+
+**NO!** And that's the problem.
+:::
+
+## The False Borders Problem
+
+::: {.callout-warning}
+## Real-World Example
+
+Research shows rainbow colormaps create **false boundaries** in smooth data:
+
+- Yellow-to-green transition "jumps out"
+- Looks like sudden change where data is actually smooth
+- Creates artificial "edges" in maps and heatmaps
+:::
+
+Source: *HESS, 2021* - "Rainbow color map distorts and misleads research in hydrology"
+
+## Perceptual Non-Uniformity
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|5|10"
+
+# Bad: Rainbow creates false artifacts
+ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  scale_fill_gradientn(colors = rainbow(7)) +
+  labs(title = "Rainbow: Notice false 'edges'?")
+
+# Good: Viridis is perceptually uniform
+ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  scale_fill_viridis_c() +
+  labs(title = "Viridis: Smooth gradient")
+```
+
+## Medical Consequences
+
+::: {.callout-important}
+## From Research
+
+"Physicians who use jet colormap in diagnosing heart disease take **longer** and make **significantly more errors** than those who use proper colormaps"
+
+- Bright yellow appears more intense than dark red
+- But dark red actually represents higher values!
+:::
+
+## Color Blindness
+
+**Statistics:**
+- ~8% of men
+- ~0.5% of women
+- Most common: Red-green deficiency
+
+::: {.fragment}
+**Classic failure**: Red-green heatmaps
+
+These look identical to someone with deuteranopia!
+:::
+
+## Test Your Figures
+
+::: {.incremental}
+1. **Grayscale test**: Convert to B&W - can you still see patterns?
+2. **Colorblind simulator**: [coblis.org](https://www.coblis.com) or ColorOracle
+3. **Print test**: B&W printout still informative?
+:::
+
+## Recommended Palettes
+
+::: {.columns}
+::: {.column width="50%"}
+**Sequential (low → high)**
+
+```{r}
+#| echo: true
+#| eval: false
+scale_color_viridis_c()
+scale_color_brewer(
+  palette = "Blues"
+)
+```
+:::
+
+::: {.column width="50%"}
+**Diverging (- to +)**
+
+```{r}
+#| echo: true
+#| eval: false
+scale_color_brewer(
+  palette = "RdBu"
+)
+scale_color_distiller(
+  palette = "BrBG"
+)
+```
+:::
+:::
+
+## Why Viridis Wins
+
+::: {.incremental}
+- ✅ Perceptually uniform (equal steps look equal)
+- ✅ Colorblind-friendly
+- ✅ Prints well in grayscale
+- ✅ Increases monotonically in lightness
+- ✅ No false boundaries or artifacts
+:::
+
+## Viridis Family
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Four options in viridis family
+scale_color_viridis_c(option = "viridis")  # blue-green-yellow (default)
+scale_color_viridis_c(option = "magma")    # purple-red-yellow
+scale_color_viridis_c(option = "plasma")   # purple-orange-yellow
+scale_color_viridis_c(option = "inferno")  # black-purple-yellow
+```
+
+All are perceptually uniform!
+
+## ColorBrewer
+
+Great for categorical and diverging data
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Categorical (up to 8-10 colors)
+scale_color_brewer(palette = "Set1")
+scale_color_brewer(palette = "Dark2")
+
+# Sequential
+scale_color_brewer(palette = "YlOrRd")
+
+# Diverging
+scale_color_brewer(palette = "RdYlBu")
+```
+
+[colorbrewer2.org](https://colorbrewer2.org)
+
+## Demonstration: Rainbow vs. Viridis
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+
+# Create sample data with smooth gradient
+df <- expand.grid(x = 1:100, y = 1:100)
+df$z <- with(df, sin(x/10) * cos(y/10))
+
+# Rainbow (bad)
+p1 <- ggplot(df, aes(x, y, fill = z)) +
+  geom_raster() +
+  scale_fill_gradientn(colors = rainbow(7)) +
+  labs(title = "Rainbow: See false borders?")
+
+# Viridis (good)
+p2 <- ggplot(df, aes(x, y, fill = z)) +
+  geom_raster() +
+  scale_fill_viridis_c() +
+  labs(title = "Viridis: Smooth and perceptual")
+
+library(patchwork)
+p1 / p2
+```
+
+## Key Message
+
+::: {.r-fit-text}
+**Just Say No to Rainbow! 🚫🌈**
+:::
+
+Use viridis or ColorBrewer instead.

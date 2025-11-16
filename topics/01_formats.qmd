@@ -1,0 +1,116 @@
+# File Formats {background-color="#3498db"}
+
+## The Format Question
+
+**Which format should I use?**
+
+::: {.incremental}
+- Journal submission?
+- Poster presentation?
+- PowerPoint?
+- Web/online?
+:::
+
+## Vector vs. Raster
+
+::: {.columns}
+::: {.column width="50%"}
+**Vector (PDF, EPS, SVG)**
+
+- Mathematical descriptions
+- Infinitely scalable
+- Small file size
+- Perfect for: plots, diagrams
+:::
+
+::: {.column width="50%"}
+**Raster (PNG, TIFF, JPG)**
+
+- Grid of pixels
+- Resolution-dependent (DPI)
+- Large file sizes
+- Perfect for: photos
+:::
+:::
+
+## Resolution Matters
+
+| Use Case | Minimum DPI |
+|----------|-------------|
+| Screen viewing | 72-96 |
+| Print publication | 300 |
+| High-quality journal | 600-1200 |
+| Poster (viewed from distance) | 150-300 |
+
+## Compression: Lossless vs. Lossy
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|2|5|8"
+
+# NEVER use JPG for line plots
+ggsave("plot.jpg", quality = 100)  # Still lossy!
+
+# Use PNG for raster graphics
+ggsave("plot.png", dpi = 300)
+
+# Use PDF for vector graphics (best for publications)
+ggsave("plot.pdf", device = cairo_pdf)
+```
+
+## JPEG Compression Artifacts
+
+::: {.callout-warning}
+## Real-World Problem
+
+"Graphics downloaded from the Web are not acceptable for print reproduction as they are low-resolution images (usually 72 dpi)" - European Journal of Orthodontics
+
+JPG creates **blocking artifacts** around sharp edges and text!
+:::
+
+## Format Decision Tree
+
+```
+Publication Figure?
+├─ Yes → Use lossless
+│   ├─ Vector preferred: PDF, EPS, SVG
+│   └─ Raster if needed: PNG, TIFF
+│
+└─ No (Presentation)
+    ├─ Need transparency? → PNG
+    ├─ Photo? → JPG (quality 90+)
+    └─ Simple graphics? → PNG or vector
+```
+
+## Demonstration: Format Comparison
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic()
+
+# Save in different formats
+ggsave("demo_vector.pdf", p, width = 6, height = 4)
+ggsave("demo_png.png", p, width = 6, height = 4, dpi = 300)
+ggsave("demo_lowres.jpg", p, width = 6, height = 4, dpi = 72, quality = 60)
+
+# Now zoom to 400% and compare!
+```
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+- **Default choice**: PDF (vector) for all plots and diagrams
+- **If raster needed**: PNG at 300+ DPI
+- **Never**: JPG for plots with text or lines
+- **Journal submission**: Check guidelines (usually PDF or TIFF)
+:::

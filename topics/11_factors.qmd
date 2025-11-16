@@ -1,0 +1,478 @@
+# Factor Ordering {background-color="#2980b9"}
+
+## The Alphabetical Problem
+
+**R's default behavior:**
+
+```{r}
+#| echo: true
+#| eval: false
+
+categories <- c("High", "Medium", "Low", "Very High")
+factor(categories)
+# Levels: High Low Medium Very High
+
+# Alphabetical! Not logical! 😞
+```
+
+## Visual Impact
+
+::: {.columns}
+::: {.column width="50%"}
+**Alphabetical (bad):**
+
+```
+High
+Low
+Medium
+Very High
+```
+
+Nonsensical!
+:::
+
+::: {.column width="50%"}
+**Logical (good):**
+
+```
+Low
+Medium
+High
+Very High
+```
+
+Makes sense!
+:::
+:::
+
+## Why This Matters
+
+::: {.incremental}
+- **Bar charts**: Random bar order confuses readers
+- **Legends**: Illogical color assignment
+- **Line plots**: Colors don't match expectations
+- **Facets**: Panels in wrong sequence
+- **Boxplots**: Treatments in random order
+:::
+
+## Solution 1: Manual Ordering
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Specify levels explicitly
+data$category <- factor(data$category,
+                       levels = c("Low", "Medium", "High", "Very High"))
+
+# Now plots will use this order!
+ggplot(data, aes(x = category, y = value)) +
+  geom_col()
+```
+
+Full control over order
+
+## Solution 2: forcats Package
+
+**Part of tidyverse, designed for factor manipulation**
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+# Reorder by another variable (e.g., median)
+data %>%
+  mutate(group = fct_reorder(group, value, .fun = median)) %>%
+  ggplot(aes(group, value)) +
+  geom_boxplot()
+
+# Boxplots now ordered by median value!
+```
+
+## fct_reorder(): Order by Another Variable
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Order categories by mean of values
+data %>%
+  mutate(category = fct_reorder(category, value, mean)) %>%
+  ggplot(aes(x = category, y = value, fill = category)) +
+  geom_col() +
+  coord_flip()  # Horizontal bars easier to read
+```
+
+Bars ordered by height!
+
+## fct_infreq(): Order by Frequency
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Order by how common each level is
+ggplot(data, aes(x = fct_infreq(category))) +
+  geom_bar() +
+  labs(x = "Category") +
+  coord_flip()
+
+# Most common category first!
+```
+
+Great for survey data
+
+## fct_rev(): Reverse Order
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Sometimes you want reverse order
+data %>%
+  mutate(category = fct_reorder(category, value) %>% fct_rev()) %>%
+  ggplot(aes(x = category, y = value)) +
+  geom_col()
+
+# Now highest values first instead of last
+```
+
+## fct_relevel(): Move Specific Levels
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Move "Control" to front, keep others in order
+data %>%
+  mutate(treatment = fct_relevel(treatment, "Control")) %>%
+  ggplot(aes(treatment, response)) +
+  geom_boxplot()
+
+# Control always shown first
+```
+
+Common in experimental data!
+
+## Common Use Case: Ordered Bar Chart
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Calculate summary statistics
+summary_data <- data %>%
+  group_by(name) %>%
+  summarise(mean_value = mean(value))
+
+# Plot with bars ordered by height
+ggplot(summary_data,
+       aes(x = fct_reorder(name, mean_value), y = mean_value)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Horizontal bars
+  labs(x = "", y = "Mean Value") +
+  theme_minimal()
+```
+
+Much easier to read than alphabetical!
+
+## Time-Based Ordering
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Months in calendar order (not alphabetical!)
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+data$month <- factor(data$month, levels = months)
+
+# Now plots show Jan, Feb, Mar... not alphabetical!
+ggplot(data, aes(month, value)) +
+  geom_line(group = 1)
+```
+
+## Legend Ordering
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Order legend by maximum y value of each group
+ggplot(data, aes(x = time,
+                 y = value,
+                 color = fct_reorder(group, value, max, .desc = TRUE))) +
+  geom_line(linewidth = 1) +
+  labs(color = "Group") +
+  theme_minimal()
+
+# Legend now shows groups in order of importance!
+```
+
+## Facet Ordering
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Order facets by median value
+data %>%
+  mutate(category = fct_reorder(category, value, median)) %>%
+  ggplot(aes(x = subcategory, y = value)) +
+  geom_boxplot() +
+  facet_wrap(~category) +
+  theme_minimal()
+
+# Facet panels in meaningful order!
+```
+
+## forcats Cheat Sheet
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+fct_reorder(f, x, fun)   # Order by another variable
+fct_infreq(f)            # Order by frequency
+fct_rev(f)               # Reverse current order
+fct_relevel(f, "A", "B") # Move specific levels to front
+fct_recode(f, new = "old") # Rename levels
+fct_lump_n(f, n = 5)     # Keep top n, lump others as "Other"
+fct_explicit_na(f)       # Make NA a visible level
+```
+
+## Real-World Example: Survey Data
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Likert scale survey responses
+survey <- data.frame(
+  response = sample(c("Strongly Disagree", "Disagree", "Neutral",
+                     "Agree", "Strongly Agree"), 100, replace = TRUE)
+)
+
+# Set logical order
+survey$response <- factor(survey$response,
+  levels = c("Strongly Disagree", "Disagree", "Neutral",
+             "Agree", "Strongly Agree"))
+
+# Plot with correct order
+ggplot(survey, aes(x = response)) +
+  geom_bar(fill = "steelblue") +
+  coord_flip() +
+  theme_minimal()
+```
+
+## Real-World Example: Treatment Groups
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+# Clinical trial data
+clinical <- data.frame(
+  treatment = rep(c("Placebo", "Low Dose", "Medium Dose", "High Dose"), each = 25),
+  response = rnorm(100, mean = rep(c(10, 12, 15, 18), each = 25), sd = 3)
+)
+
+# Ensure logical ordering
+clinical$treatment <- factor(clinical$treatment,
+  levels = c("Placebo", "Low Dose", "Medium Dose", "High Dose"))
+
+# Boxplots in dose order
+ggplot(clinical, aes(treatment, response)) +
+  geom_boxplot(fill = "lightblue") +
+  theme_classic()
+```
+
+## Combining Operations
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Combine multiple forcats functions
+data %>%
+  mutate(
+    # 1. Make NA explicit
+    category = fct_explicit_na(category),
+    # 2. Lump rare categories
+    category = fct_lump_n(category, n = 5),
+    # 3. Order by frequency
+    category = fct_infreq(category),
+    # 4. Reverse so most common at top
+    category = fct_rev(category)
+  ) %>%
+  ggplot(aes(category)) +
+  geom_bar()
+```
+
+## Before and After
+
+::: {.columns}
+::: {.column width="50%"}
+**Before (alphabetical):**
+
+```{r}
+#| echo: true
+#| eval: false
+
+ggplot(msleep,
+  aes(x = vore,
+      y = sleep_total)) +
+  geom_boxplot()
+
+# Order: carni, herbi,
+#        insecti, omni
+# Meaningless!
+```
+:::
+
+::: {.column width="50%"}
+**After (by median):**
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(forcats)
+ggplot(msleep,
+  aes(x = fct_reorder(
+           vore,
+           sleep_total,
+           median,
+           na.rm = TRUE),
+      y = sleep_total)) +
+  geom_boxplot()
+
+# Ordered by sleep time!
+```
+:::
+:::
+
+## Common Patterns
+
+### Pattern 1: Sorted bar chart
+
+```{r}
+#| echo: true
+#| eval: false
+
+data %>%
+  count(category) %>%
+  ggplot(aes(x = fct_reorder(category, n), y = n)) +
+  geom_col() +
+  coord_flip()
+```
+
+### Pattern 2: Control group first
+
+```{r}
+#| echo: true
+#| eval: false
+
+data %>%
+  mutate(group = fct_relevel(group, "Control")) %>%
+  ggplot(aes(group, value)) +
+  geom_boxplot()
+```
+
+### Pattern 3: Chronological facets
+
+```{r}
+#| echo: true
+#| eval: false
+
+data %>%
+  mutate(year = fct_reorder(as.character(year), year_numeric)) %>%
+  ggplot(aes(x, y)) +
+  geom_point() +
+  facet_wrap(~year)
+```
+
+## Debugging Factor Issues
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Check current levels
+levels(data$category)
+
+# Check level order
+data$category %>% levels()
+
+# See factor structure
+str(data$category)
+
+# Convert to character if needed
+data$category <- as.character(data$category)
+```
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Always check factor order** before plotting
+2. **Use `fct_reorder()`** for data-driven ordering
+3. **Use manual levels** for logical ordering (Low/Med/High)
+4. **Use `fct_relevel()`** to put control/baseline first
+5. **Use `fct_infreq()`** for categorical data
+6. **Think about your reader** - what order makes sense?
+:::
+
+## Complete Example
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+# Gene expression data by tissue type
+expr_data <- data.frame(
+  tissue = rep(c("Brain", "Heart", "Liver", "Lung", "Kidney"), each = 50),
+  expression = c(rnorm(50, 100, 15), rnorm(50, 50, 10),
+                 rnorm(50, 200, 30), rnorm(50, 75, 12),
+                 rnorm(50, 150, 20))
+)
+
+# Plot with tissues ordered by median expression
+expr_data %>%
+  mutate(tissue = fct_reorder(tissue, expression, median)) %>%
+  ggplot(aes(x = tissue, y = expression, fill = tissue)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_fill_brewer(palette = "Set2") +
+  theme_classic(base_size = 14) +
+  labs(x = "Tissue Type",
+       y = "Expression Level",
+       title = "Gene Expression by Tissue")
+
+# Tissues ordered by median expression level!
+```
+
+## Key Takeaways
+
+::: {.callout-important}
+## Remember
+
+- **R defaults to alphabetical** factor ordering
+- **forcats package** provides powerful ordering tools
+- **`fct_reorder()`** orders by another variable
+- **`fct_infreq()`** orders by frequency
+- **Manual levels** for logical ordering (Low/Med/High)
+- **Always think about the reader** - what order makes sense?
+- **Check factor levels** before creating final plots
+:::

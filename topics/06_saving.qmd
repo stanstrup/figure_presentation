@@ -1,0 +1,348 @@
+# Saving Plots in R {background-color="#34495e"}
+
+## The Graphics Device System
+
+**Every plot needs a "device"**
+
+::: {.fragment}
+Device = where R sends the graphics output
+
+- Screen (RStudio viewer)
+- PDF file
+- PNG file
+- etc.
+:::
+
+## Old Way: Manual Device Management
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|1|2|3"
+
+pdf("myplot.pdf", width = 7, height = 5)
+  plot(x, y)
+dev.off()  # CRITICAL! Must close device
+```
+
+::: {.fragment}
+**Problems:**
+
+- Easy to forget `dev.off()`
+- Verbose
+- Not intuitive
+:::
+
+## Modern Way: ggsave()
+
+**For ggplot2 objects** (recommended!)
+
+```{r}
+#| echo: true
+#| eval: false
+
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+# Saves last plot by default
+ggsave("myplot.pdf")
+
+# Better: explicit plot object
+ggsave("myplot.pdf", plot = p, width = 6, height = 4)
+```
+
+No `dev.off()` needed! ✨
+
+## ggsave() Full Control
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|2|3|4|5|6|7"
+
+ggsave(
+  filename = "figure1.pdf",
+  plot = my_plot,
+  width = 7,
+  height = 5,
+  units = "in",     # or "cm", "mm"
+  dpi = 300,        # for raster formats
+  device = "pdf"    # or "png", "svg", "tiff"
+)
+```
+
+## Format-Specific Settings
+
+### PDF (Vector - Best for Publications)
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Standard PDF
+ggsave("plot.pdf", width = 7, height = 5)
+
+# Better: cairo_pdf for font embedding & Unicode
+ggsave("plot.pdf", width = 7, height = 5, device = cairo_pdf)
+```
+
+::: {.callout-tip}
+Use `cairo_pdf` for better font support!
+:::
+
+## PNG (High Resolution Raster)
+
+```{r}
+#| echo: true
+#| eval: false
+
+# 300 DPI for print
+ggsave("plot.png",
+       width = 7, height = 5,
+       dpi = 300,
+       type = "cairo")  # Better antialiasing
+
+# Size calculation:
+# 7 inches × 300 DPI = 2100 pixels wide
+# 5 inches × 300 DPI = 1500 pixels tall
+```
+
+## TIFF (Journal Requirements)
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Some journals require TIFF
+ggsave("plot.tiff",
+       width = 7,
+       height = 5,
+       dpi = 600,              # High quality
+       compression = "lzw")    # Lossless compression
+```
+
+## SVG (Web and Illustrator)
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Scalable Vector Graphics
+# Great for web, editable in Inkscape/Illustrator
+ggsave("plot.svg", width = 8, height = 6)
+```
+
+::: {.callout-note}
+SVG files can be larger than PDF for complex plots
+:::
+
+## Common Mistakes
+
+::: {.columns}
+::: {.column width="50%"}
+**❌ Wrong**
+
+```{r}
+#| echo: true
+#| eval: false
+
+# No explicit size
+ggsave("plot.pdf")
+
+# Forgetting DPI for raster
+ggsave("plot.png",
+       width = 7, height = 5)
+# Defaults to 72 DPI!
+```
+:::
+
+::: {.column width="50%"}
+**✅ Correct**
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Always specify size
+ggsave("plot.pdf",
+       width = 7, height = 5)
+
+# Always specify DPI for raster
+ggsave("plot.png",
+       width = 7, height = 5,
+       dpi = 300)
+```
+:::
+:::
+
+## Converting PDF to High-Res PNG
+
+**Why?** Keep vector source, generate raster as needed
+
+### Using R (magick package)
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(magick)
+
+# Read PDF and convert
+img <- image_read_pdf("plot.pdf", density = 300)
+image_write(img, "plot.png", format = "png")
+```
+
+### Using R (pdftools package)
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(pdftools)
+
+# Convert to PNG at 300 DPI
+pdf_convert("plot.pdf",
+            format = "png",
+            dpi = 300,
+            filenames = "plot.png")
+```
+
+## Command Line (ImageMagick)
+
+```bash
+# Convert PDF to 300 DPI PNG
+convert -density 300 plot.pdf -quality 100 plot.png
+
+# With better antialiasing
+convert -density 300 -quality 100 -alpha remove \
+        plot.pdf plot.png
+
+# Batch convert all PDFs
+for file in *.pdf; do
+  convert -density 300 "$file" "${file%.pdf}.png"
+done
+```
+
+## Batch Saving Multiple Plots
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Create list of plots
+plots <- list(
+  p1 = ggplot(data1, aes(x, y)) + geom_point(),
+  p2 = ggplot(data2, aes(a, b)) + geom_line(),
+  p3 = ggplot(data3, aes(m, n)) + geom_col()
+)
+
+# Save all at once
+library(purrr)
+iwalk(plots, ~ggsave(
+  filename = paste0(.y, ".pdf"),
+  plot = .x,
+  width = 7, height = 5
+))
+
+# Creates: p1.pdf, p2.pdf, p3.pdf
+```
+
+## File Organization
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Good practice: separate directory
+dir.create("figures", showWarnings = FALSE)
+
+ggsave("figures/figure1.pdf", p1, width = 7, height = 5)
+ggsave("figures/figure1.png", p1, width = 7, height = 5, dpi = 300)
+
+# Save both vector and raster versions!
+```
+
+## Saving Base R Plots
+
+```{r}
+#| echo: true
+#| eval: false
+
+# For non-ggplot2 plots, use device functions
+cairo_pdf("baseplot.pdf", width = 7, height = 5)
+  plot(x, y)
+  abline(lm(y ~ x))
+dev.off()
+
+# Or for PNG
+png("baseplot.png", width = 7, height = 5,
+    units = "in", res = 300, type = "cairo")
+  plot(x, y)
+dev.off()
+```
+
+## Checking Output Quality
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Save plot
+ggsave("test.pdf", p, width = 7, height = 5)
+
+# Check file size
+file.info("test.pdf")$size / 1024  # Size in KB
+
+# View at 100% zoom in PDF viewer
+# Print at actual size to test
+```
+
+## Resolution Guidelines Reminder
+
+| Purpose | Format | DPI |
+|---------|--------|-----|
+| Draft/screen | PNG | 72-150 |
+| Presentation | PNG/PDF | 150-200 |
+| Print journal | PDF/TIFF | 300-600 |
+| High-quality journal | TIFF | 600-1200 |
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Always use ggsave()** for ggplot2 (not manual devices)
+2. **Always specify width, height, units**
+3. **Use cairo_pdf** for PDF output
+4. **Specify DPI** for all raster formats (≥300 for print)
+5. **Save both PDF and PNG** versions
+6. **Organize** figures in dedicated directory
+7. **Test output** by printing at actual size
+:::
+
+## Complete Example
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Create publication-quality plot
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_brewer(palette = "Set1", name = "Cylinders") +
+  theme_classic(base_size = 11) +
+  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
+       title = "Fuel Efficiency by Weight")
+
+# Save for journal (vector)
+ggsave("figures/mpg_analysis.pdf", p,
+       width = 3.5, height = 3, units = "in",
+       device = cairo_pdf)
+
+# Save for presentation (raster)
+ggsave("figures/mpg_analysis.png", p,
+       width = 8, height = 6, units = "in",
+       dpi = 300, type = "cairo")
+```
