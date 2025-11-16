@@ -4,78 +4,288 @@
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+library(ggplot2)
 
 # Default ggplot2 theme
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point()  # Uses theme_gray()
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Default theme_gray()",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme(plot.title = element_text(face = "bold"))
 ```
 
-::: {.fragment}
 **Problems:**
 
 - Gray background (wastes ink, unprofessional)
 - Too much "chart junk"
 - Not publication-ready
-:::
 
-## Built-in Clean Themes
+## Built-in Theme: theme_bw()
 
 ```{r}
 #| echo: true
-#| eval: false
-#| code-line-numbers: "|1-2|4-5|7-8|10-11"
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-theme_bw()        # White background, black border
-                  # Good for publications
-
-theme_classic()   # No gridlines, clean axes
-                  # Very minimal, classic journals
-
-theme_minimal()   # Subtle gridlines, modern
-                  # Good balance of clean + reference
-
-theme_void()      # Blank canvas
-                  # For custom designs, maps
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "theme_bw() - White background, black border",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_bw() +
+  theme(plot.title = element_text(face = "bold"))
 ```
 
-## Visual Comparison
+**Good for publications** - Clean with reference gridlines
 
-::: {.columns}
-::: {.column width="50%"}
-**theme_gray() (default)**
-
-- Gray background
-- White gridlines
-- Bulky appearance
-:::
-
-::: {.column width="50%"}
-**theme_classic()**
-
-- White background
-- No gridlines
-- Clean, traditional
-:::
-:::
-
-## Specialized Theme Packages
+## Built-in Theme: theme_classic()
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-# ggthemes package
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "theme_classic() - No gridlines, clean axes",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_classic() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+**Very minimal** - Traditional journal style
+
+## Built-in Theme: theme_minimal()
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "theme_minimal() - Subtle gridlines, modern",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+**Good balance** - Clean with subtle reference lines
+
+## Built-in Theme: theme_void()
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(title = "theme_void() - Blank canvas") +
+  theme_void() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "right")
+```
+
+**For custom designs** - Maps, minimalist graphics
+
+## Side-by-Side Comparison
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 10
+
+library(ggplot2)
+library(patchwork)
+
+# Create base plot
+base_plot <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(aes(color = factor(cyl)), size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 0.5) +
+  labs(x = "Weight", y = "MPG", color = "Cyl")
+
+# Apply different themes
+p1 <- base_plot + theme_gray() + labs(title = "theme_gray()\n(default)")
+p2 <- base_plot + theme_bw() + labs(title = "theme_bw()")
+p3 <- base_plot + theme_classic() + labs(title = "theme_classic()")
+p4 <- base_plot + theme_minimal() + labs(title = "theme_minimal()")
+p5 <- base_plot + theme_linedraw() + labs(title = "theme_linedraw()")
+p6 <- base_plot + theme_light() + labs(title = "theme_light()")
+
+(p1 | p2 | p3) / (p4 | p5 | p6) +
+  plot_annotation(
+    title = "Built-in ggplot2 Themes Comparison",
+    theme = theme(plot.title = element_text(size = 18, face = "bold"))
+  )
+```
+
+## Publication-Ready Package: cowplot
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# cowplot - designed for publications
+# install.packages("cowplot")
+library(cowplot)
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "cowplot::theme_cowplot() - Publication ready",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_cowplot() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+```
+
+::: {.callout-tip}
+## cowplot Package
+
+**Designed specifically for publication-quality figures**
+
+- Clean, professional appearance
+- Optimized for combining multiple plots
+- Great default sizes and spacings
+- `plot_grid()` for multi-panel figures
+:::
+
+## Publication Package: ggpubr
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# ggpubr - publication-ready themes and statistical annotations
+# install.packages("ggpubr")
+library(ggpubr)
+
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot(aes(fill = factor(cyl)), alpha = 0.7) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs(title = "ggpubr - Publication ready with stats",
+       x = "Cylinders",
+       y = "Miles Per Gallon") +
+  theme_pubr() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold")) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+::: {.callout-tip}
+## ggpubr Package
+
+**Publication-ready themes + statistical tests**
+
+- `theme_pubr()` - Clean publication theme
+- `theme_pubclean()` - Even more minimal
+- Built-in statistical comparison functions
+- Easy to add p-values and significance brackets
+:::
+
+## Specialized Themes: ggthemes
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 10
+
+# ggthemes - many professional themes
+# install.packages("ggthemes")
 library(ggthemes)
-theme_few()         # Stephen Few's design principles
-theme_tufte()       # Edward Tufte minimalist
-theme_economist()   # The Economist magazine style
-theme_fivethirtyeight()  # FiveThirtyEight website
+library(patchwork)
 
-# hrbrthemes package
-library(hrbrthemes)
-theme_ipsum()       # Modern professional typography
+base_plot <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(aes(color = factor(cyl)), size = 2) +
+  labs(x = "Weight", y = "MPG", color = "Cyl")
+
+p1 <- base_plot + theme_few() +
+  labs(title = "theme_few()\n(Stephen Few design)")
+
+p2 <- base_plot + theme_tufte() +
+  labs(title = "theme_tufte()\n(Edward Tufte minimalist)")
+
+p3 <- base_plot + theme_economist() + scale_color_economist() +
+  labs(title = "theme_economist()\n(The Economist style)")
+
+p4 <- base_plot + theme_fivethirtyeight() + scale_color_fivethirtyeight() +
+  labs(title = "theme_fivethirtyeight()\n(538 website)")
+
+p5 <- base_plot + theme_wsj() + scale_color_wsj() +
+  labs(title = "theme_wsj()\n(Wall Street Journal)")
+
+p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
+  labs(title = "theme_gdocs()\n(Google Docs style)")
+
+(p1 | p2 | p3) / (p4 | p5 | p6) +
+  plot_annotation(
+    title = "ggthemes Package: Professional Themes",
+    theme = theme(plot.title = element_text(size = 18, face = "bold"))
+  )
 ```
+
+## Modern Typography: hrbrthemes
+
+```{r}
+#| echo: true
+#| eval: false
+#| fig-width: 8
+#| fig-height: 5
+
+# hrbrthemes - modern professional typography
+# install.packages("hrbrthemes")
+library(hrbrthemes)
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "hrbrthemes::theme_ipsum() - Modern typography",
+       subtitle = "Clean, professional, with excellent fonts",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_ipsum() +
+  scale_color_ipsum()
+```
+
+::: {.callout-note}
+## hrbrthemes Package
+
+**Modern professional typography**
+
+- Uses high-quality fonts (requires font installation)
+- `theme_ipsum()` - Modern, clean, professional
+- `theme_ipsum_rc()` - Roboto Condensed font
+- Excellent for presentations and reports
+- May require: `extrafont::font_import()`
+:::
 
 ## Setting Global Theme
 
@@ -83,36 +293,70 @@ theme_ipsum()       # Modern professional typography
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 4
+
+library(ggplot2)
+library(patchwork)
 
 # At top of script
 theme_set(theme_bw(base_size = 12))
 
-# Now all plots use theme_bw
-ggplot(mtcars, aes(wt, mpg)) + geom_point()
-ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
-# Both use theme_bw automatically!
+# Now all plots use theme_bw automatically
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  labs(title = "Plot 1")
+
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point(aes(color = Species)) +
+  labs(title = "Plot 2")
+
+p3 <- ggplot(faithful, aes(eruptions)) +
+  geom_histogram(bins = 30, fill = "steelblue") +
+  labs(title = "Plot 3")
+
+p1 + p2 + p3 +
+  plot_annotation(
+    title = "All plots use the same theme automatically!",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
 ```
 
 ## Custom Theme for Publications
 
 ```{r}
 #| echo: true
-#| eval: false
-#| code-line-numbers: "|1|3-4|5|6|7-8"
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
+# Define your publication theme
 my_pub_theme <- theme_classic(base_size = 11) +
   theme(
     # Axis styling
     axis.line = element_line(linewidth = 0.5),
     axis.ticks = element_line(linewidth = 0.5),
-    text = element_text(family = "Arial"),
+    axis.title = element_text(size = 12, face = "bold"),
     # Bold titles
-    plot.title = element_text(face = "bold", size = 14)
+    plot.title = element_text(face = "bold", size = 14),
+    # Legend
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    # Background
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
   )
 
 # Apply to plot
-ggplot(mtcars, aes(wt, mpg)) + geom_point() + my_pub_theme
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Custom Publication Theme",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  my_pub_theme
 ```
 
 ## Font Considerations
@@ -123,60 +367,152 @@ ggplot(mtcars, aes(wt, mpg)) + geom_point() + my_pub_theme
 
 # Check available fonts
 library(extrafont)
-font_import()  # First time only
-fonts()        # List available
+font_import()  # First time only (takes a while)
+fonts()        # List available fonts
 
 # Use in theme
 theme_classic(base_family = "Arial") +
   theme(
-    plot.title = element_text(family = "Arial", face = "bold")
+    plot.title = element_text(family = "Arial", face = "bold"),
+    axis.title = element_text(family = "Arial")
   )
 ```
 
 ::: {.callout-note}
-Many journals prefer Arial, Helvetica, or Times New Roman
+## Font Preferences by Journal
+
+Many journals prefer specific fonts:
+
+- **Arial** - Most common, widely accepted
+- **Helvetica** - Classic choice
+- **Times New Roman** - Traditional journals
+- **Calibri** - Modern alternative
+
+Check journal author guidelines!
 :::
 
 ## Theme Elements You Can Customize
 
-::: {.incremental}
-- `axis.title` - Axis label text
-- `axis.text` - Axis tick labels
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+library(ggplot2)
+
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~gear, labeller = label_both) +
+  labs(title = "Customized Theme Elements",
+       x = "Cylinders",
+       y = "Miles Per Gallon",
+       fill = "Cylinders") +
+  theme_minimal() +
+  theme(
+    # Axis elements
+    axis.title = element_text(size = 12, face = "bold", color = "navy"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    # Legend
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    legend.background = element_rect(fill = "gray95", color = "gray50"),
+    # Panel
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    # Facet strips
+    strip.background = element_rect(fill = "steelblue", color = "navy"),
+    strip.text = element_text(color = "white", face = "bold", size = 11),
+    # Plot
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+**Customizable elements:**
+
+- `axis.title`, `axis.text` - Axis labels
 - `legend.position` - "top", "bottom", "left", "right", "none"
 - `panel.grid` - Gridlines
-- `plot.background` - Entire plot area
-- `strip.background` - Facet labels
-:::
+- `plot.background`, `panel.background` - Backgrounds
+- `strip.background`, `strip.text` - Facet labels
 
 ## Consistent Multi-Plot Style
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
 
-# Define once
-pub_theme <- theme_classic(base_size = 11)
-theme_set(pub_theme)
+library(ggplot2)
+library(patchwork)
+
+# Define publication theme
+pub_theme <- theme_classic(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold")
+  )
 
 # Create multiple plots with same style
-p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
-p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
-p3 <- ggplot(faithful, aes(eruptions)) + geom_histogram()
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue", size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  labs(title = "Panel A: Scatter plot", x = "Weight", y = "MPG") +
+  pub_theme
+
+p2 <- ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Panel B: Boxplot", x = "Species", y = "Sepal Length") +
+  pub_theme +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set2")
+
+p3 <- ggplot(faithful, aes(eruptions)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  labs(title = "Panel C: Histogram", x = "Eruption Duration", y = "Count") +
+  pub_theme
 
 # Combine into multi-panel figure
-library(patchwork)
-(p1 | p2) / p3
-# All panels have consistent appearance!
+p1 + p2 + p3 +
+  plot_annotation(
+    title = "Multi-panel figure with consistent theme",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
 ```
+
+**All panels have consistent, professional appearance!**
 
 ## Quick Reference
 
-| Theme | Use Case |
-|-------|----------|
-| `theme_classic()` | Traditional journals, minimal |
-| `theme_bw()` | Modern publications, gridlines |
-| `theme_minimal()` | Presentations, reports |
-| `theme_void()` | Maps, custom designs |
+| Theme | Use Case | Package |
+|-------|----------|---------|
+| `theme_classic()` | Traditional journals, minimal | ggplot2 |
+| `theme_bw()` | Modern publications, gridlines | ggplot2 |
+| `theme_minimal()` | Presentations, reports | ggplot2 |
+| `theme_void()` | Maps, custom designs | ggplot2 |
+| `theme_cowplot()` | Publication multi-panels | cowplot |
+| `theme_pubr()` | Publication with stats | ggpubr |
+| `theme_few()` | Data visualization best practices | ggthemes |
+| `theme_tufte()` | Minimalist Tufte style | ggthemes |
+| `theme_ipsum()` | Modern typography | hrbrthemes |
+
+## Package Installation Reference
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Install publication-ready theme packages
+install.packages("cowplot")    # Publication multi-panel figures
+install.packages("ggpubr")     # Publication themes + stats
+install.packages("ggthemes")   # Professional magazine/journal themes
+install.packages("hrbrthemes") # Modern typography (requires fonts)
+install.packages("patchwork")  # Combine multiple plots easily
+```
 
 ## Recommendations
 
@@ -184,7 +520,68 @@ library(patchwork)
 ## Best Practices
 
 1. **Never use default** `theme_gray()` for publications
+   - Gray background wastes ink and looks unprofessional
+
 2. **Set global theme** at start of script for consistency
+   - `theme_set(theme_classic())` applies to all subsequent plots
+
 3. **Match journal style** - check published figures
+   - Look at recent issues of your target journal
+   - Note font choices, gridline presence, color schemes
+
 4. **Keep it simple** - less chart junk = better
+   - Remove unnecessary gridlines
+   - Minimize non-data ink
+
+5. **Use publication packages** for multi-panel figures
+   - `cowplot::plot_grid()` for complex layouts
+   - `patchwork` for intuitive combining syntax
+   - `ggpubr::ggarrange()` for automatic labeling
+
+6. **Test in grayscale** - themes should work in B&W too
+   - Print preview before submission
 :::
+
+## Complete Example: Before & After
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
+
+library(ggplot2)
+library(patchwork)
+
+# Before: Default theme
+before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "BEFORE: Default theme_gray()",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders")
+# Uses default theme_gray()
+
+# After: Publication theme
+after <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "AFTER: Publication-ready theme",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_classic(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold"),
+    legend.position = "top"
+  ) +
+  scale_color_brewer(palette = "Set1")
+
+before + after +
+  plot_annotation(
+    title = "Theme Transformation: Default → Publication Ready",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```

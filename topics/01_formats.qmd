@@ -11,106 +11,339 @@
 - Web/online?
 :::
 
-## Vector vs. Raster
+## What is a Vector Image?
 
-::: {.columns}
-::: {.column width="50%"}
-**Vector (PDF, EPS, SVG)**
+**Vector graphics use mathematical descriptions**
 
-- Mathematical descriptions
-- Infinitely scalable
-- Small file size
-- Perfect for: plots, diagrams
+```r
+# Instead of storing pixels, vectors store instructions:
+# "Draw a line from point (0,0) to (10,10)"
+# "Create a circle with center (5,5) and radius 3"
+# "Fill this path with RGB color (255,0,0)"
+```
+
+::: {.callout-note}
+## Infinite Resolution
+Because vectors are mathematical formulas, they can be scaled to **any size** without losing quality. Zoom to 1000% and the text is still crisp!
 :::
 
-::: {.column width="50%"}
-**Raster (PNG, TIFF, JPG)**
+## What is a Raster Image?
 
-- Grid of pixels
-- Resolution-dependent (DPI)
-- Large file sizes
-- Perfect for: photos
+**Raster graphics are grids of colored pixels**
+
+```r
+# Stores actual pixel values:
+# Pixel[1,1] = RGB(255, 128, 64)
+# Pixel[1,2] = RGB(254, 127, 63)
+# Pixel[1,3] = RGB(253, 126, 62)
+# ... millions of pixels for high-resolution images
+```
+
+::: {.callout-warning}
+## Resolution Dependent
+Raster images have **fixed resolution**. Zoom too much and you see individual pixels (pixelation).
 :::
-:::
 
-## Resolution Matters
+## Vector vs. Raster Comparison
 
-| Use Case | Minimum DPI |
-|----------|-------------|
-| Screen viewing | 72-96 |
-| Print publication | 300 |
-| High-quality journal | 600-1200 |
-| Poster (viewed from distance) | 150-300 |
+| Aspect | Vector (PDF, SVG, EPS) | Raster (PNG, TIFF, JPG) |
+|--------|------------------------|-------------------------|
+| **Definition** | Mathematical formulas | Grid of pixels |
+| **Scalability** | Infinite resolution | Fixed resolution (DPI) |
+| **File Size** | Small (formulas compact) | Large (all pixels stored) |
+| **Best For** | Plots, diagrams, text | Photos, screenshots |
+| **Editability** | Easy to edit paths | Pixel-level editing only |
+| **Text Quality** | Always crisp | Can become blurry |
 
-## Compression: Lossless vs. Lossy
+## Demonstration: Vector vs. Raster
 
 ```{r}
 #| echo: true
-#| eval: false
-#| code-line-numbers: "|2|5|8"
+#| eval: true
+#| fig-width: 8
+#| fig-height: 3
 
-# NEVER use JPG for line plots
-ggsave("plot.jpg", quality = 100)  # Still lossy!
+library(ggplot2)
 
-# Use PNG for raster graphics
-ggsave("plot.png", dpi = 300)
+# Create a plot with text and lines
+p <- ggplot(data.frame(x = 1:5, y = c(2, 4, 3, 5, 4)),
+            aes(x, y)) +
+  geom_line(linewidth = 2, color = "steelblue") +
+  geom_point(size = 5, color = "darkred") +
+  annotate("text", x = 3, y = 3.5,
+           label = "TEXT QUALITY MATTERS",
+           size = 8, fontface = "bold") +
+  theme_classic(base_size = 16) +
+  labs(title = "Vector vs Raster: Notice Text Clarity",
+       x = "X Axis Label", y = "Y Axis Label")
 
-# Use PDF for vector graphics (best for publications)
-ggsave("plot.pdf", device = cairo_pdf)
+# Save as vector (PDF)
+ggsave("demo_vector.pdf", p, width = 8, height = 3, device = cairo_pdf)
+
+# Save as high-res PNG (300 DPI)
+ggsave("demo_highres.png", p, width = 8, height = 3, dpi = 300)
+
+# Save as low-res PNG (72 DPI) - simulate poor quality
+ggsave("demo_lowres.png", p, width = 8, height = 3, dpi = 72)
+
+# Save as JPEG (lossy compression)
+ggsave("demo_jpeg.jpg", p, width = 8, height = 3, dpi = 150, quality = 75)
+
+p
 ```
 
+**Try zooming to 400% in each file!**
+
+- PDF: Text stays crisp at any zoom level
+- Low-res PNG: Text becomes pixelated
+- JPEG: Notice compression artifacts around text
+
+## Container Formats: PDF and TIFF
+
+::: {.callout-important}
+## PDF and TIFF are Containers!
+
+Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
+
+- **PDF**: Can contain vector graphics, raster images, or both
+- **TIFF**: Usually raster, but can embed vector data
+:::
+
+**TIFF Compression Options:**
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **Uncompressed** | No compression (huge files) | Archival |
+| **LZW** | Lossless compression | Publications |
+| **ZIP** | Lossless compression | Publications |
+| **JPEG** | Lossy compression | Web (avoid for science) |
+
+## Resolution Requirements
+
+| Use Case | Minimum DPI | Recommended |
+|----------|-------------|-------------|
+| Screen viewing | 72-96 | 150 |
+| Print publication | 300 | 300-600 |
+| High-quality journal | 600-1200 | 600 |
+| Poster (arm's length) | 150 | 150-300 |
+
+## Format Selection: Decision Tree
+
+```{mermaid}
+%%| fig-width: 10
+flowchart TD
+    A[What type of image?] --> B{Photo or<br/>screenshot?}
+    B -->|Yes| C{Where will it<br/>be used?}
+    B -->|No: Created<br/>figure/plot| D{Publication<br/>or presentation?}
+
+    C -->|Publication| E[High-res TIFF<br/>or PNG<br/>300+ DPI]
+    C -->|Presentation/Web| F[JPEG or PNG<br/>150 DPI]
+
+    D -->|Publication| G{Vector support?}
+    D -->|Presentation| H{Need<br/>transparency?}
+
+    G -->|Yes| I[PDF preferred<br/>or SVG]
+    G -->|No| J[EPS format<br/>widely accepted]
+    G -->|Raster only| K[PNG 300 DPI<br/>or TIFF LZW]
+
+    H -->|Yes| L[PNG<br/>transparent BG]
+    H -->|No| M[PNG or PDF<br/>quick & dirty]
+
+    style I fill:#2ecc71
+    style J fill:#27ae60
+    style K fill:#f39c12
+    style E fill:#3498db
+    style L fill:#9b59b6
+    style M fill:#95a5a6
+```
+
+## Quick and Dirty: PNG
+
+::: {.columns}
+::: {.column width="50%"}
+**For rapid work:**
+
+```r
+# PNG is lossless and fast
+ggsave("quick_plot.png",
+       dpi = 150)
+```
+
+✓ Lossless compression
+✓ Fast to generate
+✓ Works everywhere
+✓ Good for drafts
+:::
+
+::: {.column width="50%"}
+**For publications:**
+
+```r
+# Use vector formats
+ggsave("publication.pdf",
+       device = cairo_pdf)
+```
+
+✓ Infinite resolution
+✓ Small file size
+✓ Professional quality
+✓ Easy to edit
+:::
+:::
+
 ## JPEG Compression Artifacts
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+library(ggplot2)
+library(patchwork)
+
+# Create a plot with sharp edges and text
+create_test_plot <- function(title) {
+  ggplot(data.frame(x = c(0, 1, 1, 0, 0),
+                    y = c(0, 0, 1, 1, 0)),
+         aes(x, y)) +
+    geom_polygon(fill = "white", color = "black", linewidth = 2) +
+    annotate("text", x = 0.5, y = 0.5,
+             label = "SHARP TEXT",
+             size = 12, fontface = "bold") +
+    theme_void() +
+    theme(plot.background = element_rect(fill = "gray90", color = NA),
+          plot.title = element_text(size = 10, hjust = 0.5)) +
+    labs(title = title) +
+    coord_fixed()
+}
+
+p1 <- create_test_plot("Original Vector")
+p2 <- create_test_plot("After JPEG Compression\n(Notice artifacts)")
+
+# Save and reload to show compression
+ggsave("temp_jpeg.jpg", p2, width = 4, height = 4, dpi = 150, quality = 60)
+
+p1 + p2 +
+  plot_annotation(
+    title = "JPEG Creates Artifacts Around Sharp Edges",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
 
 ::: {.callout-warning}
 ## Real-World Problem
 
-"Graphics downloaded from the Web are not acceptable for print reproduction as they are low-resolution images (usually 72 dpi)" - European Journal of Orthodontics
+"Graphics downloaded from the Web are not acceptable for print reproduction as they are low-resolution images (usually 72 dpi)"
+
+— European Journal of Orthodontics
 
 JPG creates **blocking artifacts** around sharp edges and text!
 :::
 
-## Format Decision Tree
-
-```
-Publication Figure?
-├─ Yes → Use lossless
-│   ├─ Vector preferred: PDF, EPS, SVG
-│   └─ Raster if needed: PNG, TIFF
-│
-└─ No (Presentation)
-    ├─ Need transparency? → PNG
-    ├─ Photo? → JPG (quality 90+)
-    └─ Simple graphics? → PNG or vector
-```
-
-## Demonstration: Format Comparison
+## File Format Comparison Code
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
 
+# Generate comparison files
 library(ggplot2)
 
-p <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  theme_classic()
+comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", color = "darkred", linewidth = 1.5) +
+  annotate("text", x = 4, y = 30,
+           label = "Zoom this text to 400%!",
+           size = 6, fontface = "bold") +
+  theme_classic(base_size = 14) +
+  labs(title = "Vector vs Raster Comparison",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon")
 
-# Save in different formats
-ggsave("demo_vector.pdf", p, width = 6, height = 4)
-ggsave("demo_png.png", p, width = 6, height = 4, dpi = 300)
-ggsave("demo_lowres.jpg", p, width = 6, height = 4, dpi = 72, quality = 60)
+# Vector format - always crisp
+ggsave("compare_vector.pdf", comparison_plot,
+       width = 6, height = 4, device = cairo_pdf)
 
-# Now zoom to 400% and compare!
+# High-res PNG - good quality
+ggsave("compare_highres.png", comparison_plot,
+       width = 6, height = 4, dpi = 300)
+
+# Low-res PNG - pixelated when zoomed
+ggsave("compare_lowres.png", comparison_plot,
+       width = 6, height = 4, dpi = 72)
+
+# JPEG - compression artifacts
+ggsave("compare_jpeg.jpg", comparison_plot,
+       width = 6, height = 4, dpi = 150, quality = 60)
+
+comparison_plot
 ```
+
+**Files generated - compare them yourself:**
+
+- `compare_vector.pdf` - Infinite zoom, always crisp
+- `compare_highres.png` - Good for most uses (300 DPI)
+- `compare_lowres.png` - Pixelated when zoomed (72 DPI)
+- `compare_jpeg.jpg` - Artifacts around lines and text
+
+## EPS Format: The Alternative Vector
+
+::: {.callout-tip}
+## When PDF is Not Supported
+
+Some journals don't accept PDF but **DO accept EPS** (Encapsulated PostScript):
+
+```r
+# Save as EPS instead of PDF
+ggsave("figure.eps",
+       width = 6, height = 4,
+       device = cairo_ps)
+```
+
+**EPS is widely accepted** in academic publishing when PDF is rejected.
+
+- Nature journals: ✓ EPS accepted
+- Science: ✓ EPS accepted
+- Many medical journals: ✓ EPS preferred over PDF
+:::
 
 ## Recommendations
 
 ::: {.callout-tip}
 ## Best Practices
 
-- **Default choice**: PDF (vector) for all plots and diagrams
-- **If raster needed**: PNG at 300+ DPI
-- **Never**: JPG for plots with text or lines
-- **Journal submission**: Check guidelines (usually PDF or TIFF)
+1. **Default choice**: PDF (vector) for all plots and diagrams
+   - Use `device = cairo_pdf` for best quality
+
+2. **If PDF not accepted**: EPS format (also vector)
+   - Use `device = cairo_ps`
+
+3. **If raster needed**: PNG at 300+ DPI
+   - Lossless compression
+   - Supports transparency
+
+4. **Never**: JPG for plots with text or lines
+   - Lossy compression creates artifacts
+   - Only for photographs
+
+5. **Quick drafts**: PNG at 150 DPI
+   - Fast and lossless
+   - Good for sharing in progress
+
+6. **Journal submission**: Check guidelines
+   - Usually: PDF, EPS, or high-res TIFF
+   - Rarely: PNG (but accepted)
+   - Never: JPG for line art
 :::
+
+## Summary: Format Cheat Sheet
+
+| Format | Type | Compression | Best Use | Avoid For |
+|--------|------|-------------|----------|-----------|
+| **PDF** | Vector | Lossless | Publications, plots | Photos |
+| **EPS** | Vector | None | Publications | Modern web |
+| **SVG** | Vector | Text-based | Web graphics | Print journals |
+| **PNG** | Raster | Lossless | Screenshots, drafts | Large images |
+| **TIFF** | Raster | Lossless/Lossy | Journals, archival | Presentations |
+| **JPEG** | Raster | Lossy | Photos only | Any plots/diagrams |
