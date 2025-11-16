@@ -75,7 +75,7 @@ test_all_topics_parallel <- function(n_cores = NULL) {
   if (.Platform$OS.type == "windows") {
     # Windows: use PSOCK cluster
     cl <- parallel::makeCluster(n_cores)
-    parallel::clusterExport(cl, "render_one")
+    parallel::clusterExport(cl, "render_one", envir = environment())
     parallel::clusterEvalQ(cl, library(quarto))
     results_list <- parallel::parLapply(cl, topic_files, render_one)
     parallel::stopCluster(cl)
