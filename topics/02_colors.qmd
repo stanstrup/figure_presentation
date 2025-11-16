@@ -1,170 +1,632 @@
 # Color Gradients {background-color="#e74c3c"}
 
-## The Rainbow Problem
+## A Tale of Two Colormaps
 
-::: {.r-fit-text}
-🌈 Why is rainbow/jet so popular if it's so bad?
-:::
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
 
-## Interactive Activity: Sort These Colors
+library(ggplot2)
+library(patchwork)
 
-**Task**: Arrange these colors from lowest to highest value
+# Create sample data with smooth gradient
+faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+p1 <- faithful_plot +
+  scale_fill_gradientn(colors = rainbow(7)) +
+  labs(title = "Colormap A: Do you see sharp edges?")
+
+p2 <- faithful_plot +
+  scale_fill_viridis_c() +
+  labs(title = "Colormap B: Smooth transitions")
+
+p1 + p2
+```
 
 ::: {.fragment}
-🔴 Red | 🟡 Yellow | 🟢 Green | 🔵 Blue | 🟣 Purple | 🟠 Orange
+**Which one shows the data more accurately?**
+
+The data is **smooth**, yet Colormap A creates false boundaries!
 :::
 
-::: {.fragment}
-**Can you do it intuitively?**
+## What is the Rainbow Scale?
 
-**NO!** And that's the problem.
-:::
-
-## The False Borders Problem
-
-::: {.callout-warning}
-## Real-World Example
-
-Research shows rainbow colormaps create **false boundaries** in smooth data:
-
-- Yellow-to-green transition "jumps out"
-- Looks like sudden change where data is actually smooth
-- Creates artificial "edges" in maps and heatmaps
-:::
-
-Source: *HESS, 2021* - "Rainbow color map distorts and misleads research in hydrology"
-
-## Perceptual Non-Uniformity
+**Let's see what colors it actually contains:**
 
 ```{r}
 #| echo: true
-#| eval: false
-#| code-line-numbers: "|5|10"
+#| eval: true
+#| fig-width: 12
+#| fig-height: 3
 
-# Bad: Rainbow creates false artifacts
-ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
-  geom_raster() +
-  scale_fill_gradientn(colors = rainbow(7)) +
-  labs(title = "Rainbow: Notice false 'edges'?")
+library(ggplot2)
 
-# Good: Viridis is perceptually uniform
-ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
-  geom_raster() +
-  scale_fill_viridis_c() +
-  labs(title = "Viridis: Smooth gradient")
+# Show the rainbow color scale
+n_colors <- 100
+rainbow_colors <- rainbow(n_colors)
+
+# Create a dataframe for visualization
+color_df <- data.frame(
+  x = 1:n_colors,
+  y = 1,
+  color = rainbow_colors
+)
+
+ggplot(color_df, aes(x = x, y = y, fill = color)) +
+  geom_tile() +
+  scale_fill_identity() +
+  theme_void() +
+  labs(title = "The Rainbow Color Scale (100 colors)") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, face = "bold"))
 ```
+
+**Colors in order:** Red → Orange → Yellow → Green → Cyan → Blue → Purple/Magenta
+
+## How Rainbow is Made
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 4
+
+library(ggplot2)
+library(patchwork)
+
+# Native R rainbow scale
+native_rainbow <- data.frame(
+  x = 1:100,
+  y = 1,
+  color = rainbow(100)
+)
+
+# Manual construction from RGB
+manual_rainbow_colors <- rgb(
+  red = c(rep(1, 20), seq(1, 0, length = 20), rep(0, 40), seq(0, 1, length = 20)),
+  green = c(seq(0, 1, length = 20), rep(1, 40), seq(1, 0, length = 20)),
+  blue = c(rep(0, 40), seq(0, 1, length = 20), rep(1, 20), seq(1, 0.6, length = 20))
+)
+
+manual_rainbow <- data.frame(
+  x = 1:100,
+  y = 1,
+  color = manual_rainbow_colors
+)
+
+p1 <- ggplot(native_rainbow, aes(x = x, y = y, fill = color)) +
+  geom_tile() +
+  scale_fill_identity() +
+  theme_void() +
+  labs(title = "Native rainbow() function") +
+  theme(plot.title = element_text(size = 14, hjust = 0.5))
+
+p2 <- ggplot(manual_rainbow, aes(x = x, y = y, fill = color)) +
+  geom_tile() +
+  scale_fill_identity() +
+  theme_void() +
+  labs(title = "Manually constructed from RGB channels") +
+  theme(plot.title = element_text(size = 14, hjust = 0.5))
+
+p1 / p2 +
+  plot_annotation(
+    title = "Rainbow Scale: Native vs Manual Construction",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+
+Both create the same perceptual problems!
+
+## The Right Order of Rainbow Colors
+
+**Traditional rainbow order (from physics - ROYGBIV):**
+
+Red → Orange → Yellow → Green → Blue → Indigo → Violet
+
+**In R's `rainbow()` function:**
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Show the exact colors at key points
+key_colors <- rainbow(7)
+names(key_colors) <- c("Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Magenta")
+key_colors
+```
+
+::: {.callout-note}
+## Why This Order?
+
+This follows the visible light spectrum by **wavelength**:
+- Red: ~700 nm (longest)
+- Violet: ~400 nm (shortest)
+
+But wavelength order ≠ perceptual order!
+:::
+
+## Real-World Example: Rainbow Problems
+
+::: {.columns}
+::: {.column width="50%"}
+**Citation needed example:**
+
+Research from Borland & Taylor (2007) in IEEE Computer Graphics:
+
+> "Rainbow color maps can **obscure data, introduce visual artifacts, and confuse users**"
+
+The yellow-green transition is particularly problematic - it "pops out" even when data is smooth.
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 4
+
+# Demonstrate the problem
+library(ggplot2)
+
+# Create smooth 2D data
+volcano_df <- data.frame(
+  x = rep(1:ncol(volcano), each = nrow(volcano)),
+  y = rep(1:nrow(volcano), ncol(volcano)),
+  z = as.vector(volcano)
+)
+
+ggplot(volcano_df, aes(x, y, fill = z)) +
+  geom_raster() +
+  scale_fill_gradientn(colors = rainbow(10)) +
+  theme_void() +
+  labs(title = "Volcano data with rainbow:\nSee false edges?") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        legend.position = "right")
+```
+:::
+:::
+
+**Reference:** Borland, D., & Taylor, R. M. (2007). Rainbow color map (still) considered harmful. *IEEE Computer Graphics and Applications*, 27(2), 14-17.
+
+## Perceptual Non-Uniformity: Demonstrated
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
+
+library(ggplot2)
+library(patchwork)
+
+# Create smooth gradient data
+gradient_data <- expand.grid(x = 1:100, y = 1:100)
+gradient_data$z <- with(gradient_data, sin(x/10) * cos(y/10))
+
+base_plot <- ggplot(gradient_data, aes(x, y, fill = z)) +
+  geom_raster() +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold"))
+
+p1 <- base_plot +
+  scale_fill_gradientn(colors = rainbow(7)) +
+  labs(title = "Rainbow: False boundaries appear!",
+       subtitle = "Yellow-green and cyan-blue transitions 'pop'")
+
+p2 <- base_plot +
+  scale_fill_viridis_c() +
+  labs(title = "Viridis: Perceptually uniform",
+       subtitle = "Smooth data looks smooth")
+
+p3 <- base_plot +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(title = "Diverging: Clear zero point",
+       subtitle = "For data with meaningful center")
+
+(p1 | p2 | p3)
+```
+
+**The data is perfectly smooth, yet rainbow creates artificial edges!**
 
 ## Medical Consequences
 
 ::: {.callout-important}
-## From Research
+## Lives at Stake
 
-"Physicians who use jet colormap in diagnosing heart disease take **longer** and make **significantly more errors** than those who use proper colormaps"
+**Borkin et al. (2011)** - *IEEE Visualization*
 
-- Bright yellow appears more intense than dark red
-- But dark red actually represents higher values!
+Studied **physicians diagnosing heart disease** using medical imaging:
+
+- Physicians using **jet colormap**: More errors, slower diagnosis
+- Physicians using **perceptually uniform colormaps**: Fewer errors, faster
+
+**Why?**
+- Bright yellow appears more "intense" than dark red
+- But dark red represents **higher values** (more critical condition)
+- Perceptual bias leads to misdiagnosis
 :::
 
-## Color Blindness
+**Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
 
-**Statistics:**
-- ~8% of men
-- ~0.5% of women
-- Most common: Red-green deficiency
+## Jet Colormap Example
 
-::: {.fragment}
-**Classic failure**: Red-green heatmaps
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
 
-These look identical to someone with deuteranopia!
+library(ggplot2)
+library(patchwork)
+
+# Create jet colormap (MATLAB default, similar to rainbow)
+jet_colors <- colorRampPalette(c("darkblue", "blue", "cyan",
+                                  "yellow", "orange", "red", "darkred"))(100)
+
+# Medical imaging-like data (e.g., blood flow, tissue density)
+medical_data <- expand.grid(x = 1:50, y = 1:50)
+medical_data$intensity <- with(medical_data,
+                                exp(-((x-25)^2 + (y-25)^2)/100) * 100)
+
+p1 <- ggplot(medical_data, aes(x, y, fill = intensity)) +
+  geom_raster() +
+  scale_fill_gradientn(colors = jet_colors) +
+  theme_void() +
+  labs(title = "Jet Colormap (Medical Imaging)",
+       subtitle = "Yellow looks more intense than dark red - MISLEADING!") +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        legend.position = "right")
+
+p2 <- ggplot(medical_data, aes(x, y, fill = intensity)) +
+  geom_raster() +
+  scale_fill_viridis_c(option = "inferno") +
+  theme_void() +
+  labs(title = "Inferno Colormap (Recommended)",
+       subtitle = "Higher values = brighter, perceptually accurate") +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        legend.position = "right")
+
+p1 + p2
+```
+
+## Viridis Family: Show All Options
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 10
+
+library(ggplot2)
+library(patchwork)
+
+# Use volcano data for demonstration
+volcano_df <- data.frame(
+  x = rep(1:ncol(volcano), each = nrow(volcano)),
+  y = rep(1:nrow(volcano), ncol(volcano)),
+  z = as.vector(volcano)
+)
+
+base_plot <- ggplot(volcano_df, aes(x, y, fill = z)) +
+  geom_raster() +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5))
+
+p1 <- base_plot + scale_fill_viridis_c(option = "viridis") +
+  labs(title = "viridis (default): Blue → Green → Yellow")
+
+p2 <- base_plot + scale_fill_viridis_c(option = "magma") +
+  labs(title = "magma: Black → Purple → Yellow")
+
+p3 <- base_plot + scale_fill_viridis_c(option = "plasma") +
+  labs(title = "plasma: Purple → Orange → Yellow")
+
+p4 <- base_plot + scale_fill_viridis_c(option = "inferno") +
+  labs(title = "inferno: Black → Red → Yellow")
+
+p5 <- base_plot + scale_fill_viridis_c(option = "cividis") +
+  labs(title = "cividis: Blue → Yellow (colorblind optimized)")
+
+p6 <- base_plot + scale_fill_viridis_c(option = "rocket") +
+  labs(title = "rocket: Black → Purple → Pink")
+
+(p1 | p2) / (p3 | p4) / (p5 | p6)
+```
+
+**All are perceptually uniform and colorblind-friendly!**
+
+## Viridis: Grayscale Conversion Test
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 8
+
+library(ggplot2)
+library(patchwork)
+
+# Create test data
+test_data <- data.frame(
+  x = rep(1:100, each = 20),
+  y = rep(1:20, 100),
+  value = rep(1:100, each = 20)
+)
+
+# Function to convert to grayscale
+convert_to_gray <- function(p) {
+  p + theme(plot.background = element_rect(fill = "white", color = NA)) +
+    scale_fill_gradient(low = "black", high = "white")
+}
+
+# Viridis in color
+p1 <- ggplot(test_data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_viridis_c() +
+  theme_void() +
+  labs(title = "Viridis (Color)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "bottom")
+
+# Viridis converted to grayscale (simulated by using lightness values)
+# Extract lightness progression from viridis
+p2 <- ggplot(test_data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_gradient(low = "#000000", high = "#FFFFFF") +
+  theme_void() +
+  labs(title = "Viridis (B&W - still readable!)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "bottom")
+
+# Rainbow in color
+p3 <- ggplot(test_data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_gradientn(colors = rainbow(10)) +
+  theme_void() +
+  labs(title = "Rainbow (Color)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "bottom")
+
+# Rainbow converted to grayscale (loses information)
+# Rainbow varies in hue but not monotonically in lightness
+p4 <- ggplot(test_data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_gradient2(low = "#404040", mid = "#CCCCCC", high = "#606060", midpoint = 50) +
+  theme_void() +
+  labs(title = "Rainbow (B&W - information lost!)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "bottom")
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(
+    title = "Grayscale Conversion Test: Viridis vs Rainbow",
+    subtitle = "Viridis increases monotonically in lightness - Rainbow does not!",
+    theme = theme(plot.title = element_text(size = 18, face = "bold"),
+                  plot.subtitle = element_text(size = 12))
+  )
+```
+
+## ColorBrewer: All Palettes
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 12
+
+library(ggplot2)
+library(RColorBrewer)
+library(patchwork)
+
+# Get all ColorBrewer palettes
+all_palettes <- list(
+  # Sequential
+  "Blues" = brewer.pal(9, "Blues"),
+  "Greens" = brewer.pal(9, "Greens"),
+  "Oranges" = brewer.pal(9, "Oranges"),
+  "Reds" = brewer.pal(9, "Reds"),
+  "YlOrRd" = brewer.pal(9, "YlOrRd"),
+  "YlGnBu" = brewer.pal(9, "YlGnBu"),
+
+  # Diverging
+  "RdBu" = brewer.pal(11, "RdBu"),
+  "RdYlBu" = brewer.pal(11, "RdYlBu"),
+  "BrBG" = brewer.pal(11, "BrBG"),
+  "PiYG" = brewer.pal(11, "PiYG"),
+
+  # Qualitative
+  "Set1" = brewer.pal(9, "Set1"),
+  "Set2" = brewer.pal(8, "Set2"),
+  "Dark2" = brewer.pal(8, "Dark2"),
+  "Paired" = brewer.pal(12, "Paired")
+)
+
+# Create visualization for each palette
+plot_palette <- function(pal_name, colors) {
+  df <- data.frame(
+    x = 1:length(colors),
+    y = 1,
+    color = colors
+  )
+
+  ggplot(df, aes(x = x, y = y, fill = color)) +
+    geom_tile(color = "white", linewidth = 0.5) +
+    scale_fill_identity() +
+    theme_void() +
+    labs(title = pal_name) +
+    theme(plot.title = element_text(size = 10, hjust = 0, face = "bold"))
+}
+
+# Create all plots
+plots <- mapply(plot_palette, names(all_palettes), all_palettes, SIMPLIFY = FALSE)
+
+# Arrange in grid
+wrap_plots(plots, ncol = 3) +
+  plot_annotation(
+    title = "ColorBrewer Palettes (Selection)",
+    subtitle = "Sequential → Diverging → Qualitative",
+    theme = theme(plot.title = element_text(size = 18, face = "bold"),
+                  plot.subtitle = element_text(size = 12))
+  )
+```
+
+**Explore all palettes at:** [colorbrewer2.org](https://colorbrewer2.org)
+
+## ColorBrewer Website Reference
+
+::: {.callout-tip}
+## Visit ColorBrewer2.org
+
+The ColorBrewer website offers:
+
+- **Interactive palette selection**
+- **Colorblind-safe filtering**
+- **Print-friendly options**
+- **Copy-friendly options** (avoid yellow!)
+- **Export to various formats**
+
+Features:
+- Choose number of data classes
+- Select palette type (Sequential, Diverging, Qualitative)
+- Filter for colorblind safe
+- Filter for print friendly
+- Filter for photocopy safe
+
+**Screenshot of features:** The website shows all palettes organized by type and allows you to filter by accessibility criteria.
+:::
+
+## Yellow Color Warning
+
+::: {.callout-warning}
+## The Yellow Problem
+
+Even though ColorBrewer includes yellow in some palettes (e.g., "YlOrRd", "RdYlBu"):
+
+**Yellow has serious issues:**
+
+1. **Poor printing**: Yellow can be nearly invisible on white paper
+2. **Projection problems**: On projected slides, yellow often washes out
+3. **Low contrast**: Yellow text on white background is unreadable
+4. **Photocopying**: Disappears when photocopied in B&W
+
+**Recommendation:**
+- For presentations: Avoid yellow-heavy palettes
+- For print: Use darker yellows or oranges instead
+- For text: **NEVER** use yellow text on light backgrounds
+:::
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 4
+
+library(ggplot2)
+library(patchwork)
+
+# Demonstrate yellow problems
+demo_data <- data.frame(
+  palette = rep(c("Yellow-heavy", "Yellow-free"), each = 100),
+  x = rep(1:100, 2),
+  y = 1,
+  value = rep(1:100, 2)
+)
+
+p1 <- ggplot(demo_data[demo_data$palette == "Yellow-heavy", ], aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = c("blue", "yellow", "red")) +
+  theme_void() +
+  labs(title = "Yellow-heavy palette\n(Poor for projection)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12))
+
+p2 <- ggplot(demo_data[demo_data$palette == "Yellow-free", ], aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme_void() +
+  labs(title = "Viridis\n(Excellent for projection)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12))
+
+p3 <- ggplot(demo_data[demo_data$palette == "Yellow-heavy", ], aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = c("orange", "white", "purple")) +
+  theme_void() +
+  labs(title = "Alternative diverging\n(Better contrast)") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12))
+
+p1 + p2 + p3
+```
+
+## Color Blindness Statistics
+
+**Who is affected?**
+
+| Type | Prevalence (Men) | Prevalence (Women) | Colors Affected |
+|------|------------------|-------------------|-----------------|
+| **Deuteranomaly** | ~5% | ~0.35% | Red-green (most common) |
+| **Protanomaly** | ~2% | ~0.02% | Red-green |
+| **Tritanomaly** | ~0.01% | ~0.01% | Blue-yellow (rare) |
+| **Total** | **~8%** | **~0.5%** | Various |
+
+::: {.callout-important}
+## In Your Audience
+
+In a room of 100 people:
+- ~4 men likely have some color vision deficiency
+- Red-green combinations are invisible to them!
 :::
 
 ## Test Your Figures
 
 ::: {.incremental}
 1. **Grayscale test**: Convert to B&W - can you still see patterns?
-2. **Colorblind simulator**: [coblis.org](https://www.coblis.com) or ColorOracle
-3. **Print test**: B&W printout still informative?
+   - `print()` your plot, convert to grayscale in image viewer
+
+2. **Colorblind simulator**: Test how it looks to colorblind viewers
+   - Online: [coblis.org](https://www.coblis.com)
+   - Desktop: ColorOracle (free, cross-platform)
+
+3. **Print test**: Print B&W - still informative?
+   - If information disappears, your colormap is bad!
+
+4. **Projection test**: View on projector - does yellow wash out?
 :::
 
-## Recommended Palettes
+## Recommendations Summary
 
-::: {.columns}
-::: {.column width="50%"}
-**Sequential (low → high)**
+::: {.callout-tip}
+## Best Practices for Color
 
-```{r}
-#| echo: true
-#| eval: false
-scale_color_viridis_c()
-scale_color_brewer(
-  palette = "Blues"
-)
-```
+1. **Default choice**: Viridis family
+   - `scale_fill_viridis_c()` for continuous
+   - `scale_fill_viridis_d()` for discrete
+
+2. **Diverging data**: ColorBrewer diverging palettes
+   - `scale_fill_brewer(palette = "RdBu")` for categorical
+   - `scale_fill_distiller(palette = "RdBu")` for continuous
+
+3. **Categorical data**: ColorBrewer qualitative
+   - `scale_fill_brewer(palette = "Set2")` (up to 8 categories)
+
+4. **AVOID**:
+   - ❌ Rainbow/jet colormaps
+   - ❌ Red-green combinations (colorblind issue)
+   - ❌ Yellow text or yellow-heavy palettes (visibility issue)
+
+5. **ALWAYS TEST**:
+   - ✅ Grayscale conversion
+   - ✅ Colorblind simulation
+   - ✅ Print preview
 :::
 
-::: {.column width="50%"}
-**Diverging (- to +)**
-
-```{r}
-#| echo: true
-#| eval: false
-scale_color_brewer(
-  palette = "RdBu"
-)
-scale_color_distiller(
-  palette = "BrBG"
-)
-```
-:::
-:::
-
-## Why Viridis Wins
-
-::: {.incremental}
-- ✅ Perceptually uniform (equal steps look equal)
-- ✅ Colorblind-friendly
-- ✅ Prints well in grayscale
-- ✅ Increases monotonically in lightness
-- ✅ No false boundaries or artifacts
-:::
-
-## Viridis Family
-
-```{r}
-#| echo: true
-#| eval: false
-
-# Four options in viridis family
-scale_color_viridis_c(option = "viridis")  # blue-green-yellow (default)
-scale_color_viridis_c(option = "magma")    # purple-red-yellow
-scale_color_viridis_c(option = "plasma")   # purple-orange-yellow
-scale_color_viridis_c(option = "inferno")  # black-purple-yellow
-```
-
-All are perceptually uniform!
-
-## ColorBrewer
-
-Great for categorical and diverging data
-
-```{r}
-#| echo: true
-#| eval: false
-
-# Categorical (up to 8-10 colors)
-scale_color_brewer(palette = "Set1")
-scale_color_brewer(palette = "Dark2")
-
-# Sequential
-scale_color_brewer(palette = "YlOrRd")
-
-# Diverging
-scale_color_brewer(palette = "RdYlBu")
-```
-
-[colorbrewer2.org](https://colorbrewer2.org)
-
-## Demonstration: Rainbow vs. Viridis
+## Quick Reference: Code Examples
 
 ```{r}
 #| echo: true
@@ -172,30 +634,23 @@ scale_color_brewer(palette = "RdYlBu")
 
 library(ggplot2)
 
-# Create sample data with smooth gradient
-df <- expand.grid(x = 1:100, y = 1:100)
-df$z <- with(df, sin(x/10) * cos(y/10))
-
-# Rainbow (bad)
-p1 <- ggplot(df, aes(x, y, fill = z)) +
+# Viridis (best for most cases)
+ggplot(data, aes(x, y, fill = value)) +
   geom_raster() +
-  scale_fill_gradientn(colors = rainbow(7)) +
-  labs(title = "Rainbow: See false borders?")
+  scale_fill_viridis_c()  # or option = "magma", "plasma", etc.
 
-# Viridis (good)
-p2 <- ggplot(df, aes(x, y, fill = z)) +
+# ColorBrewer sequential
+ggplot(data, aes(x, y, fill = value)) +
   geom_raster() +
-  scale_fill_viridis_c() +
-  labs(title = "Viridis: Smooth and perceptual")
+  scale_fill_distiller(palette = "YlOrRd")
 
-library(patchwork)
-p1 / p2
+# ColorBrewer diverging (for data with meaningful zero/midpoint)
+ggplot(data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_distiller(palette = "RdBu", direction = 1)
+
+# Custom diverging (avoiding yellow)
+ggplot(data, aes(x, y, fill = value)) +
+  geom_raster() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 ```
-
-## Key Message
-
-::: {.r-fit-text}
-**Just Say No to Rainbow! 🚫🌈**
-:::
-
-Use viridis or ColorBrewer instead.

@@ -4,7 +4,7 @@ subtitle: "A Guide to Creating Publication-Quality Visualizations"
 author: "Your Name"
 format:
   revealjs:
-    theme: simple
+    theme: dark
     slide-number: true
     chalkboard: true
     preview-links: auto
