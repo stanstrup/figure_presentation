@@ -1,0 +1,309 @@
+# Heatmap Scaling {background-color="#e67e22"}
+
+## The Outlier Problem
+
+**Scenario**: Gene expression data
+
+- 99% of values: -2 to +2
+- 1 outlier gene: +20
+
+::: {.fragment}
+**What happens with default scaling?**
+
+Color scale: -20 to +20
+
+Result: Everything looks the same color! 😱
+:::
+
+## Visual Example
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Simulate data with outlier
+set.seed(123)
+data <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
+data[5, 5] <- 20  # One extreme outlier
+
+# Default heatmap - terrible!
+library(pheatmap)
+pheatmap(data)  # All data compressed to narrow range
+```
+
+::: {.fragment}
+99% of your data is invisible due to 1 outlier!
+:::
+
+## The Problem Illustrated
+
+::: {.columns}
+::: {.column width="50%"}
+**Without Outlier Handling**
+
+- Scale: -20 to +20
+- Most data: -2 to +2
+- Uses only 20% of color range
+- Real patterns invisible
+:::
+
+::: {.column width="50%"}
+**With Proper Scaling**
+
+- Scale: -3 to +3 (capped)
+- Most data: -2 to +2
+- Uses 100% of color range
+- Patterns visible!
+:::
+:::
+
+## The Dendrogram Scaling Trap
+
+::: {.callout-warning}
+## Hidden Technical Issue
+
+**Critical R bug**: Functions like `heatmap()`, `heatmap.2()`, and `heatplot()` have a dangerous inconsistency:
+
+- The `scale` parameter affects **color visualization**
+- But **NOT** dendrogram calculation!
+
+**Result**: Dendrograms cluster on unscaled data while colors show scaled data!
+:::
+
+## Why This Matters
+
+```{r}
+#| echo: true
+#| eval: false
+
+# This looks correct but is misleading!
+heatmap.2(data, scale = "column")
+
+# Dendrograms calculated on RAW data
+# Colors displayed on SCALED data
+# Clustering doesn't match what you see!
+```
+
+## The Correct Approach: heat.clust
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(massageR)  # or source the function
+
+# Pre-scale data AND calculate dendrograms on scaled data
+z <- heat.clust(data,
+                scaledim = "column",  # Scale by column
+                zlim = c(-3, 3),      # Cap at ±3
+                reorder = c("column", "row"))
+
+# Now pass pre-computed dendrograms
+heatmap.2(z$data,
+          Rowv = z$Rowv,
+          Colv = z$Colv,
+          scale = "none")  # Already scaled!
+
+# Dendrograms and colors now consistent!
+```
+
+Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps.html)
+
+## Solution 1: Standard Deviation Cutoffs
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|2-3|5-6"
+
+# Cap at ±2 SD
+mean_val <- mean(data, na.rm = TRUE)
+sd_val <- sd(data, na.rm = TRUE)
+
+data_capped <- pmin(pmax(data, mean_val - 2*sd_val),
+                    mean_val + 2*sd_val)
+
+pheatmap(data_capped,
+         main = "Values capped at ±2 SD")
+```
+
+Most common: ±2 or ±3 SD cutoff
+
+## Solution 2: Quantile-Based
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Cap at 5th and 95th percentiles
+lower <- quantile(data, 0.05, na.rm = TRUE)
+upper <- quantile(data, 0.95, na.rm = TRUE)
+
+data_capped <- pmin(pmax(data, lower), upper)
+
+pheatmap(data_capped,
+         main = "Values capped at 5-95 percentiles")
+```
+
+Robust to extreme outliers
+
+## Solution 3: Manual Breaks
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Define your own color breaks
+breaks <- seq(-3, 3, length.out = 100)
+
+pheatmap(data,
+         breaks = breaks,
+         main = "Custom breaks: -3 to +3")
+
+# Values outside range automatically assigned to extremes
+```
+
+Full control over color mapping
+
+## Solution 4: Log Transformation
+
+**For positive values only** (e.g., counts, intensities)
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Log transform data
+data_log <- log10(data + 1)  # +1 to handle zeros
+
+pheatmap(data_log,
+         main = "Log10 transformed")
+
+# Or with ggplot2
+ggplot(df, aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c(trans = "log10")
+```
+
+## Annotating Capped Values
+
+**Best practice**: Indicate when values are capped
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(ComplexHeatmap)
+
+# Create annotation for outliers
+outliers <- data > 3 | data < -3
+
+Heatmap(data_capped,
+        name = "Expression",
+        cell_fun = function(j, i, x, y, width, height, fill) {
+          if(outliers[i, j]) {
+            grid.text("*", x, y)  # Mark outliers with asterisk
+          }
+        })
+```
+
+## Color Scale Considerations
+
+::: {.callout-important}
+## Critical Elements
+
+1. **Always include color scale bar** with numeric labels
+2. **Center at meaningful value** (often zero for diverging data)
+3. **Label extremes if capped**: "<-2 SD" or ">+3"
+4. **Use appropriate palette**:
+   - Diverging for data with meaningful zero (red-white-blue)
+   - Sequential for one-directional (viridis)
+:::
+
+## Diverging Scales for Centered Data
+
+```{r}
+#| echo: true
+#| eval: false
+
+# When zero is meaningful (fold-change, difference, etc.)
+library(RColorBrewer)
+
+pheatmap(data_capped,
+         color = colorRampPalette(
+           brewer.pal(11, "RdBu")
+         )(100),
+         breaks = seq(-3, 3, length.out = 101))
+
+# Zero = white, negative = blue, positive = red
+```
+
+## Real-World Example
+
+```{r}
+#| echo: true
+#| eval: false
+
+# RNA-seq data
+library(DESeq2)
+
+# Log fold changes: often have outliers
+# Cap at ±4 for visualization
+results$log2FC_capped <- pmin(pmax(results$log2FoldChange, -4), 4)
+
+# Make heatmap
+library(ComplexHeatmap)
+Heatmap(log2FC_capped,
+        col = circlize::colorRamp2(
+          c(-4, 0, 4),
+          c("blue", "white", "red")
+        ),
+        heatmap_legend_param = list(
+          title = "log2 FC",
+          at = c(-4, -2, 0, 2, 4),
+          labels = c("≤-4", "-2", "0", "2", "≥4")
+        ))
+```
+
+## When NOT to Cap
+
+::: {.callout-warning}
+## Don't cap blindly!
+
+- If outliers are **biologically meaningful** (rare events)
+- Small datasets where each value matters
+- When you want to highlight extreme values
+
+**Alternative**: Use asterisks or separate panel for outliers
+:::
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Inspect data distribution** before making heatmap
+2. **Cap at 2-3 SD** for large datasets with outliers
+3. **Use quantiles** (5-95%) for robustness
+4. **Always annotate** what you did: "Values capped at ±2 SD"
+5. **Include color scale** with actual values
+6. **Test different scales** to ensure you're not hiding real patterns
+:::
+
+## Comparison: Before and After
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(patchwork)
+
+# Before: with outlier
+p1 <- pheatmap(data, main = "Uncapped: Pattern lost", silent = TRUE)
+
+# After: outlier capped
+p2 <- pheatmap(data_capped, main = "Capped at ±2 SD", silent = TRUE)
+
+# Side-by-side comparison
+p1[[4]] | p2[[4]]
+```

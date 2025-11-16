@@ -1,0 +1,289 @@
+# Post-Export Editing {background-color="#16a085"}
+
+## Why Edit After Export?
+
+**Legitimate uses:**
+
+::: {.incremental}
+- Combine multiple plots into multi-panel figures (A, B, C labels)
+- Fine-tune alignment and spacing
+- Add annotations, arrows, or highlights
+- Adjust layout without re-running analysis
+:::
+
+## Vector Editing Tools
+
+::: {.columns}
+::: {.column width="50%"}
+**Adobe Illustrator**
+
+- Industry standard
+- Commercial ($$$)
+- Best PDF/EPS import
+- Precise typography
+:::
+
+::: {.column width="50%"}
+**Inkscape**
+
+- Free & open source
+- Excellent alternative
+- Native SVG format
+- Cross-platform
+:::
+:::
+
+## Export for Editability
+
+```{r}
+#| echo: true
+#| eval: false
+
+# For Inkscape: use SVG
+ggsave("plot.svg", p, width = 7, height = 5)
+
+# For Illustrator: use PDF with embedded fonts
+ggsave("plot.pdf", p, width = 7, height = 5,
+       device = cairo_pdf)
+
+# Both preserve vector graphics
+# Text remains editable
+```
+
+## Common Editing Tasks
+
+### Adding Panel Labels
+
+::: {.fragment}
+**Typical style:**
+
+- Position: Top-left of each panel
+- Font: Arial or Helvetica, **Bold**
+- Size: 14-16 pt
+- Label: **A**, **B**, **C**, etc.
+:::
+
+## Aligning Multiple Plots
+
+**In Illustrator/Inkscape:**
+
+1. Import all plots
+2. Select all panels
+3. Use alignment tools:
+   - Align left edges
+   - Distribute vertically with equal spacing
+4. Ensure axis widths match for stacked plots
+
+## What NOT to Edit
+
+::: {.callout-warning}
+## Keep These in R!
+
+**Never manually edit:**
+
+- Data points themselves
+- Axis scales or ranges
+- Statistical elements (error bars, fit lines, p-values)
+- Color mappings
+
+**Why?** Breaks reproducibility! Always regenerate from R.
+:::
+
+## The Golden Rule
+
+::: {.r-fit-text}
+R scripts = Source of Truth
+:::
+
+::: {.fragment}
+Illustrator/Inkscape = Final polish only
+:::
+
+## Workflow Example
+
+```{r}
+#| echo: true
+#| eval: false
+
+# 1_analysis.R - Data analysis and initial plots
+p1 <- ggplot(data, aes(x, y)) + geom_point()
+p2 <- ggplot(data, aes(a, b)) + geom_line()
+
+# 2_export_figures.R - Standardized export
+ggsave("figures/panel_a.pdf", p1, width = 3.5, height = 3)
+ggsave("figures/panel_b.pdf", p2, width = 3.5, height = 3)
+
+# 3_combine_in_illustrator.ai - Manual combining
+# - Add panel labels (A, B)
+# - Align panels
+# - Add title/caption
+
+# 4_README.txt - Document manual edits
+# "Added bold panel labels (A, B) in Arial 16pt"
+```
+
+## Maintaining Reproducibility
+
+**Document your workflow:**
+
+```
+project/
+├── data/
+├── scripts/
+│   ├── 01_analysis.R
+│   ├── 02_generate_figures.R
+├── figures/
+│   ├── raw/           # Direct from R
+│   ├── panel_a.pdf
+│   ├── panel_b.pdf
+│   └── final/         # After Illustrator
+│       └── figure1_combined.pdf
+└── README.md          # Documents manual edits
+```
+
+## Inkscape Basics
+
+**Opening PDFs:**
+
+1. File → Open → Select PDF
+2. Choose "Import via Poppler" for best results
+3. Each plot element is now editable
+
+**Useful tools:**
+
+- Selection tool (F1): Move and resize
+- Text tool (F8): Edit or add text
+- Align and Distribute (Ctrl+Shift+A)
+
+## Illustrator Basics
+
+**Opening PDFs:**
+
+1. File → Open → Select PDF
+2. Plots import as grouped objects
+3. Use Direct Selection Tool (A) to edit individual elements
+
+**Useful features:**
+
+- Artboards: Multiple figures in one file
+- Symbols: Reuse panel labels
+- Guides: Align elements precisely
+
+## Combining Plots: R vs. Post-Processing
+
+::: {.columns}
+::: {.column width="50%"}
+**In R (patchwork)**
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(patchwork)
+p1 + p2 +
+  plot_annotation(
+    tag_levels = 'A'
+  )
+```
+
+Fully reproducible!
+:::
+
+::: {.column width="50%"}
+**In Illustrator**
+
+- More layout control
+- Easier fine-tuning
+- Less reproducible
+- Good for final polish
+:::
+:::
+
+## When to Use Each Approach
+
+**Use R (patchwork/cowplot):**
+
+- Simple multi-panel layouts
+- Need to regenerate frequently
+- Sharing code with collaborators
+
+**Use Illustrator/Inkscape:**
+
+- Complex layouts with mixed content
+- Final publication figure
+- Need pixel-perfect alignment
+- Adding non-data elements (photos, diagrams)
+
+## Avoiding Common Pitfalls
+
+::: {.callout-warning}
+## Watch Out!
+
+1. **Don't convert to raster**: Keep as vector
+2. **Don't edit data**: Only layout/labels
+3. **Save source files**: Keep .ai or .svg
+4. **Export final as PDF**: For submission
+5. **Document changes**: Note what was done manually
+:::
+
+## Example: Multi-Panel Figure
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Create 4 plots in R
+p1 <- ggplot(data, aes(x, y)) + geom_point() +
+      theme_classic(base_size = 10)
+p2 <- ggplot(data, aes(a, b)) + geom_line() +
+      theme_classic(base_size = 10)
+p3 <- ggplot(data, aes(m, n)) + geom_col() +
+      theme_classic(base_size = 10)
+p4 <- ggplot(data, aes(p, q)) + geom_boxplot() +
+      theme_classic(base_size = 10)
+
+# Export each
+walk2(list(p1, p2, p3, p4),
+      paste0("panel_", letters[1:4], ".pdf"),
+      ~ggsave(.y, .x, width = 3, height = 3))
+
+# Then combine in Illustrator/Inkscape
+# 2×2 layout with labels A-D
+```
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Keep R scripts** as authoritative source
+2. **Export individual panels** as separate files
+3. **Use vector formats** (PDF, SVG)
+4. **Document manual edits** in README
+5. **Save layered source files** (.ai, .svg)
+6. **Final export as PDF** for submission
+7. **When in doubt, regenerate from R**
+:::
+
+## Tools for Combining in R
+
+**Instead of post-processing:**
+
+```{r}
+#| echo: true
+#| eval: false
+
+# patchwork
+library(patchwork)
+(p1 | p2) / (p3 | p4) + plot_annotation(tag_levels = 'A')
+
+# cowplot
+library(cowplot)
+plot_grid(p1, p2, p3, p4, labels = "AUTO", ncol = 2)
+
+# gridExtra
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+```
+
+All fully reproducible!

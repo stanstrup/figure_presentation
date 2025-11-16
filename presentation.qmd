@@ -1,0 +1,119 @@
+---
+title: "Academic Figures: Common Pitfalls and Best Practices"
+subtitle: "A Guide to Creating Publication-Quality Visualizations"
+author: "Your Name"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    chalkboard: true
+    preview-links: auto
+    footer: "Academic Figure Pitfalls"
+    code-fold: false
+    code-overflow: wrap
+    fig-width: 8
+    fig-height: 5
+---
+
+# Introduction {background-color="#2c3e50"}
+
+## Why This Matters
+
+::: {.incremental}
+- Figures are often the first (and sometimes only) thing readers look at
+- Poor quality figures can undermine excellent research
+- Journal rejections due to technical figure issues
+- Reproducibility and transparency in science
+:::
+
+## What We'll Cover
+
+::: {.columns}
+::: {.column width="50%"}
+1. File Formats
+2. Color Gradients
+3. Themes & Styling
+4. Heatmap Scaling
+5. Text Sizing
+6. Saving Plots
+:::
+
+::: {.column width="50%"}
+7. Post-Processing
+8. PowerPoint Import
+9. Rendering Issues
+10. Interactive Plots
+11. Factor Ordering
+:::
+:::
+
+---
+
+{{< include topics/01_formats.qmd >}}
+
+---
+
+{{< include topics/02_colors.qmd >}}
+
+---
+
+{{< include topics/03_themes.qmd >}}
+
+---
+
+{{< include topics/04_heatmaps.qmd >}}
+
+---
+
+{{< include topics/05_sizing.qmd >}}
+
+---
+
+{{< include topics/06_saving.qmd >}}
+
+---
+
+{{< include topics/07_editing.qmd >}}
+
+---
+
+{{< include topics/08_powerpoint.qmd >}}
+
+---
+
+{{< include topics/09_rendering.qmd >}}
+
+---
+
+{{< include topics/10_interactive.qmd >}}
+
+---
+
+{{< include topics/11_factors.qmd >}}
+
+---
+
+# Summary {background-color="#2c3e50"}
+
+## Key Takeaways
+
+::: {.incremental}
+- **Format**: Vector for plots (PDF/SVG), high-res raster for photos (PNG/TIFF)
+- **Colors**: Avoid rainbow, use viridis/ColorBrewer, test for colorblindness
+- **Sizing**: Set text sizes explicitly for final dimensions
+- **Saving**: Use `ggsave()` with proper DPI and dimensions
+- **Reproducibility**: Keep R scripts as source of truth
+:::
+
+## Resources
+
+- ColorBrewer: [colorbrewer2.org](https://colorbrewer2.org)
+- Colorblind simulator: [coblis.org](https://www.coblis.com)
+- "Fundamentals of Data Visualization" by Claus Wilke
+- ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
+
+## Questions? {background-color="#2c3e50"}
+
+Contact: your.email@institution.edu
+
+Slides: github.com/yourrepo

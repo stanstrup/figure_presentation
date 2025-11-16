@@ -1,0 +1,190 @@
+# ggplot2 Themes {background-color="#9b59b6"}
+
+## The Default Problem
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Default ggplot2 theme
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point()  # Uses theme_gray()
+```
+
+::: {.fragment}
+**Problems:**
+
+- Gray background (wastes ink, unprofessional)
+- Too much "chart junk"
+- Not publication-ready
+:::
+
+## Built-in Clean Themes
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|1-2|4-5|7-8|10-11"
+
+theme_bw()        # White background, black border
+                  # Good for publications
+
+theme_classic()   # No gridlines, clean axes
+                  # Very minimal, classic journals
+
+theme_minimal()   # Subtle gridlines, modern
+                  # Good balance of clean + reference
+
+theme_void()      # Blank canvas
+                  # For custom designs, maps
+```
+
+## Visual Comparison
+
+::: {.columns}
+::: {.column width="50%"}
+**theme_gray() (default)**
+
+- Gray background
+- White gridlines
+- Bulky appearance
+:::
+
+::: {.column width="50%"}
+**theme_classic()**
+
+- White background
+- No gridlines
+- Clean, traditional
+:::
+:::
+
+## Specialized Theme Packages
+
+```{r}
+#| echo: true
+#| eval: false
+
+# ggthemes package
+library(ggthemes)
+theme_few()         # Stephen Few's design principles
+theme_tufte()       # Edward Tufte minimalist
+theme_economist()   # The Economist magazine style
+theme_fivethirtyeight()  # FiveThirtyEight website
+
+# hrbrthemes package
+library(hrbrthemes)
+theme_ipsum()       # Modern professional typography
+```
+
+## Setting Global Theme
+
+**Set once, apply to all plots:**
+
+```{r}
+#| echo: true
+#| eval: false
+
+# At top of script
+theme_set(theme_bw(base_size = 12))
+
+# Now all plots use theme_bw
+ggplot(data, aes(x, y)) + geom_point()
+ggplot(data2, aes(a, b)) + geom_line()
+# Both use theme_bw automatically!
+```
+
+## Custom Theme for Publications
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|1|3-4|5|6|7-8"
+
+my_pub_theme <- theme_classic(base_size = 11) +
+  theme(
+    # Axis styling
+    axis.line = element_line(linewidth = 0.5),
+    axis.ticks = element_line(linewidth = 0.5),
+    text = element_text(family = "Arial"),
+    # Bold titles
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+# Apply to plot
+ggplot(data, aes(x, y)) + geom_point() + my_pub_theme
+```
+
+## Font Considerations
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Check available fonts
+library(extrafont)
+font_import()  # First time only
+fonts()        # List available
+
+# Use in theme
+theme_classic(base_family = "Arial") +
+  theme(
+    plot.title = element_text(family = "Arial", face = "bold")
+  )
+```
+
+::: {.callout-note}
+Many journals prefer Arial, Helvetica, or Times New Roman
+:::
+
+## Theme Elements You Can Customize
+
+::: {.incremental}
+- `axis.title` - Axis label text
+- `axis.text` - Axis tick labels
+- `legend.position` - "top", "bottom", "left", "right", "none"
+- `panel.grid` - Gridlines
+- `plot.background` - Entire plot area
+- `strip.background` - Facet labels
+:::
+
+## Consistent Multi-Plot Style
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Define once
+pub_theme <- theme_classic(base_size = 11)
+theme_set(pub_theme)
+
+# Create multiple plots with same style
+p1 <- ggplot(data1, aes(x, y)) + geom_point()
+p2 <- ggplot(data2, aes(a, b)) + geom_line()
+p3 <- ggplot(data3, aes(c, d)) + geom_col()
+
+# Combine into multi-panel figure
+library(patchwork)
+(p1 | p2) / p3
+# All panels have consistent appearance!
+```
+
+## Quick Reference
+
+| Theme | Use Case |
+|-------|----------|
+| `theme_classic()` | Traditional journals, minimal |
+| `theme_bw()` | Modern publications, gridlines |
+| `theme_minimal()` | Presentations, reports |
+| `theme_void()` | Maps, custom designs |
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Never use default** `theme_gray()` for publications
+2. **Set global theme** at start of script for consistency
+3. **Match journal style** - check published figures
+4. **Keep it simple** - less chart junk = better
+:::
