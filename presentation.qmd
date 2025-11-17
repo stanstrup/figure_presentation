@@ -5,6 +5,7 @@ author: "Your Name"
 format:
   revealjs:
     theme: dark
+    css: custom.css
     slide-number: true
     chalkboard: true
     preview-links: auto
