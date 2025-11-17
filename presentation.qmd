@@ -1,6 +1,5 @@
 ---
 title: "Academic Figures: Common Pitfalls and Best Practices"
-subtitle: "A Guide to Creating Publication-Quality Visualizations"
 author: "Your Name"
 format:
   revealjs:
@@ -14,6 +13,12 @@ format:
     code-overflow: wrap
     fig-width: 8
     fig-height: 5
+---
+
+::: {.fragment}
+**A Guide to Creating Publication-Quality Visualizations**
+:::
+
 ---
 
 # Introduction {background-color="#2c3e50"}
