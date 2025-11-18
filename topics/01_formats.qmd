@@ -203,7 +203,6 @@ flowchart LR
     A --> C{Screenshot}
     A --> D{Generated figure/<br/>website snapshot}
 
-
     B --> B1{Where will it<br/>be used?}
     B1 -->|Publication| B2[TIFF LZW<br/>300+ DPI]
     B1 -->|Presentation/Web| B3[JPEG/WebP <br/> 150+ DPI]
@@ -214,7 +213,7 @@ flowchart LR
 
     D --> D1{Publication or<br/>presentation?}
     D1 -->|Publication| D2{Vector support?}
-    D1 -->|Presentation| D3[SVG or PNG]
+    D1 -->|Presentation/Web| D3[SVG or PNG]
 
     D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
     D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
@@ -228,7 +227,7 @@ flowchart LR
     style D1 fill:#5dade2,color:#fff
     style D2 fill:#5dade2,color:#fff
     style D4 fill:#2ecc71,color:#fff
-    style D5 fill:#f39c12,color:#fff
+    style D5 fill:#5dade2,color:#fff
     style D3 fill:#9b59b6,color:#fff
     style B2 fill:#3498db,color:#fff
     style B3 fill:#e74c3c,color:#fff
@@ -240,7 +239,6 @@ flowchart LR
 ## Format Properties Comparison
 
 <div style="font-size: 0.85em;">
-
 <table>
 <colgroup>
 <col style="width: 10%">
@@ -268,10 +266,10 @@ flowchart LR
 <tr><td><strong>WebP</strong></td><td>Raster</td><td>Lossless or Lossy</td><td>No</td><td>Modern web format, smaller than PNG/JPEG</td></tr>
 </tbody>
 </table>
-
 </div>
 
 ::: {.callout-note}
+
 ## Container Formats
 
 **Container formats** can hold multiple types of data or multiple images:
@@ -280,7 +278,9 @@ flowchart LR
 - **TIFF**: Can contain multiple pages/images with different compression
 
 **Non-container formats** store a single image with one encoding type.
+
 :::
+
 
 ## JPEG Compression Artifacts
 
@@ -336,6 +336,7 @@ combined
 ```
 
 ::: {.callout-warning}
+
 ## Real-World Problem
 
 "Graphics downloaded from the Web are not acceptable for print reproduction as they are low-resolution images (usually 72 dpi)"
@@ -343,6 +344,7 @@ combined
 — European Journal of Orthodontics
 
 JPG creates **blocking artifacts** around sharp edges and text!
+
 :::
 
 ## File Format Comparison
@@ -426,6 +428,7 @@ combined
 ## Vector Screenshots from Websites
 
 ::: {.callout-tip}
+
 ## Capturing Website Content as Vector Graphics
 
 **Google Chrome has a built-in feature to save web pages as PDF (vector format)!**
@@ -456,6 +459,7 @@ combined
 - **Smaller file size** - Vector PDF is compact
 - **Editable** - Can extract or edit elements in PDF editor
 - **Publication quality** - No pixelation when zoomed
+
 :::
 
 ### Use Cases
@@ -473,6 +477,7 @@ combined
 - Include web-based tools in presentations
 
 ::: {.callout-note}
+
 ## Alternative: Browser Extensions
 
 For more control:
@@ -481,11 +486,13 @@ For more control:
 - **FireShot** - Multiple format options including PDF
 
 But Chrome's built-in Print to PDF is usually sufficient!
+
 :::
 
 ## Recommendations
 
 ::: {.callout-tip}
+
 ## Best Practices
 
 1. **Default choice**: PDF (vector) for all plots and diagrams
@@ -510,6 +517,7 @@ But Chrome's built-in Print to PDF is usually sufficient!
    - Usually: PDF, EPS, or high-res TIFF
    - Rarely: PNG (but accepted)
    - Never: JPG for line art
+
 :::
 
 ## Summary: Format Cheat Sheet
@@ -522,3 +530,5 @@ But Chrome's built-in Print to PDF is usually sufficient!
 | **PNG** | Raster | Lossless | Screenshots, drafts | Large images |
 | **TIFF** | Raster | Lossless/Lossy | Journals, archival | Presentations |
 | **JPEG** | Raster | Lossy | Photos only | Any plots/diagrams |
+
+
