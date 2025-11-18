@@ -6,8 +6,21 @@
 }
 
 /* Center title slide content */
-.reveal .center {
+.reveal .title-slide {
   text-align: center;
+}
+
+.reveal .title-slide h1 {
+  font-size: 2.2em;
+  margin-bottom: 0.5em;
+}
+
+.reveal .title-slide .fragment {
+  font-size: 1.2em;
+  font-style: italic;
+  color: #bbb;
+  margin-top: 0.5em;
+  margin-bottom: 1em;
 }
 
 /* Reduce heading sizes */
