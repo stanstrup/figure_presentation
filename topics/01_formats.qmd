@@ -238,35 +238,17 @@ flowchart LR
 
 ## Format Properties Comparison
 
-<div style="font-size: 0.85em;">
-<table>
-<colgroup>
-<col style="width: 10%">
-<col style="width: 18%">
-<col style="width: 15%">
-<col style="width: 10%">
-<col style="width: 47%">
-</colgroup>
-<thead>
-<tr>
-<th>Format</th>
-<th>Type</th>
-<th>Compression</th>
-<th>Container?</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr><td><strong>PDF</strong></td><td>Vector + Raster</td><td>Lossless</td><td>Yes</td><td>Can embed both vector and raster data</td></tr>
-<tr><td><strong>EPS</strong></td><td>Vector</td><td>Lossless</td><td>Yes</td><td>Can embed fonts and images</td></tr>
-<tr><td><strong>SVG</strong></td><td>Vector</td><td>Lossless</td><td>No</td><td>XML-based, web-native</td></tr>
-<tr><td><strong>PNG</strong></td><td>Raster</td><td>Lossless</td><td>No</td><td>Supports transparency</td></tr>
-<tr><td><strong>TIFF</strong></td><td>Raster</td><td>Lossless or Lossy</td><td>Yes</td><td>Multiple pages, various compression options</td></tr>
-<tr><td><strong>JPEG</strong></td><td>Raster</td><td>Lossy</td><td>No</td><td>Best for photos only</td></tr>
-<tr><td><strong>WebP</strong></td><td>Raster</td><td>Lossless or Lossy</td><td>No</td><td>Modern web format, smaller than PNG/JPEG</td></tr>
-</tbody>
-</table>
-</div>
+| Format | Type | Compression | Container? | Notes |
+|--------|------|-------------|------------|-------|
+| **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
+| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
+| **SVG** | Vector | Lossless | No | XML-based, web-native |
+| **PNG** | Raster | Lossless | No | Supports transparency |
+| **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
+| **JPEG** | Raster | Lossy | No | Best for photos only |
+| **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
+
+: {tbl-colwidths="[10,18,15,10,47]"}
 
 ::: {.callout-note}
 
