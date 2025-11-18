@@ -16,14 +16,80 @@
 - Web/online?
 :::
 
+
+
+## What is a Raster Image?
+
+::: {.columns}
+::: {.column width="50%"}
+**Raster graphics are grids of colored pixels**
+
+- Stores individual pixel colors: RGB(255, 128, 64)
+- Fixed resolution measured in DPI (Dots Per Inch)
+- More pixels = higher resolution = larger file size
+- Cannot be scaled up without quality loss
+:::
+
+::: {.column width="50%"}
+![](sources/Rgb-raster-image.svg){width=100%}
+:::
+:::
+
 ## What is a Vector Image?
 
+```{r}
+#| echo: false
+#| eval: true
+
+library(ggplot2)
+
+# Create a smooth curved line
+x <- seq(0, 4*pi, length.out = 200)
+curve_data <- data.frame(
+  x = x,
+  y = sin(x) * exp(-x/10)
+)
+
+# Create the plot
+p <- ggplot(curve_data, aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 3) +
+  geom_point(data = curve_data[seq(1, 200, 25), ],
+             color = "darkred", size = 4) +
+  theme_classic(base_size = 16) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  ) +
+  labs(x = "", y = "")
+
+# Save as SVG (vector format)
+ggsave("plots/01_formats/vector-curve.svg", p, width = 6, height = 4, device = "svg")
+```
+
+::: {.columns}
+::: {.column width="50%"}
 **Vector graphics use mathematical descriptions**
 
 - Mathematical formulas define shapes and lines
 - "Draw a line from point (0,0) to (10,10)"
 - "Create a circle with center (5,5) and radius 3"
 - Infinitely scalable without quality loss
+
+::: {.callout-note}
+## Infinite Resolution
+Because vectors are mathematical formulas, they can be scaled to **any size** without losing quality. The curve is defined by equations, not pixels!
+:::
+:::
+
+::: {.column width="50%"}
+![](plots/01_formats/vector-curve.svg){width=100%}
+:::
+:::
+
+
+
+## Vector vs. Raster Comparison
+
 
 ```{r}
 #| echo: false
@@ -33,6 +99,7 @@
 
 library(ggplot2)
 library(magick)
+library(glue)
 
 # Create a smooth curve with text
 x <- seq(0, 4*pi, length.out = 200)
@@ -56,13 +123,19 @@ ggsave("plots/01_formats/vector_demo.svg", p, width = 8, height = 4)
 ggsave("plots/01_formats/raster_demo.png", p, width = 8, height = 4, dpi = 72)
 
 # Read the saved images and zoom in to show difference
-vector_img <- image_read_svg("plots/01_formats/vector_demo.svg", width = 800)
-raster_img <- image_read("plots/01_formats/raster_demo.png")
+oversize_scale <- 10
+vector <- image_read_svg("plots/01_formats/vector_demo.svg", width = 576*oversize_scale)
 
-# Crop a section and zoom 3x to show the difference
-crop_geom <- "300x200+250+100"
-vector_crop <- image_crop(vector_img, crop_geom) %>% image_scale("900x600")
-raster_crop <- image_crop(raster_img, crop_geom) %>% image_scale("900x600")
+vector_crop <- vector %>% 
+  image_crop(glue("{100*oversize_scale}x{50*oversize_scale}+{300*oversize_scale}+{75*oversize_scale}")) %>% 
+  image_scale("900x600")
+
+
+oversize_scale <- 1
+raster_crop <- image_read("plots/01_formats/raster_demo.png",   density = 72*oversize_scale) %>% 
+  image_crop(glue("{100*oversize_scale}x{50*oversize_scale}+{300*oversize_scale}+{75*oversize_scale}")) %>% 
+  image_scale("900x600")
+
 
 # Add labels
 vector_labeled <- image_annotate(vector_crop, "VECTOR (SVG)\nStays Crisp",
@@ -72,26 +145,10 @@ raster_labeled <- image_annotate(raster_crop, "RASTER (PNG 72 DPI)\nPixelated",
                                   size = 40, color = "red",
                                   location = "+10+10", font = "sans", weight = 700)
 
-# Combine side by side
-combined <- image_append(c(vector_labeled, raster_labeled))
-combined
+vector
 ```
 
-**Zoomed 3× to show the difference - Vector stays smooth, Raster shows pixels**
-
-::: {.callout-note}
-## Infinite Resolution
-Because vectors are mathematical formulas, they can be scaled to **any size** without losing quality. The curve is defined by equations, not pixels!
-:::
-
-## What is a Raster Image?
-
-**Raster graphics are grids of colored pixels**
-
-- Stores individual pixel colors: RGB(255, 128, 64)
-- Fixed resolution measured in DPI (Dots Per Inch)
-- More pixels = higher resolution = larger file size
-- Cannot be scaled up without quality loss
+## Vector vs. Raster Comparison (2)
 
 ```{r}
 #| echo: false
@@ -99,60 +156,10 @@ Because vectors are mathematical formulas, they can be scaled to **any size** wi
 #| fig-width: 12
 #| fig-height: 6
 
-library(ggplot2)
-library(magick)
-
-# Same curve
-x <- seq(0, 4*pi, length.out = 200)
-raster_data <- data.frame(x = x, y = sin(x) * exp(-x/10))
-
-p_base <- ggplot(raster_data, aes(x, y)) +
-  geom_line(color = "steelblue", linewidth = 3) +
-  geom_point(data = raster_data[seq(1, 200, 20), ],
-             color = "darkred", size = 4) +
-  annotate("text", x = 6, y = 0.6,
-           label = "Same Curve",
-           size = 10, fontface = "bold", color = "navy") +
-  theme_classic(base_size = 18) +
-  theme(plot.title = element_text(face = "bold", size = 20)) +
-  labs(title = "Raster at Different DPI", x = "", y = "")
-
-# Save as high-res PNG (300 DPI) - 2400 × 1200 pixels
-ggsave("plots/01_formats/raster_300dpi.png", p_base, width = 8, height = 4, dpi = 300)
-
-# Save as low-res PNG (72 DPI) - 576 × 288 pixels
-ggsave("plots/01_formats/raster_72dpi.png", p_base, width = 8, height = 4, dpi = 72)
-
-# Read the saved images
-highres_img <- image_read("plots/01_formats/raster_300dpi.png")
-lowres_img <- image_read("plots/01_formats/raster_72dpi.png")
-
-# Crop same region and zoom 3x
-crop_geom <- "300x200+250+100"
-highres_crop <- image_crop(highres_img, crop_geom) %>% image_scale("900x600")
-lowres_crop <- image_crop(lowres_img, crop_geom) %>% image_scale("900x600")
-
-# Add labels
-highres_labeled <- image_annotate(highres_crop, "300 DPI PNG\nSmooth",
-                                   size = 40, color = "darkgreen",
-                                   location = "+10+10", font = "sans", weight = 700)
-lowres_labeled <- image_annotate(lowres_crop, "72 DPI PNG\nPixelated",
-                                  size = 40, color = "darkred",
-                                  location = "+10+10", font = "sans", weight = 700)
-
 # Combine side by side
-raster_combined <- image_append(c(highres_labeled, lowres_labeled))
-raster_combined
+combined <- image_append(c(vector_labeled, raster_labeled))
+combined
 ```
-
-**Zoomed 3× - High DPI has more pixels = smoother, Low DPI = visible pixelation**
-
-::: {.callout-warning}
-## Resolution Dependent
-Raster images have **fixed resolution**. A 72 DPI image has only 72 pixels per inch. Zoom too much and you see individual pixels (pixelation). Both images look the same at normal size, but zoom reveals the difference!
-:::
-
-## Vector vs. Raster Comparison
 
 | Aspect | Vector (PDF, SVG, EPS) | Raster (PNG, TIFF, JPG) |
 |--------|------------------------|-------------------------|
@@ -163,48 +170,7 @@ Raster images have **fixed resolution**. A 72 DPI image has only 72 pixels per i
 | **Editability** | Easy to edit paths | Pixel-level editing only |
 | **Text Quality** | Always crisp | Can become blurry |
 
-## Demonstration: Vector vs. Raster
 
-```{r}
-#| echo: true
-#| eval: true
-#| fig-width: 8
-#| fig-height: 3
-
-library(ggplot2)
-
-# Create a plot with text and lines
-p <- ggplot(data.frame(x = 1:5, y = c(2, 4, 3, 5, 4)),
-            aes(x, y)) +
-  geom_line(linewidth = 2, color = "steelblue") +
-  geom_point(size = 5, color = "darkred") +
-  annotate("text", x = 3, y = 3.5,
-           label = "TEXT QUALITY MATTERS",
-           size = 8, fontface = "bold") +
-  theme_classic(base_size = 16) +
-  labs(title = "Vector vs Raster: Notice Text Clarity",
-       x = "X Axis Label", y = "Y Axis Label")
-
-# Save as vector (PDF)
-ggsave("plots/01_formats/demo_vector.pdf", p, width = 8, height = 3, device = cairo_pdf)
-
-# Save as high-res PNG (300 DPI)
-ggsave("plots/01_formats/demo_highres.png", p, width = 8, height = 3, dpi = 300)
-
-# Save as low-res PNG (72 DPI) - simulate poor quality
-ggsave("plots/01_formats/demo_lowres.png", p, width = 8, height = 3, dpi = 72)
-
-# Save as JPEG (lossy compression)
-ggsave("plots/01_formats/demo_jpeg.jpg", p, width = 8, height = 3, dpi = 150, quality = 75)
-
-p
-```
-
-**Try zooming to 400% in each file!**
-
-- PDF: Text stays crisp at any zoom level
-- Low-res PNG: Text becomes pixelated
-- JPEG: Notice compression artifacts around text
 
 ## Container Formats: PDF and TIFF
 
@@ -226,19 +192,11 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 | **ZIP** | Lossless compression | Publications |
 | **JPEG** | Lossy compression | Web (avoid for science) |
 
-## Resolution Requirements
-
-| Use Case | Minimum DPI | Recommended |
-|----------|-------------|-------------|
-| Screen viewing | 72-96 | 150 |
-| Print publication | 300 | 300-600 |
-| High-quality journal | 600-1200 | 600 |
-| Poster (arm's length) | 150 | 150-300 |
 
 ## Format Selection: Decision Tree
 
 ```{mermaid}
-%%| fig-width: 10
+
 flowchart TD
     A[What type of image?] --> B{Photo or<br/>screenshot?}
     B -->|Yes| C{Where will it<br/>be used?}
@@ -263,6 +221,7 @@ flowchart TD
     style E fill:#3498db
     style L fill:#9b59b6
     style M fill:#95a5a6
+
 ```
 
 ## Quick and Dirty: PNG
