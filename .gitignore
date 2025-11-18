@@ -6,3 +6,13 @@ topics/*.html
 topics/*_files
 *_files
 *.html
+topics/*.png
+topics/*.jpg
+topics/*.pdf
+compare_*.png
+compare_*.pdf
+compare_*.jpg
+demo_*.png
+demo_*.pdf
+demo_*.jpg
+temp*.jpg
