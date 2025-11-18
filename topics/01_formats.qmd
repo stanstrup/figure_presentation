@@ -66,8 +66,8 @@ p <- ggplot(curve_data, aes(x, y)) +
 ggsave("plots/01_formats/vector-curve.svg", p, width = 6, height = 4, device = "svg")
 ```
 
-:::: {.columns}
-::: {.column width="50%"}
+::::: {.columns}
+:::: {.column width="50%"}
 **Vector graphics use mathematical descriptions**
 
 - Mathematical formulas define shapes and lines
@@ -79,12 +79,12 @@ ggsave("plots/01_formats/vector-curve.svg", p, width = 6, height = 4, device = "
 ## Infinite Resolution
 Because vectors are mathematical formulas, they can be scaled to **any size** without losing quality. The curve is defined by equations, not pixels!
 :::
-:::
-
-::: {.column width="50%"}
-![](plots/01_formats/vector-curve.svg){width=100%}
-:::
 ::::
+
+:::: {.column width="50%"}
+![](plots/01_formats/vector-curve.svg){width=100%}
+::::
+:::::
 
 
 
