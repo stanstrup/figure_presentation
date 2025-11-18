@@ -5,6 +5,11 @@
 **Which format should I use?**
 
 ::: {.incremental}
+
+- **Type of image**
+
+\
+
 - Journal submission?
 - Poster presentation?
 - PowerPoint?
@@ -133,7 +138,7 @@ Raster images have **fixed resolution**. A 72 DPI image has only 72 pixels per i
 | **Definition** | Mathematical formulas | Grid of pixels |
 | **Scalability** | Infinite resolution | Fixed resolution (DPI) |
 | **File Size** | Small (formulas compact) | Large (all pixels stored) |
-| **Best For** | Plots, diagrams, text | Photos, screenshots |
+| **Best For** | Plots, diagrams, text, screenshots of websites | Photos, screenshots |
 | **Editability** | Easy to edit paths | Pixel-level editing only |
 | **Text Quality** | Always crisp | Can become blurry |
 
