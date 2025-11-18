@@ -204,11 +204,11 @@ flowchart LR
 
 
     B --> B1{Where will it<br/>be used?}
-    B1 -->|Publication| B2[High-res TIFF<br/>300+ DPI]
-    B1 -->|Presentation/Web| B3[JPEG or PNG<br/>150 DPI]
+    B1 -->|Publication| B2[TIFF LZW<br/>300+ DPI]
+    B1 -->|Presentation/Web| B3[JPEG/WebP <br/> 150+ DPI]
 
     C --> C1{Where will it<br/>be used?}
-    C1 -->|Publication| C2[High-res PNG<br/>300+ DPI]
+    C1 -->|Publication| C2[TIFF LZW<br/>300+ DPI]
     C1 -->|Presentation/Web| C3[PNG<br/>150 DPI]
 
     D --> D1{Publication or<br/>presentation?}
@@ -216,11 +216,11 @@ flowchart LR
     D1 -->|Presentation| D3{Need<br/>transparency?}
 
     D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
-    D2 -->|No| D5[TIFF 600 DPI LZW<br/>PNG not supported]
+    D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
 
 
-    D3 -->|Yes| D6[PNG<br/>transparent BG]
-    D3 -->|No| D7[PNG or PDF<br/>quick & dirty]
+    D3 -->|Yes| D6[SVG or PNG with <br/>transparent BG]
+    D3 -->|No| D7[SVG or PNG]
 
     style D4 fill:#2ecc71
     style D5 fill:#f39c12
