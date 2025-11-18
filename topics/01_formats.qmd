@@ -231,7 +231,7 @@ flowchart LR
     style D5 fill:#f39c12,color:#fff
     style D3 fill:#9b59b6,color:#fff
     style B2 fill:#3498db,color:#fff
-    style B3 fill:#9b59b6,color:#fff
+    style B3 fill:#e67e22,color:#fff
     style C2 fill:#3498db,color:#fff
     style C3 fill:#9b59b6,color:#fff
 
