@@ -270,6 +270,29 @@ flowchart LR
     style C2 fill:#3498db
 ```
 
+## Format Properties Comparison
+
+| Format | Type | Compression | Container? | Notes |
+|--------|------|-------------|------------|-------|
+| **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
+| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
+| **SVG** | Vector | Lossless | No | XML-based, web-native |
+| **PNG** | Raster | Lossless | No | Supports transparency |
+| **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
+| **JPEG** | Raster | Lossy | No | Best for photos only |
+| **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
+
+::: {.callout-note}
+## Container Formats
+
+**Container formats** can hold multiple types of data or multiple images:
+- **PDF**: Can mix vector graphics, raster images, fonts, and text
+- **EPS**: Can embed fonts, preview images, and vector data
+- **TIFF**: Can contain multiple pages/images with different compression
+
+**Non-container formats** store a single image with one encoding type.
+:::
+
 ## Quick and Dirty: PNG
 
 ::: {.columns}
