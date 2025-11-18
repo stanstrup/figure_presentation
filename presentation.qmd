@@ -15,9 +15,15 @@ format:
     fig-height: 5
 ---
 
+## {.center}
+
+### Academic Figures: Common Pitfalls and Best Practices
+
 ::: {.fragment}
-**A Guide to Creating Publication-Quality Visualizations**
+*A Guide to Creating Publication-Quality Visualizations*
 :::
+
+**Your Name**
 
 ---
 

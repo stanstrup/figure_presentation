@@ -5,6 +5,11 @@
   font-size: 28px;
 }
 
+/* Center title slide content */
+.reveal .center {
+  text-align: center;
+}
+
 /* Reduce heading sizes */
 .reveal h1 {
   font-size: 2.0em;
