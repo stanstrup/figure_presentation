@@ -50,14 +50,14 @@ p <- ggplot(curve_data, aes(x, y)) +
   labs(title = "Mathematical Curve", x = "", y = "")
 
 # Save as SVG (vector - web compatible)
-ggsave("vector_demo.svg", p, width = 8, height = 4)
+ggsave("plots/01_formats/vector_demo.svg", p, width = 8, height = 4)
 
 # Save as low-res PNG (raster)
-ggsave("raster_demo.png", p, width = 8, height = 4, dpi = 72)
+ggsave("plots/01_formats/raster_demo.png", p, width = 8, height = 4, dpi = 72)
 
 # Read the saved images and zoom in to show difference
-vector_img <- image_read_svg("vector_demo.svg", width = 800)
-raster_img <- image_read("raster_demo.png")
+vector_img <- image_read_svg("plots/01_formats/vector_demo.svg", width = 800)
+raster_img <- image_read("plots/01_formats/raster_demo.png")
 
 # Crop a section and zoom 3x to show the difference
 crop_geom <- "300x200+250+100"
@@ -118,14 +118,14 @@ p_base <- ggplot(raster_data, aes(x, y)) +
   labs(title = "Raster at Different DPI", x = "", y = "")
 
 # Save as high-res PNG (300 DPI) - 2400 × 1200 pixels
-ggsave("raster_300dpi.png", p_base, width = 8, height = 4, dpi = 300)
+ggsave("plots/01_formats/raster_300dpi.png", p_base, width = 8, height = 4, dpi = 300)
 
 # Save as low-res PNG (72 DPI) - 576 × 288 pixels
-ggsave("raster_72dpi.png", p_base, width = 8, height = 4, dpi = 72)
+ggsave("plots/01_formats/raster_72dpi.png", p_base, width = 8, height = 4, dpi = 72)
 
 # Read the saved images
-highres_img <- image_read("raster_300dpi.png")
-lowres_img <- image_read("raster_72dpi.png")
+highres_img <- image_read("plots/01_formats/raster_300dpi.png")
+lowres_img <- image_read("plots/01_formats/raster_72dpi.png")
 
 # Crop same region and zoom 3x
 crop_geom <- "300x200+250+100"
@@ -186,16 +186,16 @@ p <- ggplot(data.frame(x = 1:5, y = c(2, 4, 3, 5, 4)),
        x = "X Axis Label", y = "Y Axis Label")
 
 # Save as vector (PDF)
-ggsave("demo_vector.pdf", p, width = 8, height = 3, device = cairo_pdf)
+ggsave("plots/01_formats/demo_vector.pdf", p, width = 8, height = 3, device = cairo_pdf)
 
 # Save as high-res PNG (300 DPI)
-ggsave("demo_highres.png", p, width = 8, height = 3, dpi = 300)
+ggsave("plots/01_formats/demo_highres.png", p, width = 8, height = 3, dpi = 300)
 
 # Save as low-res PNG (72 DPI) - simulate poor quality
-ggsave("demo_lowres.png", p, width = 8, height = 3, dpi = 72)
+ggsave("plots/01_formats/demo_lowres.png", p, width = 8, height = 3, dpi = 72)
 
 # Save as JPEG (lossy compression)
-ggsave("demo_jpeg.jpg", p, width = 8, height = 3, dpi = 150, quality = 75)
+ggsave("plots/01_formats/demo_jpeg.jpg", p, width = 8, height = 3, dpi = 150, quality = 75)
 
 p
 ```
@@ -330,7 +330,7 @@ p1 <- create_test_plot("Original Vector")
 p2 <- create_test_plot("After JPEG Compression\n(Notice artifacts)")
 
 # Save and reload to show compression
-ggsave("temp_jpeg.jpg", p2, width = 4, height = 4, dpi = 150, quality = 60)
+ggsave("plots/01_formats/temp_jpeg.jpg", p2, width = 4, height = 4, dpi = 150, quality = 60)
 
 p1 + p2 +
   plot_annotation(
@@ -370,19 +370,19 @@ comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
        y = "Miles Per Gallon")
 
 # Vector format - always crisp
-ggsave("compare_vector.pdf", comparison_plot,
+ggsave("plots/01_formats/compare_vector.pdf", comparison_plot,
        width = 6, height = 4, device = cairo_pdf)
 
 # High-res PNG - good quality
-ggsave("compare_highres.png", comparison_plot,
+ggsave("plots/01_formats/compare_highres.png", comparison_plot,
        width = 6, height = 4, dpi = 300)
 
 # Low-res PNG - pixelated when zoomed
-ggsave("compare_lowres.png", comparison_plot,
+ggsave("plots/01_formats/compare_lowres.png", comparison_plot,
        width = 6, height = 4, dpi = 72)
 
 # JPEG - compression artifacts
-ggsave("compare_jpeg.jpg", comparison_plot,
+ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
        width = 6, height = 4, dpi = 150, quality = 60)
 
 comparison_plot
