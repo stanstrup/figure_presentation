@@ -196,7 +196,7 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 ## Format Selection: Decision Tree
 
 ```{mermaid}
-%%{init: {'theme':'dark'}}%%
+%%{init: {'theme':'dark', 'themeVariables': {'edgeLabelBackground':'#1a1a1a', 'primaryTextColor':'#fff', 'secondaryTextColor':'#fff', 'tertiaryTextColor':'#fff'}}}%%
 
 flowchart LR
     A[What type of image?] --> B{Photo}
