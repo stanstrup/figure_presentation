@@ -196,6 +196,7 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 ## Format Selection: Decision Tree
 
 ```{mermaid}
+%%{init: {'theme':'dark'}}%%
 
 flowchart LR
     A[What type of image?] --> B{Photo}
@@ -218,17 +219,19 @@ flowchart LR
     D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
     D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
 
-    style D4 fill:#2ecc71
-    style D5 fill:#f39c12
-    style D3 fill:#9b59b6
-    style B2 fill:#3498db
-    style B3 fill:#9b59b6
-    style C2 fill:#3498db
-    style C3 fill:#9b59b6
+    style D4 fill:#2ecc71,color:#fff
+    style D5 fill:#f39c12,color:#fff
+    style D3 fill:#9b59b6,color:#fff
+    style B2 fill:#3498db,color:#fff
+    style B3 fill:#9b59b6,color:#fff
+    style C2 fill:#3498db,color:#fff
+    style C3 fill:#9b59b6,color:#fff
 
 ```
 
 ## Format Properties Comparison
+
+<div style="font-size: 0.85em;">
 
 | Format | Type | Compression | Container? | Notes |
 |--------|------|-------------|------------|-------|
@@ -239,6 +242,8 @@ flowchart LR
 | **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
 | **JPEG** | Raster | Lossy | No | Best for photos only |
 | **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
+
+</div>
 
 ::: {.callout-note}
 ## Container Formats
@@ -254,16 +259,13 @@ flowchart LR
 ## JPEG Compression Artifacts
 
 ```{r}
-#| echo: true
+#| echo: false
 #| eval: true
-#| fig-width: 10
-#| fig-height: 4
 
 library(ggplot2)
-library(patchwork)
 
 # Create a plot with sharp edges and text
-create_test_plot <- function(title) {
+create_test_plot <- function() {
   ggplot(data.frame(x = c(0, 1, 1, 0, 0),
                     y = c(0, 0, 1, 1, 0)),
          aes(x, y)) +
@@ -272,24 +274,30 @@ create_test_plot <- function(title) {
              label = "SHARP TEXT",
              size = 12, fontface = "bold") +
     theme_void() +
-    theme(plot.background = element_rect(fill = "gray90", color = NA),
-          plot.title = element_text(size = 10, hjust = 0.5)) +
-    labs(title = title) +
+    theme(plot.background = element_rect(fill = "gray90", color = NA)) +
     coord_fixed()
 }
 
-p1 <- create_test_plot("Original Vector")
-p2 <- create_test_plot("After JPEG Compression\n(Notice artifacts)")
+p <- create_test_plot()
 
-# Save and reload to show compression
-ggsave("plots/01_formats/temp_jpeg.jpg", p2, width = 4, height = 4, dpi = 150, quality = 60)
-
-p1 + p2 +
-  plot_annotation(
-    title = "JPEG Creates Artifacts Around Sharp Edges",
-    theme = theme(plot.title = element_text(size = 16, face = "bold"))
-  )
+# Save as PNG (lossless) and JPEG (lossy with low quality)
+ggsave("plots/01_formats/artifacts_original.png", p, width = 4, height = 4, dpi = 150)
+ggsave("plots/01_formats/artifacts_jpeg.jpg", p, width = 4, height = 4, dpi = 150, quality = 60)
 ```
+
+::: {.columns}
+::: {.column width="50%"}
+**Original (PNG - Lossless)**
+
+![](plots/01_formats/artifacts_original.png)
+:::
+
+::: {.column width="50%"}
+**After JPEG Compression (Quality 60)**
+
+![](plots/01_formats/artifacts_jpeg.jpg)
+:::
+:::
 
 ::: {.callout-warning}
 ## Real-World Problem
@@ -301,10 +309,10 @@ p1 + p2 +
 JPG creates **blocking artifacts** around sharp edges and text!
 :::
 
-## File Format Comparison Code
+## File Format Comparison
 
 ```{r}
-#| echo: true
+#| echo: false
 #| eval: true
 
 # Generate comparison files
@@ -321,9 +329,9 @@ comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
        x = "Weight (1000 lbs)",
        y = "Miles Per Gallon")
 
-# Vector format - always crisp
-ggsave("plots/01_formats/compare_vector.pdf", comparison_plot,
-       width = 6, height = 4, device = cairo_pdf)
+# Vector format - always crisp (SVG for web)
+ggsave("plots/01_formats/compare_vector.svg", comparison_plot,
+       width = 6, height = 4, device = "svg")
 
 # High-res PNG - good quality
 ggsave("plots/01_formats/compare_highres.png", comparison_plot,
@@ -336,36 +344,34 @@ ggsave("plots/01_formats/compare_lowres.png", comparison_plot,
 # JPEG - compression artifacts
 ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
        width = 6, height = 4, dpi = 150, quality = 60)
-
-comparison_plot
 ```
 
-**Files generated - compare them yourself:**
+::: {.columns}
+::: {.column width="50%"}
+**Vector (SVG) - Infinite zoom, always crisp**
 
-- `compare_vector.pdf` - Infinite zoom, always crisp
-- `compare_highres.png` - Good for most uses (300 DPI)
-- `compare_lowres.png` - Pixelated when zoomed (72 DPI)
-- `compare_jpeg.jpg` - Artifacts around lines and text
+![](plots/01_formats/compare_vector.svg)
+:::
 
-## EPS Format: The Alternative Vector
+::: {.column width="50%"}
+**High-res PNG (300 DPI) - Good quality**
 
-::: {.callout-tip}
-## When PDF is Not Supported
+![](plots/01_formats/compare_highres.png)
+:::
+:::
 
-Some journals don't accept PDF but **DO accept EPS** (Encapsulated PostScript):
+::: {.columns}
+::: {.column width="50%"}
+**Low-res PNG (72 DPI) - Pixelated when zoomed**
 
-```r
-# Save as EPS instead of PDF
-ggsave("figure.eps",
-       width = 6, height = 4,
-       device = cairo_ps)
-```
+![](plots/01_formats/compare_lowres.png)
+:::
 
-**EPS is widely accepted** in academic publishing when PDF is rejected.
+::: {.column width="50%"}
+**JPEG (Quality 60) - Compression artifacts**
 
-- Nature journals: ✓ EPS accepted
-- Science: ✓ EPS accepted
-- Many medical journals: ✓ EPS preferred over PDF
+![](plots/01_formats/compare_jpeg.jpg)
+:::
 :::
 
 ## Vector Screenshots from Websites
