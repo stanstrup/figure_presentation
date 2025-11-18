@@ -17,5 +17,9 @@ demo_*.pdf
 demo_*.jpg
 temp*.jpg
 presentation.rmarkdown
+presentation.md
+presentation.revealjs.md
+*.knit.md
 plots/*
 topics/plots/*
+public/
