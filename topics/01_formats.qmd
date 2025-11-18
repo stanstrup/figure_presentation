@@ -390,12 +390,17 @@ highres_img <- image_read("plots/01_formats/compare_highres.png")
 lowres_img <- image_read("plots/01_formats/compare_lowres.png")
 jpeg_img <- image_read("plots/01_formats/compare_jpeg.jpg")
 
-# Crop and zoom on the text area
+# Scale all images to same size first (1800 width to match vector)
+highres_scaled <- image_scale(highres_img, "1800x")
+lowres_scaled <- image_scale(lowres_img, "1800x")
+jpeg_scaled <- image_scale(jpeg_img, "1800x")
+
+# Crop and zoom on the text area (now all images have same dimensions)
 crop_geom <- "200x100+800+50"
 vector_crop <- image_crop(vector_img, crop_geom) %>% image_scale("600x300")
-highres_crop <- image_crop(highres_img, crop_geom) %>% image_scale("600x300")
-lowres_crop <- image_crop(lowres_img, crop_geom) %>% image_scale("600x300")
-jpeg_crop <- image_crop(jpeg_img, crop_geom) %>% image_scale("600x300")
+highres_crop <- image_crop(highres_scaled, crop_geom) %>% image_scale("600x300")
+lowres_crop <- image_crop(lowres_scaled, crop_geom) %>% image_scale("600x300")
+jpeg_crop <- image_crop(jpeg_scaled, crop_geom) %>% image_scale("600x300")
 
 # Add labels
 vector_labeled <- image_annotate(vector_crop, "SVG (Vector)",
