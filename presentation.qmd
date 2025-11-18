@@ -36,7 +36,7 @@ keep-source: true
 
 ## What We'll Cover
 
-::: {.columns}
+:::: {.columns}
 ::: {.column width="50%"}
 1. File Formats
 2. Color Gradients
@@ -53,7 +53,7 @@ keep-source: true
 10. Interactive Plots
 11. Factor Ordering
 :::
-:::
+::::
 
 ---
 
