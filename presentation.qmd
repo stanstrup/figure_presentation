@@ -1,5 +1,4 @@
 ---
-title: "Academic Figures: Common Pitfalls and Best Practices"
 author: "Your Name"
 format:
   revealjs:
@@ -15,9 +14,9 @@ format:
     fig-height: 5
 ---
 
-## {.center}
+## {.title-slide}
 
-### Academic Figures: Common Pitfalls and Best Practices
+# Academic Figures: Common Pitfalls and Best Practices
 
 ::: {.fragment}
 *A Guide to Creating Publication-Quality Visualizations*
