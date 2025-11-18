@@ -251,40 +251,6 @@ flowchart LR
 **Non-container formats** store a single image with one encoding type.
 :::
 
-## Quick and Dirty: PNG
-
-::: {.columns}
-::: {.column width="50%"}
-**For rapid work:**
-
-```r
-# PNG is lossless and fast
-ggsave("quick_plot.png",
-       dpi = 150)
-```
-
-✓ Lossless compression
-✓ Fast to generate
-✓ Works everywhere
-✓ Good for drafts
-:::
-
-::: {.column width="50%"}
-**For publications:**
-
-```r
-# Use vector formats
-ggsave("publication.pdf",
-       device = cairo_pdf)
-```
-
-✓ Infinite resolution
-✓ Small file size
-✓ Professional quality
-✓ Easy to edit
-:::
-:::
-
 ## JPEG Compression Artifacts
 
 ```{r}
