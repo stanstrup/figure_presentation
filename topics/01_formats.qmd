@@ -239,30 +239,35 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 
 ```{mermaid}
 %%| fig-width: 10
-flowchart TD
-    A[What type of image?] --> B{Photo or<br/>screenshot?}
-    B -->|Yes| C{Where will it<br/>be used?}
-    B -->|No: Created<br/>figure/plot| D{Publication<br/>or presentation?}
+flowchart LR
+    A[What type of image?] --> B{Photo}
+    A --> C{Screenshot}
+    A --> D{Generated figure/<br/>website snapshot}
 
-    C -->|Publication| E[High-res TIFF<br/>or PNG<br/>300+ DPI]
-    C -->|Presentation/Web| F[JPEG or PNG<br/>150 DPI]
+    B --> B1{Where will it<br/>be used?}
+    B1 -->|Publication| B2[High-res TIFF<br/>300+ DPI]
+    B1 -->|Presentation/Web| B3[JPEG or PNG<br/>150 DPI]
 
-    D -->|Publication| G{Vector support?}
-    D -->|Presentation| H{Need<br/>transparency?}
+    C --> C1{Where will it<br/>be used?}
+    C1 -->|Publication| C2[High-res PNG<br/>300+ DPI]
+    C1 -->|Presentation/Web| C3[PNG<br/>150 DPI]
 
-    G -->|Yes| I[PDF preferred<br/>or SVG]
-    G -->|No| J[EPS format<br/>widely accepted]
-    G -->|Raster only| K[PNG 300 DPI<br/>or TIFF LZW]
+    D --> D1{Publication or<br/>presentation?}
+    D1 -->|Publication| D2{Vector support?}
+    D1 -->|Presentation| D3{Need<br/>transparency?}
 
-    H -->|Yes| L[PNG<br/>transparent BG]
-    H -->|No| M[PNG or PDF<br/>quick & dirty]
+    D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
+    D2 -->|No| D5[TIFF 600 DPI LZW<br/>PNG not supported]
 
-    style I fill:#2ecc71
-    style J fill:#27ae60
-    style K fill:#f39c12
-    style E fill:#3498db
-    style L fill:#9b59b6
-    style M fill:#95a5a6
+    D3 -->|Yes| D6[PNG<br/>transparent BG]
+    D3 -->|No| D7[PNG or PDF<br/>quick & dirty]
+
+    style D4 fill:#2ecc71
+    style D5 fill:#f39c12
+    style D6 fill:#9b59b6
+    style D7 fill:#95a5a6
+    style B2 fill:#3498db
+    style C2 fill:#3498db
 ```
 
 ## Quick and Dirty: PNG
