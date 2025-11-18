@@ -219,6 +219,14 @@ flowchart LR
     D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
     D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
 
+    style A fill:#5dade2,color:#fff
+    style B fill:#5dade2,color:#fff
+    style C fill:#5dade2,color:#fff
+    style D fill:#5dade2,color:#fff
+    style B1 fill:#5dade2,color:#fff
+    style C1 fill:#5dade2,color:#fff
+    style D1 fill:#5dade2,color:#fff
+    style D2 fill:#5dade2,color:#fff
     style D4 fill:#2ecc71,color:#fff
     style D5 fill:#f39c12,color:#fff
     style D3 fill:#9b59b6,color:#fff
@@ -233,15 +241,33 @@ flowchart LR
 
 <div style="font-size: 0.85em;">
 
-| Format | Type | Compression | Container? | Notes |
-|--------|------|-------------|------------|-------|
-| **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
-| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
-| **SVG** | Vector | Lossless | No | XML-based, web-native |
-| **PNG** | Raster | Lossless | No | Supports transparency |
-| **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
-| **JPEG** | Raster | Lossy | No | Best for photos only |
-| **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
+<table>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 47%">
+</colgroup>
+<thead>
+<tr>
+<th>Format</th>
+<th>Type</th>
+<th>Compression</th>
+<th>Container?</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>PDF</strong></td><td>Vector + Raster</td><td>Lossless</td><td>Yes</td><td>Can embed both vector and raster data</td></tr>
+<tr><td><strong>EPS</strong></td><td>Vector</td><td>Lossless</td><td>Yes</td><td>Can embed fonts and images</td></tr>
+<tr><td><strong>SVG</strong></td><td>Vector</td><td>Lossless</td><td>No</td><td>XML-based, web-native</td></tr>
+<tr><td><strong>PNG</strong></td><td>Raster</td><td>Lossless</td><td>No</td><td>Supports transparency</td></tr>
+<tr><td><strong>TIFF</strong></td><td>Raster</td><td>Lossless or Lossy</td><td>Yes</td><td>Multiple pages, various compression options</td></tr>
+<tr><td><strong>JPEG</strong></td><td>Raster</td><td>Lossy</td><td>No</td><td>Best for photos only</td></tr>
+<tr><td><strong>WebP</strong></td><td>Raster</td><td>Lossless or Lossy</td><td>No</td><td>Modern web format, smaller than PNG/JPEG</td></tr>
+</tbody>
+</table>
 
 </div>
 
@@ -261,8 +287,11 @@ flowchart LR
 ```{r}
 #| echo: false
 #| eval: true
+#| fig-width: 12
+#| fig-height: 6
 
 library(ggplot2)
+library(magick)
 
 # Create a plot with sharp edges and text
 create_test_plot <- function() {
@@ -283,21 +312,28 @@ p <- create_test_plot()
 # Save as PNG (lossless) and JPEG (lossy with low quality)
 ggsave("plots/01_formats/artifacts_original.png", p, width = 4, height = 4, dpi = 150)
 ggsave("plots/01_formats/artifacts_jpeg.jpg", p, width = 4, height = 4, dpi = 150, quality = 60)
+
+# Read and zoom in on the edge to show artifacts
+png_img <- image_read("plots/01_formats/artifacts_original.png")
+jpeg_img <- image_read("plots/01_formats/artifacts_jpeg.jpg")
+
+# Crop and zoom 4x on the edge where artifacts are visible
+crop_geom <- "150x150+450+300"
+png_crop <- image_crop(png_img, crop_geom) %>% image_scale("600x600")
+jpeg_crop <- image_crop(jpeg_img, crop_geom) %>% image_scale("600x600")
+
+# Add labels
+png_labeled <- image_annotate(png_crop, "PNG (Lossless)\nSharp Edges",
+                               size = 30, color = "green",
+                               location = "+10+10", font = "sans", weight = 700)
+jpeg_labeled <- image_annotate(jpeg_crop, "JPEG (Quality 60)\nCompression Artifacts",
+                                size = 30, color = "red",
+                                location = "+10+10", font = "sans", weight = 700)
+
+# Combine side by side
+combined <- image_append(c(png_labeled, jpeg_labeled))
+combined
 ```
-
-::: {.columns}
-::: {.column width="50%"}
-**Original (PNG - Lossless)**
-
-![](plots/01_formats/artifacts_original.png)
-:::
-
-::: {.column width="50%"}
-**After JPEG Compression (Quality 60)**
-
-![](plots/01_formats/artifacts_jpeg.jpg)
-:::
-:::
 
 ::: {.callout-warning}
 ## Real-World Problem
@@ -314,15 +350,18 @@ JPG creates **blocking artifacts** around sharp edges and text!
 ```{r}
 #| echo: false
 #| eval: true
+#| fig-width: 12
+#| fig-height: 12
 
 # Generate comparison files
 library(ggplot2)
+library(magick)
 
 comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 3, color = "steelblue") +
   geom_smooth(method = "lm", color = "darkred", linewidth = 1.5) +
   annotate("text", x = 4, y = 30,
-           label = "Zoom this text to 400%!",
+           label = "Zoom to see quality!",
            size = 6, fontface = "bold") +
   theme_classic(base_size = 14) +
   labs(title = "Vector vs Raster Comparison",
@@ -344,35 +383,40 @@ ggsave("plots/01_formats/compare_lowres.png", comparison_plot,
 # JPEG - compression artifacts
 ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
        width = 6, height = 4, dpi = 150, quality = 60)
+
+# Read and zoom in on text area to show differences
+vector_img <- image_read_svg("plots/01_formats/compare_vector.svg", width = 1800)
+highres_img <- image_read("plots/01_formats/compare_highres.png")
+lowres_img <- image_read("plots/01_formats/compare_lowres.png")
+jpeg_img <- image_read("plots/01_formats/compare_jpeg.jpg")
+
+# Crop and zoom on the text area
+crop_geom <- "200x100+800+50"
+vector_crop <- image_crop(vector_img, crop_geom) %>% image_scale("600x300")
+highres_crop <- image_crop(highres_img, crop_geom) %>% image_scale("600x300")
+lowres_crop <- image_crop(lowres_img, crop_geom) %>% image_scale("600x300")
+jpeg_crop <- image_crop(jpeg_img, crop_geom) %>% image_scale("600x300")
+
+# Add labels
+vector_labeled <- image_annotate(vector_crop, "SVG (Vector)",
+                                  size = 25, color = "green",
+                                  location = "+10+10", font = "sans", weight = 700)
+highres_labeled <- image_annotate(highres_crop, "PNG 300 DPI",
+                                   size = 25, color = "darkgreen",
+                                   location = "+10+10", font = "sans", weight = 700)
+lowres_labeled <- image_annotate(lowres_crop, "PNG 72 DPI",
+                                  size = 25, color = "orange",
+                                  location = "+10+10", font = "sans", weight = 700)
+jpeg_labeled <- image_annotate(jpeg_crop, "JPEG Q60",
+                                size = 25, color = "red",
+                                location = "+10+10", font = "sans", weight = 700)
+
+# Combine in 2x2 grid
+top_row <- image_append(c(vector_labeled, highres_labeled))
+bottom_row <- image_append(c(lowres_labeled, jpeg_labeled))
+combined <- image_append(c(top_row, bottom_row), stack = TRUE)
+combined
 ```
-
-::: {.columns}
-::: {.column width="50%"}
-**Vector (SVG) - Infinite zoom, always crisp**
-
-![](plots/01_formats/compare_vector.svg)
-:::
-
-::: {.column width="50%"}
-**High-res PNG (300 DPI) - Good quality**
-
-![](plots/01_formats/compare_highres.png)
-:::
-:::
-
-::: {.columns}
-::: {.column width="50%"}
-**Low-res PNG (72 DPI) - Pixelated when zoomed**
-
-![](plots/01_formats/compare_lowres.png)
-:::
-
-::: {.column width="50%"}
-**JPEG (Quality 60) - Compression artifacts**
-
-![](plots/01_formats/compare_jpeg.jpg)
-:::
-:::
 
 ## Vector Screenshots from Websites
 
