@@ -29,48 +29,55 @@
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 5
+#| fig-height: 6
 
 library(ggplot2)
-library(patchwork)
+library(magick)
 
 # Create a smooth curve with text
 x <- seq(0, 4*pi, length.out = 200)
-curve_data <- data.frame(
-  x = x,
-  y = sin(x) * exp(-x/10)
-)
+curve_data <- data.frame(x = x, y = sin(x) * exp(-x/10))
 
-# Create the plot
 p <- ggplot(curve_data, aes(x, y)) +
-  geom_line(color = "steelblue", linewidth = 2) +
+  geom_line(color = "steelblue", linewidth = 3) +
   geom_point(data = curve_data[seq(1, 200, 20), ],
-             color = "darkred", size = 3) +
-  annotate("text", x = 6, y = 0.5,
-           label = "VECTOR\nInfinite Resolution",
-           size = 8, fontface = "bold", color = "navy") +
-  theme_classic(base_size = 14) +
-  labs(title = "Vector Format (PDF/SVG)",
-       x = "x", y = "sin(x) × exp(-x/10)")
+             color = "darkred", size = 4) +
+  annotate("text", x = 6, y = 0.6,
+           label = "Smooth Curve",
+           size = 10, fontface = "bold", color = "navy") +
+  theme_classic(base_size = 18) +
+  theme(plot.title = element_text(face = "bold", size = 20)) +
+  labs(title = "Mathematical Curve", x = "", y = "")
 
-# Save as vector
-ggsave("demo_vector_curve.pdf", p, width = 6, height = 4, device = cairo_pdf)
+# Save as SVG (vector - web compatible)
+ggsave("vector_demo.svg", p, width = 8, height = 4)
 
-# Save as low-res raster
-ggsave("demo_lowres_curve.png", p, width = 6, height = 4, dpi = 50)
+# Save as low-res PNG (raster)
+ggsave("raster_demo.png", p, width = 8, height = 4, dpi = 72)
 
-# Display side-by-side comparison
-p1 <- p + labs(title = "Vector (PDF) - Smooth at any zoom")
-p2 <- p +
-  labs(title = "Low-res Raster (50 DPI) - Pixelated when zoomed") +
-  annotate("text", x = 6, y = 0.5,
-           label = "RASTER\nFixed Resolution",
-           size = 8, fontface = "bold", color = "darkred")
+# Read the saved images and zoom in to show difference
+vector_img <- image_read_svg("vector_demo.svg", width = 800)
+raster_img <- image_read("raster_demo.png")
 
-p1 + p2
+# Crop a section and zoom 3x to show the difference
+crop_geom <- "300x200+250+100"
+vector_crop <- image_crop(vector_img, crop_geom) %>% image_scale("900x600")
+raster_crop <- image_crop(raster_img, crop_geom) %>% image_scale("900x600")
+
+# Add labels
+vector_labeled <- image_annotate(vector_crop, "VECTOR (SVG)\nStays Crisp",
+                                  size = 40, color = "green",
+                                  location = "+10+10", font = "sans", weight = 700)
+raster_labeled <- image_annotate(raster_crop, "RASTER (PNG 72 DPI)\nPixelated",
+                                  size = 40, color = "red",
+                                  location = "+10+10", font = "sans", weight = 700)
+
+# Combine side by side
+combined <- image_append(c(vector_labeled, raster_labeled))
+combined
 ```
 
-**Vector stays crisp at any zoom level - Raster shows pixels when zoomed**
+**Zoomed 3× to show the difference - Vector stays smooth, Raster shows pixels**
 
 ::: {.callout-note}
 ## Infinite Resolution
@@ -90,50 +97,59 @@ Because vectors are mathematical formulas, they can be scaled to **any size** wi
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 5
+#| fig-height: 6
 
 library(ggplot2)
-library(patchwork)
+library(magick)
 
-# Same curve, saved at different resolutions
+# Same curve
 x <- seq(0, 4*pi, length.out = 200)
 raster_data <- data.frame(x = x, y = sin(x) * exp(-x/10))
 
-base_plot <- ggplot(raster_data, aes(x, y)) +
-  geom_line(color = "steelblue", linewidth = 2) +
+p_base <- ggplot(raster_data, aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 3) +
   geom_point(data = raster_data[seq(1, 200, 20), ],
-             color = "darkred", size = 3) +
-  theme_classic(base_size = 14) +
-  labs(x = "x", y = "sin(x) × exp(-x/10)")
+             color = "darkred", size = 4) +
+  annotate("text", x = 6, y = 0.6,
+           label = "Same Curve",
+           size = 10, fontface = "bold", color = "navy") +
+  theme_classic(base_size = 18) +
+  theme(plot.title = element_text(face = "bold", size = 20)) +
+  labs(title = "Raster at Different DPI", x = "", y = "")
 
-# High-res raster (300 DPI)
-p_highres <- base_plot +
-  labs(title = "High-res PNG (300 DPI)",
-       subtitle = "Looks good - 1800 × 1200 pixels") +
-  annotate("text", x = 6, y = 0.5,
-           label = "300 DPI\nLooks Good",
-           size = 7, fontface = "bold", color = "darkgreen")
+# Save as high-res PNG (300 DPI) - 2400 × 1200 pixels
+ggsave("raster_300dpi.png", p_base, width = 8, height = 4, dpi = 300)
 
-# Low-res raster (72 DPI)
-p_lowres <- base_plot +
-  labs(title = "Low-res PNG (72 DPI)",
-       subtitle = "Pixelated when zoomed - 432 × 288 pixels") +
-  annotate("text", x = 6, y = 0.5,
-           label = "72 DPI\nPixelated",
-           size = 7, fontface = "bold", color = "darkred")
+# Save as low-res PNG (72 DPI) - 576 × 288 pixels
+ggsave("raster_72dpi.png", p_base, width = 8, height = 4, dpi = 72)
 
-# Save examples
-ggsave("raster_highres.png", p_highres, width = 6, height = 4, dpi = 300)
-ggsave("raster_lowres.png", p_lowres, width = 6, height = 4, dpi = 72)
+# Read the saved images
+highres_img <- image_read("raster_300dpi.png")
+lowres_img <- image_read("raster_72dpi.png")
 
-p_highres + p_lowres
+# Crop same region and zoom 3x
+crop_geom <- "300x200+250+100"
+highres_crop <- image_crop(highres_img, crop_geom) %>% image_scale("900x600")
+lowres_crop <- image_crop(lowres_img, crop_geom) %>% image_scale("900x600")
+
+# Add labels
+highres_labeled <- image_annotate(highres_crop, "300 DPI PNG\nSmooth",
+                                   size = 40, color = "darkgreen",
+                                   location = "+10+10", font = "sans", weight = 700)
+lowres_labeled <- image_annotate(lowres_crop, "72 DPI PNG\nPixelated",
+                                  size = 40, color = "darkred",
+                                  location = "+10+10", font = "sans", weight = 700)
+
+# Combine side by side
+raster_combined <- image_append(c(highres_labeled, lowres_labeled))
+raster_combined
 ```
 
-**High DPI = More pixels - Low DPI = Fewer pixels (pixelation when zoomed)**
+**Zoomed 3× - High DPI has more pixels = smoother, Low DPI = visible pixelation**
 
 ::: {.callout-warning}
 ## Resolution Dependent
-Raster images have **fixed resolution**. A 72 DPI image has only 72 pixels per inch. Zoom too much and you see individual pixels (pixelation).
+Raster images have **fixed resolution**. A 72 DPI image has only 72 pixels per inch. Zoom too much and you see individual pixels (pixelation). Both images look the same at normal size, but zoom reveals the difference!
 :::
 
 ## Vector vs. Raster Comparison
