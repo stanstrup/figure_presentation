@@ -12,6 +12,7 @@ format:
     fig-width: 8
     fig-height: 5
 keep-md: true
+keep-source: true
 ---
 
 # Academic Figures: Common Pitfalls and Best Practices {.title-slide}
