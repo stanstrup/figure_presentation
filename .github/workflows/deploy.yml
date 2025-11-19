@@ -36,7 +36,7 @@ jobs:
 
       - name: Install R packages
         run: |
-          R -e 'install.packages(c("ggplot2", "patchwork", "magick", "glue", "viridis", "remotes"))'
+          R -e 'install.packages(c("ggplot2", "patchwork", "magick", "glue", "viridis", "remotes", "mixOmics"))'
 
       - name: Render Quarto presentation
         run: |
