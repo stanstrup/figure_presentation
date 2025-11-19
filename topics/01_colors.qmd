@@ -66,11 +66,14 @@ ggplot(circle_data, aes(x = x, y = y)) +
   geom_point(aes(fill = color), shape = 21, size = 25, stroke = 2, color = "white") +
   geom_text(aes(label = label), size = 8, fontface = "bold", color = "white") +
   scale_fill_identity() +
-  scale_x_continuous(breaks = 1:k, labels = 1:k) +
+  #scale_x_continuous(breaks = 1:k, labels = 1:k) +
   theme_void() +
-  coord_fixed(ratio = 0.2) +
+  coord_fixed(ratio = 8) +
+  theme(
+    plot.margin = margin(0, 0, 0, 10)
+  ) +
   labs(title = "Put these colors in the correct rainbow order",
-       subtitle = "Remember the number above each color!")
+       subtitle = "Write down the correct number order!")
 ```
 
 ::: {.notes}
@@ -83,13 +86,13 @@ Ask the audience to mentally arrange these numbered colors in rainbow order befo
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 2
+#| fig-height: 2.5
 
 # Show the correct order (reversed to match gradient direction)
 # Use the original shuffled numbers so participants can verify their answers
 anchors_reversed <- rev(anchors_named)
 correct_data <- data.frame(
-  x = 1:k,
+  x = rev(1:k),
   y = 1,
   color = anchors_reversed,
   label = paste0(rev(order(shuffled_idx)))
@@ -99,15 +102,14 @@ ggplot(correct_data, aes(x = x, y = y)) +
   geom_point(aes(fill = color), shape = 21, size = 25, stroke = 2, color = "white") +
   geom_text(aes(label = label), size = 8, fontface = "bold", color = "white") +
   scale_fill_identity() +
-  scale_x_continuous(breaks = 1:k, labels = anchors_reversed, position = "bottom") +
+  scale_x_continuous(breaks = 1:k, labels = rev(correct_data$color), position = "bottom") +
   theme_void() +
-  coord_fixed(ratio = 0.2) +
+  coord_fixed(ratio = 8) +
   theme(
     axis.text.x = element_text(size = 10, angle = 45, hjust = 1, margin = margin(t = 10)),
-    plot.margin = margin(20, 20, 40, 20)
+    plot.margin = margin(0, 0, 0, 10)
   ) +
-  labs(title = "Correct Rainbow Order",
-       subtitle = paste("Colors:", paste(anchors_reversed, collapse = " → ")))
+  labs(title = "Correct Rainbow Order")
 ```
 
 **Colors in order:** Red → Orange → Yellow → Green → Cyan → Blue → Purple/Magenta
@@ -125,7 +127,7 @@ ggplot(correct_data, aes(x = x, y = y)) +
 # -------------------------------------------------------------------------
 native <- data.frame(x = n:1, y = 1, color = rev(rainbow(n)))
 manual <- data.frame(x = n:1, y = 1, color = rev(manual_colors))
-jet    <- data.frame(x = n:1, y = 1, color = rev(mixOmics::color.jet(n)))
+jet    <- data.frame(x = n:1, y = 1, color = mixOmics::color.jet(n))
 
 # -------------------------------------------------------------------------
 # Helper plot function
@@ -151,28 +153,6 @@ p1 / p2 / p3 +
     title = "Comparison of rainbow(), Manual RGB Interpolation, and Jet",
     theme = theme(plot.title = element_text(size = 16, face = "bold"))
   )
-```
-
-**All three create perceptually non-uniform gradients** - notice how some color transitions appear sharper than others!
-
-Both create the same perceptual problems!
-
-## The Right Order of Rainbow Colors
-
-**Traditional rainbow order (from physics - ROYGBIV):**
-
-Red → Orange → Yellow → Green → Blue → Indigo → Violet
-
-**In R's `rainbow()` function:**
-
-```{r}
-#| echo: true
-#| eval: true
-
-# Show the exact colors at key points
-key_colors <- rainbow(7)
-names(key_colors) <- c("Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Magenta")
-key_colors
 ```
 
 ::: {.callout-note}
@@ -205,12 +185,12 @@ faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
   theme(legend.position = "bottom")
 
 p1 <- faithful_plot +
-  scale_fill_gradientn(colors = rainbow(7)) +
-  labs(title = "Colormap A: Do you see sharp edges?")
+  scale_fill_gradientn(colors = rainbow(256)) +
+  labs(title = "Colormap A: Do you see sharp edges?", subtitle = "Rainbow scale")
 
 p2 <- faithful_plot +
   scale_fill_viridis_c() +
-  labs(title = "Colormap B: Smooth transitions")
+  labs(title = "Colormap B: Smooth transitions", subtitle = "Viridis scale")
 
 p1 + p2
 ```
@@ -268,7 +248,7 @@ ggplot(volcano_df, aes(x, y, fill = z)) +
 ## Perceptual Non-Uniformity: Demonstrated
 
 ```{r}
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 14
 #| fig-height: 6
@@ -326,48 +306,6 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 
 **Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
 
-## Jet Colormap Example
-
-```{r}
-#| echo: true
-#| eval: true
-#| fig-width: 12
-#| fig-height: 5
-
-library(ggplot2)
-library(patchwork)
-
-# Create jet colormap (MATLAB default, similar to rainbow)
-jet_colors <- colorRampPalette(c("darkblue", "blue", "cyan",
-                                  "yellow", "orange", "red", "darkred"))(100)
-
-# Medical imaging-like data (e.g., blood flow, tissue density)
-medical_data <- expand.grid(x = 1:50, y = 1:50)
-medical_data$intensity <- with(medical_data,
-                                exp(-((x-25)^2 + (y-25)^2)/100) * 100)
-
-p1 <- ggplot(medical_data, aes(x, y, fill = intensity)) +
-  geom_raster() +
-  scale_fill_gradientn(colors = jet_colors) +
-  theme_void() +
-  labs(title = "Jet Colormap (Medical Imaging)",
-       subtitle = "Yellow looks more intense than dark red - MISLEADING!") +
-  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        legend.position = "right")
-
-p2 <- ggplot(medical_data, aes(x, y, fill = intensity)) +
-  geom_raster() +
-  scale_fill_viridis_c(option = "inferno") +
-  theme_void() +
-  labs(title = "Inferno Colormap (Recommended)",
-       subtitle = "Higher values = brighter, perceptually accurate") +
-  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        legend.position = "right")
-
-p1 + p2
-```
 
 ## Viridis Family: Show All Options
 
