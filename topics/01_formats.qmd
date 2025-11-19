@@ -329,6 +329,7 @@ combined
 # Generate comparison files
 library(ggplot2)
 library(magick)
+library(glue)
 
 comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 3, color = "steelblue") +
@@ -358,22 +359,36 @@ ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
        width = 6, height = 4, dpi = 150, quality = 60)
 
 # Read and zoom in on text area to show differences
-vector_img <- image_read_svg("plots/01_formats/compare_vector.svg", width = 1800)
-highres_img <- image_read("plots/01_formats/compare_highres.png")
-lowres_img <- image_read("plots/01_formats/compare_lowres.png")
-jpeg_img <- image_read("plots/01_formats/compare_jpeg.jpg")
+# Base dimensions: 6 inches wide * 72 DPI = 432 pixels (low-res baseline)
 
-# Scale all images to same size first (1800 width to match vector)
-highres_scaled <- image_scale(highres_img, "1800x")
-lowres_scaled <- image_scale(lowres_img, "1800x")
-jpeg_scaled <- image_scale(jpeg_img, "1800x")
+# Vector: Read at very high resolution (10x the base size)
+oversize_scale <- 10
+vector_img <- image_read_svg("plots/01_formats/compare_vector.svg", width = 432*oversize_scale)
 
-# Crop and zoom on the text area (now all images have same dimensions)
-crop_geom <- "200x100+800+50"
-vector_crop <- image_crop(vector_img, crop_geom) %>% image_scale("600x300")
-highres_crop <- image_crop(highres_scaled, crop_geom) %>% image_scale("600x300")
-lowres_crop <- image_crop(lowres_scaled, crop_geom) %>% image_scale("600x300")
-jpeg_crop <- image_crop(jpeg_scaled, crop_geom) %>% image_scale("600x300")
+# Crop a region from the vector (scaled by oversize_scale) and zoom to display size
+vector_crop <- vector_img %>%
+  image_crop(glue("{200*oversize_scale}x{100*oversize_scale}+{800*oversize_scale}+{50*oversize_scale}")) %>%
+  image_scale("600x300")
+
+# PNG 300 DPI: Native size is 1800x1200 (6" * 300 DPI)
+# Scale factor relative to 72 DPI base: 300/72 = 4.167
+scale_300 <- 300/72
+highres_crop <- image_read("plots/01_formats/compare_highres.png") %>%
+  image_crop(glue("{200*scale_300}x{100*scale_300}+{800*scale_300}+{50*scale_300}")) %>%
+  image_scale("600x300")
+
+# PNG 72 DPI: Native size is 432x288 (6" * 72 DPI) - our baseline
+scale_72 <- 1
+lowres_crop <- image_read("plots/01_formats/compare_lowres.png") %>%
+  image_crop(glue("{200*scale_72}x{100*scale_72}+{800*scale_72}+{50*scale_72}")) %>%
+  image_scale("600x300")
+
+# JPEG 150 DPI: Native size is 900x600 (6" * 150 DPI)
+# Scale factor relative to 72 DPI base: 150/72 = 2.083
+scale_150 <- 150/72
+jpeg_crop <- image_read("plots/01_formats/compare_jpeg.jpg") %>%
+  image_crop(glue("{200*scale_150}x{100*scale_150}+{800*scale_150}+{50*scale_150}")) %>%
+  image_scale("600x300")
 
 # Add labels
 vector_labeled <- image_annotate(vector_crop, "SVG (Vector)",
