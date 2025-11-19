@@ -1,21 +1,4 @@
-# File Formats {background-color="#3498db"}
-
-## The Format Question
-
-**Which format should I use?**
-
-::: {.incremental}
-
-- **Type of image**
-
-\
-
-- Journal submission?
-- Poster presentation?
-- PowerPoint?
-- Web/online?
-:::
-
+# Which image format for which purpose? {background-color="#3498db"}
 
 
 ## What is a Raster Image?
@@ -193,76 +176,6 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 | **JPEG** | Lossy compression | Web (avoid for science) |
 
 
-## Format Selection: Decision Tree
-
-```{mermaid}
-%%{init: {'theme':'dark', 'themeVariables': {'edgeLabelBackground':'#1a1a1a', 'primaryTextColor':'#fff', 'secondaryTextColor':'#fff', 'tertiaryTextColor':'#fff'}}}%%
-
-flowchart LR
-    A[What type of image?] --> B{Photo}
-    A --> C{Screenshot}
-    A --> D{Generated figure/<br/>website snapshot}
-
-    B --> B1{Where will it<br/>be used?}
-    B1 -->|Publication| B2[TIFF LZW<br/>300+ DPI]
-    B1 -->|Presentation/Web| B3[JPEG/WebP <br/> 150+ DPI]
-
-    C --> C1{Where will it<br/>be used?}
-    C1 -->|Publication| C2[TIFF LZW<br/>300+ DPI]
-    C1 -->|Presentation/Web| C3[PNG<br/>150 DPI]
-
-    D --> D1{Publication or<br/>presentation?}
-    D1 -->|Publication| D2{Vector support?}
-    D1 -->|Presentation/Web| D3[SVG or PNG]
-
-    D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
-    D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
-
-    style A fill:#5dade2,color:#fff
-    style B fill:#5dade2,color:#fff
-    style C fill:#5dade2,color:#fff
-    style D fill:#5dade2,color:#fff
-    style B1 fill:#5dade2,color:#fff
-    style C1 fill:#5dade2,color:#fff
-    style D1 fill:#5dade2,color:#fff
-    style D2 fill:#5dade2,color:#fff
-    style D4 fill:#2ecc71,color:#fff
-    style D5 fill:#5dade2,color:#fff
-    style D3 fill:#9b59b6,color:#fff
-    style B2 fill:#3498db,color:#fff
-    style B3 fill:#e74c3c,color:#fff
-    style C2 fill:#3498db,color:#fff
-    style C3 fill:#9b59b6,color:#fff
-
-```
-
-## Format Properties Comparison
-
-| Format | Type | Compression | Container? | Notes |
-|--------|------|-------------|------------|-------|
-| **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
-| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
-| **SVG** | Vector | Lossless | No | XML-based, web-native |
-| **PNG** | Raster | Lossless | No | Supports transparency |
-| **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
-| **JPEG** | Raster | Lossy | No | Best for photos only |
-| **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
-
-: {tbl-colwidths="[10,18,15,10,47]"}
-
-::: {.callout-note}
-
-## Container Formats
-
-**Container formats** can hold multiple types of data or multiple images:
-- **PDF**: Can mix vector graphics, raster images, fonts, and text
-- **EPS**: Can embed fonts, preview images, and vector data
-- **TIFF**: Can contain multiple pages/images with different compression
-
-**Non-container formats** store a single image with one encoding type.
-
-:::
-
 
 ## JPEG Compression Artifacts
 
@@ -318,6 +231,36 @@ combined
 ```
 
 
+
+## Format Properties Comparison
+
+| Format | Type | Compression | Container? | Notes |
+|--------|------|-------------|------------|-------|
+| **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
+| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
+| **SVG** | Vector | Lossless | No | XML-based, web-native |
+| **PNG** | Raster | Lossless | No | Supports transparency |
+| **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
+| **JPEG** | Raster | Lossy | No | Best for photos only |
+| **WebP** | Raster | Lossless or Lossy | No | Modern web format, smaller than PNG/JPEG |
+
+: {tbl-colwidths="[10,18,15,10,47]"}
+
+::: {.callout-note}
+
+## Container Formats
+
+**Container formats** can hold multiple types of data or multiple images:
+
+- **PDF**: Can mix vector graphics, raster images, fonts, and text
+- **EPS**: Can embed fonts, preview images, and vector data
+- **TIFF**: Can contain multiple pages/images with different compression
+
+**Non-container formats** store a single image with one encoding type.
+
+:::
+
+
 ## File Format Comparison
 
 ```{r}
@@ -368,27 +311,27 @@ vector_img <- image_read_svg("plots/01_formats/compare_vector.svg", width = 432*
 # Crop a region from the vector (scaled by oversize_scale) and zoom to display size
 # Crop coordinates: x=250, y=20, width=150, height=75 (at base scale)
 vector_crop <- vector_img %>%
-  image_crop(glue("{150*oversize_scale}x{75*oversize_scale}+{250*oversize_scale}+{20*oversize_scale}")) %>%
+  image_crop(glue("{150*oversize_scale}x{75*oversize_scale}+{250*oversize_scale}+{200*oversize_scale}")) %>%
   image_scale("600x300")
 
 # PNG 300 DPI: Native size is 1800x1200 (6" * 300 DPI)
 # Scale factor relative to 72 DPI base: 300/72 = 4.167
 scale_300 <- 300/72
 highres_crop <- image_read("plots/01_formats/compare_highres.png") %>%
-  image_crop(glue("{150*scale_300}x{75*scale_300}+{250*scale_300}+{20*scale_300}")) %>%
+  image_crop(glue("{150*scale_300}x{75*scale_300}+{250*scale_300}+{200*scale_300}")) %>%
   image_scale("600x300")
 
 # PNG 72 DPI: Native size is 432x288 (6" * 72 DPI) - our baseline
 scale_72 <- 1
 lowres_crop <- image_read("plots/01_formats/compare_lowres.png") %>%
-  image_crop(glue("{150*scale_72}x{75*scale_72}+{250*scale_72}+{20*scale_72}")) %>%
+  image_crop(glue("{150*scale_72}x{75*scale_72}+{250*scale_72}+{200*scale_72}")) %>%
   image_scale("600x300")
 
 # JPEG 150 DPI: Native size is 900x600 (6" * 150 DPI)
 # Scale factor relative to 72 DPI base: 150/72 = 2.083
 scale_150 <- 150/72
 jpeg_crop <- image_read("plots/01_formats/compare_jpeg.jpg") %>%
-  image_crop(glue("{150*scale_150}x{75*scale_150}+{250*scale_150}+{20*scale_150}")) %>%
+  image_crop(glue("{150*scale_150}x{75*scale_150}+{250*scale_150}+{200*scale_150}")) %>%
   image_scale("600x300")
 
 # Add labels
@@ -412,33 +355,59 @@ combined <- image_append(c(top_row, bottom_row), stack = TRUE)
 combined
 ```
 
+## Real world horror story
+
+
+
+:::: {.columns}
+::: {.column width="50%"}
+
+This is the graphical abstract
+
+![](sources/1-s2.0-S0003267012000062-fx1.jpg)
+
+:::
+
+::: {.column width="50%"}
+
+This was one of the figures
+
+![](sources/1-s2.0-S0003267012000062-gr4.jpg)
+
+:::
+::::
+
+
+
+
+
+
+
+
+
+::: notes
+
+Barri, T., Holmer-Jensen, J., Hermansen, K., & Dragsted, L. O. (2012). Metabolic fingerprinting of high-fat plasma samples processed by centrifugation- and filtration-based protein precipitation delineates significant differences in metabolite information coverage. Analytica Chimica Acta, 718, 47–57. https://doi.org/10.1016/j.aca.2011.12.065
+
+:::
+
+
 ## Vector Screenshots from Websites
 
 ::: {.callout-tip}
 
 ## Capturing Website Content as Vector Graphics
 
-**Google Chrome has a built-in feature to save web pages as PDF (vector format)!**
-
-### Method 1: Print to PDF (Recommended)
+### Print to PDF as you see the website
 
 1. Open the webpage in Google Chrome
-2. Press `Ctrl+P` (Windows/Linux) or `Cmd+P` (Mac)
-3. Select **"Save as PDF"** as the destination
-4. Adjust settings:
-   - Uncheck "Headers and footers" for cleaner output
-   - Set margins as needed
-   - Choose "Background graphics" if you want colors
-5. Click "Save"
+2. Open Chrome DevTools (`F12`)
+3. Click "⋮"
+4. Click "More Tools"
+5. click "Rendering"
+6. Set "Emulate CSS media type" to "screen"
+7. "Print"to PDF
 
-**Result:** Vector-based PDF that can be zoomed infinitely!
-
-### Method 2: Chrome DevTools (For Specific Elements)
-
-1. Open Chrome DevTools (`F12` or `Ctrl+Shift+I`)
-2. Right-click on the element you want to capture
-3. Select "Capture node screenshot" (saves as PNG)
-4. For vector: Use Print to PDF method instead
 
 ### Why This Matters
 
@@ -449,73 +418,54 @@ combined
 
 :::
 
-### Use Cases
-
-```r
-# After saving webpage as PDF, you can include in your document
-# Or extract specific figures using PDF tools
-```
 
 **Examples:**
 
-- Capture ColorBrewer website for reference
-- Save interactive plot demonstrations
 - Document online data visualization examples
-- Include web-based tools in presentations
+- Include web-based tools in presentations and papers
 
-::: {.callout-note}
 
-## Alternative: Browser Extensions
 
-For more control:
-- **Awesome Screenshot** - Can save as PDF
-- **Full Page Screen Capture** - Saves entire page
-- **FireShot** - Multiple format options including PDF
+## Format Selection: Decision Tree
 
-But Chrome's built-in Print to PDF is usually sufficient!
+```{mermaid}
+%%{init: {'theme':'dark', 'themeVariables': {'edgeLabelBackground':'#1a1a1a', 'primaryTextColor':'#fff', 'secondaryTextColor':'#fff', 'tertiaryTextColor':'#fff'}}}%%
 
-:::
+flowchart LR
+    A[What type of image?] --> B{Photo}
+    A --> C{Screenshot}
+    A --> D{Generated figure/<br/>website snapshot}
 
-## Recommendations
+    B --> B1{Where will it<br/>be used?}
+    B1 -->|Publication| B2[TIFF LZW<br/>300+ DPI]
+    B1 -->|Presentation/Web| B3[JPEG/WebP <br/> 150+ DPI]
 
-::: {.callout-tip}
+    C --> C1{Where will it<br/>be used?}
+    C1 -->|Publication| C2[TIFF LZW<br/>300+ DPI]
+    C1 -->|Presentation/Web| C3[PNG<br/>150 DPI]
 
-## Best Practices
+    D --> D1{Publication or<br/>presentation?}
+    D1 -->|Publication| D2{Vector support?}
+    D1 -->|Presentation/Web| D3[SVG or PNG]
 
-1. **Default choice**: PDF (vector) for all plots and diagrams
-   - Use `device = cairo_pdf` for best quality
+    D2 -->|Yes| D4[PDF / SVG / EPS<br/>All equivalent vectors]
+    D2 -->|No| D5[TIFF 600+ DPI LZW<br/>PNG not supported]
 
-2. **If PDF not accepted**: EPS format (also vector)
-   - Use `device = cairo_ps`
+    style A fill:#5dade2,color:#fff
+    style B fill:#5dade2,color:#fff
+    style C fill:#5dade2,color:#fff
+    style D fill:#5dade2,color:#fff
+    style B1 fill:#5dade2,color:#fff
+    style C1 fill:#5dade2,color:#fff
+    style D1 fill:#5dade2,color:#fff
+    style D2 fill:#5dade2,color:#fff
+    style D4 fill:#2ecc71,color:#fff
+    style D5 fill:#5dade2,color:#fff
+    style D3 fill:#9b59b6,color:#fff
+    style B2 fill:#3498db,color:#fff
+    style B3 fill:#e74c3c,color:#fff
+    style C2 fill:#3498db,color:#fff
+    style C3 fill:#9b59b6,color:#fff
 
-3. **If raster needed**: PNG at 300+ DPI
-   - Lossless compression
-   - Supports transparency
-
-4. **Never**: JPG for plots with text or lines
-   - Lossy compression creates artifacts
-   - Only for photographs
-
-5. **Quick drafts**: PNG at 150 DPI
-   - Fast and lossless
-   - Good for sharing in progress
-
-6. **Journal submission**: Check guidelines
-   - Usually: PDF, EPS, or high-res TIFF
-   - Rarely: PNG (but accepted)
-   - Never: JPG for line art
-
-:::
-
-## Summary: Format Cheat Sheet
-
-| Format | Type | Compression | Best Use | Avoid For |
-|--------|------|-------------|----------|-----------|
-| **PDF** | Vector | Lossless | Publications, plots | Photos |
-| **EPS** | Vector | None | Publications | Modern web |
-| **SVG** | Vector | Text-based | Web graphics | Print journals |
-| **PNG** | Raster | Lossless | Screenshots, drafts | Large images |
-| **TIFF** | Raster | Lossless/Lossy | Journals, archival | Presentations |
-| **JPEG** | Raster | Lossy | Photos only | Any plots/diagrams |
-
+```
 
