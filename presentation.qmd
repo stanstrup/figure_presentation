@@ -21,7 +21,7 @@ keep-source: true
 *Things that annoy me - An opinionated guide*
 :::
 
-**Your Name**
+**Jan Stanstrup**
 
 # Introduction {background-color="#2c3e50"}
 
@@ -29,77 +29,89 @@ keep-source: true
 
 ::: {.incremental}
 - Figures are often the first (and sometimes only) thing readers look at
-- Poor quality figures can undermine excellent research
-- Journal rejections due to technical figure issues
-- Reproducibility and transparency in science
+
+- Poor quality figures look unprofessional
+- Low resolution images look bad when scaled up (e.g. posters)
+
+- Bad visualizations can be misleading
 :::
 
 ## What We'll Cover
 
 :::: {.columns}
 ::: {.column width="50%"}
-1. File Formats
+
+**Do it right**
+
 2. Color Gradients
-3. Themes & Styling
 4. Heatmap Scaling
-5. Text Sizing
-6. Saving Plots
+1. File Formats
+
 :::
 
 ::: {.column width="50%"}
+
+**Do it easily**
+
+5. Text Sizing
+3. Themes & Styling
+6. Saving Plots
+11. Factor Ordering
+
 7. Post-Processing
 8. PowerPoint Import
 9. Rendering Issues
+
 10. Interactive Plots
-11. Factor Ordering
+
 :::
 ::::
 
----
+
 
 {{< include topics/01_formats.qmd >}}
 
----
+
 
 {{< include topics/02_colors.qmd >}}
 
----
+
 
 {{< include topics/03_themes.qmd >}}
 
----
+
 
 {{< include topics/04_heatmaps.qmd >}}
 
----
+
 
 {{< include topics/05_sizing.qmd >}}
 
----
+
 
 {{< include topics/06_saving.qmd >}}
 
----
+
 
 {{< include topics/07_editing.qmd >}}
 
----
+
 
 {{< include topics/08_powerpoint.qmd >}}
 
----
+
 
 {{< include topics/09_rendering.qmd >}}
 
----
+
 
 {{< include topics/10_interactive.qmd >}}
 
----
+
 
 {{< include topics/11_factors.qmd >}}
 
----
+
 
 # Summary {background-color="#2c3e50"}
 
@@ -120,8 +132,5 @@ keep-source: true
 - "Fundamentals of Data Visualization" by Claus Wilke
 - ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
 
-## Questions? {background-color="#2c3e50"}
-
-Contact: your.email@institution.edu
 
 Slides: github.com/yourrepo
