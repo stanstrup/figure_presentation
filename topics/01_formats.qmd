@@ -300,7 +300,7 @@ png_img <- image_read("plots/01_formats/artifacts_original.png")
 jpeg_img <- image_read("plots/01_formats/artifacts_jpeg.jpg")
 
 # Crop and zoom 4x on the edge where artifacts are visible
-crop_geom <- "150x150+450+300"
+crop_geom <- "100x100+450+250"
 png_crop <- image_crop(png_img, crop_geom) %>% image_scale("600x600")
 jpeg_crop <- image_crop(jpeg_img, crop_geom) %>% image_scale("600x600")
 
@@ -317,17 +317,6 @@ combined <- image_append(c(png_labeled, jpeg_labeled))
 combined
 ```
 
-::: {.callout-warning}
-
-## Real-World Problem
-
-"Graphics downloaded from the Web are not acceptable for print reproduction as they are low-resolution images (usually 72 dpi)"
-
-— European Journal of Orthodontics
-
-JPG creates **blocking artifacts** around sharp edges and text!
-
-:::
 
 ## File Format Comparison
 
