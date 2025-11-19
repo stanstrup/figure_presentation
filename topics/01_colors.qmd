@@ -9,6 +9,10 @@
 library(ggplot2)
 library(patchwork)
 library(mixOmics)
+library(viridis)
+library(scales)
+library(colorspace)
+library(dichromat)
 
 n <- 100      # number of final colors in the gradient
 k <- 12       # number of anchor colors to sample from rainbow()
@@ -305,6 +309,127 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 :::
 
 **Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
+
+
+## The Viridis Color Scales
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 9
+
+n_col <- 128
+
+# Helper function to display color scales
+img <- function(obj, nam) {
+  image(1:length(obj), 1, as.matrix(1:length(obj)), col=obj,
+        main = nam, ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+}
+
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(rev(viridis(n_col)), "viridis")
+img(rev(magma(n_col)), "magma")
+img(rev(plasma(n_col)), "plasma")
+img(rev(inferno(n_col)), "inferno")
+img(rev(cividis(n_col)), "cividis")
+img(rev(mako(n_col)), "mako")
+img(rev(rocket(n_col)), "rocket")
+img(rev(turbo(n_col)), "turbo")
+```
+
+**All viridis scales are perceptually uniform and colorblind-friendly!**
+
+
+## Comparison: Rainbow vs Better Alternatives
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+par(mfrow=c(7, 1), mar=rep(1, 4))
+img(rev(rainbow(n_col)), "rainbow")
+img(rev(heat.colors(n_col)), "heat")
+img(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "ggplot default")
+img(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "brewer blues")
+img(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col)), "brewer yellow-green-blue")
+img(rev(viridis(n_col)), "viridis")
+img(rev(magma(n_col)), "magma")
+```
+
+**Notice how rainbow and heat have sharp transitions while viridis/magma are smooth!**
+
+
+## Desaturated (Black & White Printing)
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+par(mfrow=c(7, 1), mar=rep(1, 4))
+img(desaturate(rev(rainbow(n_col))), "rainbow")
+img(desaturate(rev(heat.colors(n_col))), "heat")
+img(desaturate(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col)))), "ggplot default")
+img(desaturate(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col))), "brewer blues")
+img(desaturate(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col))), "brewer yellow-green-blue")
+img(desaturate(rev(viridis(n_col))), "viridis")
+img(desaturate(rev(magma(n_col))), "magma")
+```
+
+**Rainbow loses all information when desaturated! Viridis/magma remain readable.**
+
+
+## Green-Blind Vision (Deuteranopia)
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+par(mfrow=c(7, 1), mar=rep(1, 4))
+img(dichromat(rev(rainbow(n_col)), "deutan"), "rainbow")
+img(dichromat(rev(heat.colors(n_col)), "deutan"), "heat")
+img(dichromat(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "deutan"), "ggplot default")
+img(dichromat(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "deutan"), "brewer blues")
+img(dichromat(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col)), "deutan"), "brewer yellow-green-blue")
+img(dichromat(rev(viridis(n_col)), "deutan"), "viridis")
+img(dichromat(rev(magma(n_col)), "deutan"), "magma")
+```
+
+**For ~8% of men, rainbow is nearly useless! Viridis/magma stay distinct.**
+
+
+## Color Scale Comparison: Pros and Cons
+
+| Scale | Pros | Cons | Best Use |
+|-------|------|------|----------|
+| **Rainbow** | ❌ Familiar to some users | ❌ Perceptually non-uniform<br>❌ Creates false boundaries<br>❌ Fails colorblind test<br>❌ Loses information when desaturated<br>❌ Medical misdiagnosis risk | **AVOID** |
+| **Heat** | ❌ Traditional in some fields | ❌ Poor colorblind performance<br>❌ Limited perceptual uniformity<br>❌ Yellow visibility issues | **AVOID** |
+| **ggplot default** | ✅ Perceptually uniform<br>✅ Colorblind safe | ⚠️ Limited range<br>⚠️ Only blue gradient | Sequential data (single direction) |
+| **Brewer Blues** | ✅ Colorblind safe<br>✅ Print friendly<br>✅ Professional appearance | ⚠️ Monochromatic (less engaging)<br>⚠️ Limited discrimination | Print publications, maps |
+| **Brewer YlGnBu** | ✅ Good perceptual uniformity<br>✅ Colorblind safe<br>✅ Aesthetically pleasing | ⚠️ Yellow can wash out<br>⚠️ Not ideal for projection | Print, web (not projection) |
+| **Viridis** | ✅ Perceptually uniform<br>✅ Colorblind safe<br>✅ B&W photocopy safe<br>✅ Projection safe<br>✅ Engaging colors | ⚠️ Very popular (less unique) | **DEFAULT CHOICE** for most data |
+| **Magma/Inferno** | ✅ All viridis benefits<br>✅ Warmer aesthetic<br>✅ High contrast endpoints | ⚠️ Dark end can be hard to see | Dark backgrounds, presentations |
+| **Cividis** | ✅ Optimized for colorblindness<br>✅ All viridis benefits | ⚠️ Less saturated (less engaging) | When colorblind audience is priority |
+
+::: {.callout-tip}
+## Quick Decision Guide
+
+**For most use cases:** Use **Viridis** (or Magma/Plasma variants)
+
+**When to use something else:**
+- Diverging data (has meaningful center): ColorBrewer diverging (RdBu, RdYlBu)
+- Categorical data: ColorBrewer qualitative (Set2, Paired)
+- High colorblind audience: Cividis
+- Print-only publication: Brewer Blues or Greens
+
+**Never use:** Rainbow or Jet
+:::
 
 
 ## Viridis Family: Show All Options
