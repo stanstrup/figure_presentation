@@ -1,39 +1,5 @@
 # Color Gradients {background-color="#e74c3c"}
 
-## A Tale of Two Colormaps
-
-```{r}
-#| echo: false
-#| eval: true
-#| fig-width: 12
-#| fig-height: 5
-
-library(ggplot2)
-library(patchwork)
-
-# Create sample data with smooth gradient
-faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
-  geom_raster() +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = "bottom")
-
-p1 <- faithful_plot +
-  scale_fill_gradientn(colors = rainbow(7)) +
-  labs(title = "Colormap A: Do you see sharp edges?")
-
-p2 <- faithful_plot +
-  scale_fill_viridis_c() +
-  labs(title = "Colormap B: Smooth transitions")
-
-p1 + p2
-```
-
-::: {.fragment}
-**Which one shows the data more accurately?**
-
-The data is **smooth**, yet Colormap A creates false boundaries!
-:::
-
 ## What is the Rainbow Scale?
 
 ```{r}
@@ -102,12 +68,7 @@ ggplot(circle_data, aes(x = x, y = y)) +
   scale_fill_identity() +
   scale_x_continuous(breaks = 1:k, labels = 1:k) +
   theme_void() +
-  theme(
-    axis.text.x = element_text(size = 14, face = "bold", margin = margin(t = 10)),
-    plot.margin = margin(20, 20, 20, 20)
-  ) +
-  coord_fixed(ratio = 0.5) +
-  labs(title = "Put these colors in the correct rainbow order (Red → Orange → Yellow → Green → Cyan → Blue → Purple)",
+  labs(title = "Put these colors in the correct rainbow order",
        subtitle = "Remember the number above each color!")
 ```
 
@@ -137,11 +98,6 @@ ggplot(correct_data, aes(x = x, y = y)) +
   scale_fill_identity() +
   scale_x_continuous(breaks = 1:k, labels = anchors_named, position = "bottom") +
   theme_void() +
-  theme(
-    axis.text.x = element_text(size = 10, angle = 45, hjust = 1, margin = margin(t = 10)),
-    plot.margin = margin(20, 20, 40, 20)
-  ) +
-  coord_fixed(ratio = 0.5) +
   labs(title = "Correct Rainbow Order",
        subtitle = paste("Colors:", paste(anchors_named, collapse = " → ")))
 ```
@@ -220,6 +176,43 @@ This follows the visible light spectrum by **wavelength**:
 
 But wavelength order ≠ perceptual order!
 :::
+
+
+
+## A Tale of Two Colormaps
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+library(ggplot2)
+library(patchwork)
+
+# Create sample data with smooth gradient
+faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+p1 <- faithful_plot +
+  scale_fill_gradientn(colors = rainbow(7)) +
+  labs(title = "Colormap A: Do you see sharp edges?")
+
+p2 <- faithful_plot +
+  scale_fill_viridis_c() +
+  labs(title = "Colormap B: Smooth transitions")
+
+p1 + p2
+```
+
+::: {.fragment}
+**Which one shows the data more accurately?**
+
+The data is **smooth**, yet Colormap A creates false boundaries!
+:::
+
 
 ## Real-World Example: Rainbow Problems
 
