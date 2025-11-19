@@ -131,6 +131,6 @@ keep-source: true
 - Colorblind simulator: [coblis.org](https://www.coblis.com)
 - "Fundamentals of Data Visualization" by Claus Wilke
 - ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
-
+- https://clauswilke.com/dataviz
 
 Slides: github.com/yourrepo
