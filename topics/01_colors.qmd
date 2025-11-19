@@ -47,7 +47,7 @@ manual_colors <- manual_crp(n)
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 6
+#| fig-height: 2
 
 # Randomize the order for the challenge
 set.seed(42)  # for reproducibility
@@ -68,6 +68,7 @@ ggplot(circle_data, aes(x = x, y = y)) +
   scale_fill_identity() +
   scale_x_continuous(breaks = 1:k, labels = 1:k) +
   theme_void() +
+  coord_fixed(ratio = 0.2) +
   labs(title = "Put these colors in the correct rainbow order",
        subtitle = "Remember the number above each color!")
 ```
@@ -82,24 +83,31 @@ Ask the audience to mentally arrange these numbered colors in rainbow order befo
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 6
+#| fig-height: 2
 
-# Show the correct order
+# Show the correct order (reversed to match gradient direction)
+# Use the original shuffled numbers so participants can verify their answers
+anchors_reversed <- rev(anchors_named)
 correct_data <- data.frame(
   x = 1:k,
   y = 1,
-  color = anchors_named,
-  label = paste0(1:k)
+  color = anchors_reversed,
+  label = paste0(rev(order(shuffled_idx)))
 )
 
 ggplot(correct_data, aes(x = x, y = y)) +
   geom_point(aes(fill = color), shape = 21, size = 25, stroke = 2, color = "white") +
   geom_text(aes(label = label), size = 8, fontface = "bold", color = "white") +
   scale_fill_identity() +
-  scale_x_continuous(breaks = 1:k, labels = anchors_named, position = "bottom") +
+  scale_x_continuous(breaks = 1:k, labels = anchors_reversed, position = "bottom") +
   theme_void() +
+  coord_fixed(ratio = 0.2) +
+  theme(
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1, margin = margin(t = 10)),
+    plot.margin = margin(20, 20, 40, 20)
+  ) +
   labs(title = "Correct Rainbow Order",
-       subtitle = paste("Colors:", paste(anchors_named, collapse = " → ")))
+       subtitle = paste("Colors:", paste(anchors_reversed, collapse = " → ")))
 ```
 
 **Colors in order:** Red → Orange → Yellow → Green → Cyan → Blue → Purple/Magenta
@@ -113,11 +121,11 @@ ggplot(correct_data, aes(x = x, y = y)) +
 #| fig-height: 8
 
 # -------------------------------------------------------------------------
-# Build data frames for ggplot
+# Build data frames for ggplot (reversed to match the dot visualization)
 # -------------------------------------------------------------------------
-native <- data.frame(x = n:1, y = 1, color = rainbow(n))
-manual <- data.frame(x = n:1, y = 1, color = manual_colors)
-jet    <- data.frame(x = n:1, y = 1, color = mixOmics::color.jet(n))
+native <- data.frame(x = n:1, y = 1, color = rev(rainbow(n)))
+manual <- data.frame(x = n:1, y = 1, color = rev(manual_colors))
+jet    <- data.frame(x = n:1, y = 1, color = rev(mixOmics::color.jet(n)))
 
 # -------------------------------------------------------------------------
 # Helper plot function
