@@ -46,7 +46,7 @@ p <- ggplot(curve_data, aes(x, y)) +
   labs(x = "", y = "")
 
 # Save as SVG (vector format)
-ggsave("plots/01_formats/vector-curve.svg", p, width = 6, height = 4, device = "svg")
+ggsave("plots/03_formats/vector-curve.svg", p, width = 6, height = 4, device = "svg")
 ```
 
 ::::: {.columns}
@@ -65,7 +65,7 @@ Because vectors are mathematical formulas, they can be scaled to **any size** wi
 ::::
 
 :::: {.column width="50%"}
-![](plots/01_formats/vector-curve.svg){width=100%}
+![](plots/03_formats/vector-curve.svg){width=100%}
 ::::
 :::::
 
@@ -100,14 +100,14 @@ p <- ggplot(curve_data, aes(x, y)) +
   labs(title = "Mathematical Curve", x = "", y = "")
 
 # Save as SVG (vector - web compatible)
-ggsave("plots/01_formats/vector_demo.svg", p, width = 8, height = 4)
+ggsave("plots/03_formats/vector_demo.svg", p, width = 8, height = 4)
 
 # Save as low-res PNG (raster)
-ggsave("plots/01_formats/raster_demo.png", p, width = 8, height = 4, dpi = 72)
+ggsave("plots/03_formats/raster_demo.png", p, width = 8, height = 4, dpi = 72)
 
 # Read the saved images and zoom in to show difference
 oversize_scale <- 10
-vector <- image_read_svg("plots/01_formats/vector_demo.svg", width = 576*oversize_scale)
+vector <- image_read_svg("plots/03_formats/vector_demo.svg", width = 576*oversize_scale)
 
 vector_crop <- vector %>% 
   image_crop(glue("{100*oversize_scale}x{50*oversize_scale}+{300*oversize_scale}+{75*oversize_scale}")) %>% 
@@ -115,7 +115,7 @@ vector_crop <- vector %>%
 
 
 oversize_scale <- 1
-raster_crop <- image_read("plots/01_formats/raster_demo.png",   density = 72*oversize_scale) %>% 
+raster_crop <- image_read("plots/03_formats/raster_demo.png",   density = 72*oversize_scale) %>% 
   image_crop(glue("{100*oversize_scale}x{50*oversize_scale}+{300*oversize_scale}+{75*oversize_scale}")) %>% 
   image_scale("900x600")
 
@@ -205,12 +205,12 @@ create_test_plot <- function() {
 p <- create_test_plot()
 
 # Save as PNG (lossless) and JPEG (lossy with low quality)
-ggsave("plots/01_formats/artifacts_original.png", p, width = 4, height = 4, dpi = 150)
-ggsave("plots/01_formats/artifacts_jpeg.jpg", p, width = 4, height = 4, dpi = 150, quality = 60)
+ggsave("plots/03_formats/artifacts_original.png", p, width = 4, height = 4, dpi = 150)
+ggsave("plots/03_formats/artifacts_jpeg.jpg", p, width = 4, height = 4, dpi = 150, quality = 60)
 
 # Read and zoom in on the edge to show artifacts
-png_img <- image_read("plots/01_formats/artifacts_original.png")
-jpeg_img <- image_read("plots/01_formats/artifacts_jpeg.jpg")
+png_img <- image_read("plots/03_formats/artifacts_original.png")
+jpeg_img <- image_read("plots/03_formats/artifacts_jpeg.jpg")
 
 # Crop and zoom 4x on the edge where artifacts are visible
 crop_geom <- "100x100+450+250"
@@ -286,19 +286,19 @@ comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
        y = "Miles Per Gallon")
 
 # Vector format - always crisp (SVG for web)
-ggsave("plots/01_formats/compare_vector.svg", comparison_plot,
+ggsave("plots/03_formats/compare_vector.svg", comparison_plot,
        width = 6, height = 4, device = "svg")
 
 # High-res PNG - good quality
-ggsave("plots/01_formats/compare_highres.png", comparison_plot,
+ggsave("plots/03_formats/compare_highres.png", comparison_plot,
        width = 6, height = 4, dpi = 300)
 
 # Low-res PNG - pixelated when zoomed
-ggsave("plots/01_formats/compare_lowres.png", comparison_plot,
+ggsave("plots/03_formats/compare_lowres.png", comparison_plot,
        width = 6, height = 4, dpi = 72)
 
 # JPEG - compression artifacts
-ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
+ggsave("plots/03_formats/compare_jpeg.jpg", comparison_plot,
        width = 6, height = 4, dpi = 150, quality = 60)
 
 # Read and zoom in on text area to show differences
@@ -306,7 +306,7 @@ ggsave("plots/01_formats/compare_jpeg.jpg", comparison_plot,
 
 # Vector: Read at very high resolution (10x the base size)
 oversize_scale <- 10
-vector_img <- image_read_svg("plots/01_formats/compare_vector.svg", width = 432*oversize_scale)
+vector_img <- image_read_svg("plots/03_formats/compare_vector.svg", width = 432*oversize_scale)
 
 # Crop a region from the vector (scaled by oversize_scale) and zoom to display size
 # Crop coordinates: x=250, y=20, width=150, height=75 (at base scale)
@@ -317,20 +317,20 @@ vector_crop <- vector_img %>%
 # PNG 300 DPI: Native size is 1800x1200 (6" * 300 DPI)
 # Scale factor relative to 72 DPI base: 300/72 = 4.167
 scale_300 <- 300/72
-highres_crop <- image_read("plots/01_formats/compare_highres.png") %>%
+highres_crop <- image_read("plots/03_formats/compare_highres.png") %>%
   image_crop(glue("{150*scale_300}x{75*scale_300}+{250*scale_300}+{200*scale_300}")) %>%
   image_scale("600x300")
 
 # PNG 72 DPI: Native size is 432x288 (6" * 72 DPI) - our baseline
 scale_72 <- 1
-lowres_crop <- image_read("plots/01_formats/compare_lowres.png") %>%
+lowres_crop <- image_read("plots/03_formats/compare_lowres.png") %>%
   image_crop(glue("{150*scale_72}x{75*scale_72}+{250*scale_72}+{200*scale_72}")) %>%
   image_scale("600x300")
 
 # JPEG 150 DPI: Native size is 900x600 (6" * 150 DPI)
 # Scale factor relative to 72 DPI base: 150/72 = 2.083
 scale_150 <- 150/72
-jpeg_crop <- image_read("plots/01_formats/compare_jpeg.jpg") %>%
+jpeg_crop <- image_read("plots/03_formats/compare_jpeg.jpg") %>%
   image_crop(glue("{150*scale_150}x{75*scale_150}+{250*scale_150}+{200*scale_150}")) %>%
   image_scale("600x300")
 

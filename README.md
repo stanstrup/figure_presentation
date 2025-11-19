@@ -4,9 +4,9 @@ A Quarto RevealJS presentation about common pitfalls in creating academic figure
 
 ## Viewing the Presentation
 
-The presentation is automatically built and deployed to GitLab Pages on every commit to the main branch.
+The presentation is automatically built and deployed to GitHub Pages on every commit to the main branch.
 
-**Live Presentation:** `https://<your-namespace>.gitlab.io/<your-project>/`
+**Live Presentation:** `https://<your-username>.github.io/<your-repo>/`
 
 ## Local Development
 
@@ -41,27 +41,27 @@ quarto preview presentation.qmd
 
 ## Topics Covered
 
-1. File Formats (Vector vs Raster)
-2. Color Gradients
-3. Themes & Styling
-4. Heatmap Scaling
-5. Text Sizing
+1. Color Gradients
+2. Heatmap Scaling
+3. File Formats (Vector vs Raster)
+4. Text Sizing
+5. Themes & Styling
 6. Saving Plots
-7. Post-Processing
-8. PowerPoint Import
-9. Rendering Issues
-10. Interactive Plots
-11. Factor Ordering
+7. Factor Ordering
+8. Post-Processing
+9. PowerPoint Import
+10. Rendering Issues
+11. Interactive Plots
 
 ## CI/CD
 
-This project uses GitLab CI/CD to automatically build and deploy the presentation:
+This project uses GitHub Actions to automatically build and deploy the presentation:
 
 - **Build**: Renders the Quarto presentation
-- **Deploy**: Publishes to GitLab Pages
+- **Deploy**: Publishes to GitHub Pages
 - **Trigger**: Commits to `main` or `master` branch
 
-See `.gitlab-ci.yml` for configuration details.
+See `.github/workflows/deploy.yml` for configuration details.
 
 ## License
 

@@ -43,9 +43,9 @@ keep-source: true
 
 **Do it right**
 
-2. Color Gradients
-4. Heatmap Scaling
-1. File Formats
+1. Color Gradients
+2. Heatmap Scaling
+3. File Formats
 
 :::
 
@@ -53,39 +53,39 @@ keep-source: true
 
 **Do it easily**
 
-5. Text Sizing
-3. Themes & Styling
+4. Text Sizing
+5. Themes & Styling
 6. Saving Plots
-11. Factor Ordering
+7. Factor Ordering
 
-7. Post-Processing
-8. PowerPoint Import
-9. Rendering Issues
+8. Post-Processing
+9. PowerPoint Import
+10. Rendering Issues
 
-10. Interactive Plots
+11. Interactive Plots
 
 :::
 ::::
 
 
 
-{{< include topics/01_formats.qmd >}}
+{{< include topics/01_colors.qmd >}}
 
 
 
-{{< include topics/02_colors.qmd >}}
+{{< include topics/02_heatmaps.qmd >}}
 
 
 
-{{< include topics/03_themes.qmd >}}
+{{< include topics/03_formats.qmd >}}
 
 
 
-{{< include topics/04_heatmaps.qmd >}}
+{{< include topics/04_sizing.qmd >}}
 
 
 
-{{< include topics/05_sizing.qmd >}}
+{{< include topics/05_themes.qmd >}}
 
 
 
@@ -93,23 +93,23 @@ keep-source: true
 
 
 
-{{< include topics/07_editing.qmd >}}
+{{< include topics/07_factors.qmd >}}
 
 
 
-{{< include topics/08_powerpoint.qmd >}}
+{{< include topics/08_editing.qmd >}}
 
 
 
-{{< include topics/09_rendering.qmd >}}
+{{< include topics/09_powerpoint.qmd >}}
 
 
 
-{{< include topics/10_interactive.qmd >}}
+{{< include topics/10_rendering.qmd >}}
 
 
 
-{{< include topics/11_factors.qmd >}}
+{{< include topics/11_interactive.qmd >}}
 
 
 
