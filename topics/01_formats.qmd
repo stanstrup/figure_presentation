@@ -469,3 +469,10 @@ flowchart LR
 
 ```
 
+## Last notes
+
+* Make sure that any art you include is vector based!
+* Composing your figures in Powerpoint is OK - but use high quality source-material
+* BioRender material is typically vector based
+
+
