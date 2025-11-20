@@ -163,6 +163,7 @@ p1 / p2 / p3 +
 ## Why This Order?
 
 This follows the visible light spectrum by **wavelength**:
+
 - Red: ~700 nm (longest)
 - Violet: ~400 nm (shortest)
 
@@ -171,12 +172,71 @@ But wavelength order ≠ perceptual order!
 
 
 
-## A Tale of Two Colormaps
+
+
+
+
+
+
+
+
+## Comparing Rainbow Implementations, desaturated
 
 ```{r}
 #| echo: false
 #| eval: true
 #| fig-width: 12
+#| fig-height: 8
+
+library(colorspace)
+
+# -------------------------------------------------------------------------
+# Build data frames for ggplot (reversed to match the dot visualization)
+# -------------------------------------------------------------------------
+native <- data.frame(x = n:1, y = 1, color = desaturate(rev(rainbow(n))))
+manual <- data.frame(x = n:1, y = 1, color = desaturate(rev(manual_colors)))
+jet    <- data.frame(x = n:1, y = 1, color = desaturate(mixOmics::color.jet(n)))
+
+# -------------------------------------------------------------------------
+# Helper plot function
+# -------------------------------------------------------------------------
+make_plot <- function(df, title_text) {
+  ggplot(df, aes(x = x, y = y, fill = color)) +
+    geom_tile() +
+    scale_fill_identity() +
+    theme_void() +
+    labs(title = title_text) +
+    theme(plot.title = element_text(size = 14, hjust = 0.5))
+}
+
+p1 <- make_plot(native, "rainbow()")
+p2 <- make_plot(manual, "Manual colorRampPalette() using nearest R named colors")
+p3 <- make_plot(jet,    "Jet (mixOmics::color.jet)")
+
+# -------------------------------------------------------------------------
+# Combine with patchwork
+# -------------------------------------------------------------------------
+p1 / p2 / p3 +
+  plot_annotation(
+    title = "Comparison of rainbow(), Manual RGB Interpolation, and Jet",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+
+
+
+
+
+
+
+## A Tale of Two Colormaps
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 6
 #| fig-height: 5
 
 library(ggplot2)
@@ -196,8 +256,25 @@ p2 <- faithful_plot +
   scale_fill_viridis_c() +
   labs(title = "Colormap B: Smooth transitions", subtitle = "Viridis scale")
 
-p1 + p2
+p1
 ```
+
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p2
+```
+:::
+:::
+:::
+
 
 ::: {.fragment}
 **Which one shows the data more accurately?**
@@ -206,48 +283,6 @@ The data is **smooth**, yet Colormap A creates false boundaries!
 :::
 
 
-## Real-World Example: Rainbow Problems
-
-::: {.columns}
-::: {.column width="50%"}
-**Citation needed example:**
-
-Research from Borland & Taylor (2007) in IEEE Computer Graphics:
-
-> "Rainbow color maps can **obscure data, introduce visual artifacts, and confuse users**"
-
-The yellow-green transition is particularly problematic - it "pops out" even when data is smooth.
-:::
-
-::: {.column width="50%"}
-```{r}
-#| echo: false
-#| eval: true
-#| fig-width: 6
-#| fig-height: 4
-
-# Demonstrate the problem
-library(ggplot2)
-
-# Create smooth 2D data
-volcano_df <- data.frame(
-  x = rep(1:ncol(volcano), each = nrow(volcano)),
-  y = rep(1:nrow(volcano), ncol(volcano)),
-  z = as.vector(volcano)
-)
-
-ggplot(volcano_df, aes(x, y, fill = z)) +
-  geom_raster() +
-  scale_fill_gradientn(colors = rainbow(10)) +
-  theme_void() +
-  labs(title = "Volcano data with rainbow:\nSee false edges?") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        legend.position = "right")
-```
-:::
-:::
-
-**Reference:** Borland, D., & Taylor, R. M. (2007). Rainbow color map (still) considered harmful. *IEEE Computer Graphics and Applications*, 27(2), 14-17.
 
 ## Perceptual Non-Uniformity: Demonstrated
 
@@ -290,7 +325,23 @@ p3 <- base_plot +
 
 **The data is perfectly smooth, yet rainbow creates artificial edges!**
 
+
+## Not just spacial data
+
+
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+
+
+::: {.notes}
+Haseneyer, G., Schmutzer, T., Seidel, M. et al. From RNA-seq to large-scale genotyping - genomics resources for rye (Secale cereale L.). BMC Plant Biol 11, 131 (2011). https://doi.org/10.1186/1471-2229-11-131
+:::
+
+
 ## Medical Consequences
+
+
+::::: {.columns}
+:::: {.column width="50%"}
 
 ::: {.callout-important}
 ## Lives at Stake
@@ -303,12 +354,31 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 - Physicians using **perceptually uniform colormaps**: Fewer errors, faster
 
 **Why?**
+
 - Bright yellow appears more "intense" than dark red
 - But dark red represents **higher values** (more critical condition)
 - Perceptual bias leads to misdiagnosis
-:::
 
 **Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
+
+:::
+
+::::
+
+:::: {.column width="50%"}
+
+
+![](sources/borkin.png)
+
+::::
+:::
+
+:::::
+
+
+
+
+
 
 
 ## The Viridis Color Scales
@@ -549,6 +619,9 @@ p4 <- ggplot(test_data, aes(x, y, fill = value)) +
                   plot.subtitle = element_text(size = 12))
   )
 ```
+
+
+# Colors for qualitative data {background-color="#e74c3c"}
 
 ## ColorBrewer: All Palettes
 

@@ -132,5 +132,6 @@ keep-source: true
 - "Fundamentals of Data Visualization" by Claus Wilke
 - ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
 - https://clauswilke.com/dataviz
+- https://www.nature.com/articles/s41467-020-19160-7?utm_source=chatgpt.com
 
 Slides: github.com/yourrepo
