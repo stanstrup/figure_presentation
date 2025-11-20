@@ -77,3 +77,44 @@
 .reveal .columns {
   font-size: 0.9em;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Both containers have the same width and alignment */
+.image-container {
+  width: 80vw;       /* full container width */
+  max-width: 1200px; /* optional: don't exceed natural size */
+  overflow: hidden;
+  margin: auto;      /* center container on slide */
+  text-align: left;  /* important for cropped image */
+}
+
+/* Cropped container shows only part of the image */
+.cropped {
+  width: 62%;        /* fraction of the container visible */
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* Keep image at natural size, scale to fit viewport if needed */
+.image-container img {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  object-fit: none !important;
+  object-position: left top;
+  transform: scale(0.7);       /* scale to fit screen */
+  transform-origin: top left;
+}

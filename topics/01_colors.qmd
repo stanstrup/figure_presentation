@@ -326,17 +326,22 @@ p3 <- base_plot +
 **The data is perfectly smooth, yet rainbow creates artificial edges!**
 
 
-## Not just spacial data
+## Not just spatial data
 
-::: {.fragment .fade-out fragment-index=1}
-::: {style="overflow: hidden; max-width: 50%; margin: auto;"}
-![](sources/12870_2011_Article_914_Fig2_HTML.webp)
-:::
-:::
 
-::: {.fragment fragment-index=1}
+## Not just spatial data
+
+<div class="image-container">
+<div class="cropped">
 ![](sources/12870_2011_Article_914_Fig2_HTML.webp)
-:::
+</div>
+</div>
+
+## Not just spatial data (2)
+
+<div class="image-container">
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+</div>
 
 
 ::: {.notes}
