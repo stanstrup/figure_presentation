@@ -328,8 +328,15 @@ p3 <- base_plot +
 
 ## Not just spacial data
 
-
+::: {.fragment .fade-out fragment-index=1}
+::: {style="overflow: hidden; max-width: 50%; margin: auto;"}
 ![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+:::
+:::
+
+::: {.fragment fragment-index=1}
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+:::
 
 
 ::: {.notes}
