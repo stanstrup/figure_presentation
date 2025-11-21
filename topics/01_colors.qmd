@@ -120,6 +120,12 @@ ggplot(correct_data, aes(x = x, y = y)) +
 
 ## Comparing Rainbow Implementations
 
+
+
+:::: {.columns}
+::: {.column width="50%"}
+
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -159,28 +165,15 @@ p1 / p2 / p3 +
   )
 ```
 
-::: {.callout-note}
-## Why This Order?
 
-This follows the visible light spectrum by **wavelength**:
 
-- Red: ~700 nm (longest)
-- Violet: ~400 nm (shortest)
-
-But wavelength order ≠ perceptual order!
 :::
 
+::: {.column width="50%"}
+::: {.fragment}
 
 
 
-
-
-
-
-
-
-
-## Comparing Rainbow Implementations, desaturated
 
 ```{r}
 #| echo: false
@@ -225,7 +218,29 @@ p1 / p2 / p3 +
 
 
 
+:::
+:::
+::::
 
+
+
+
+
+
+
+
+
+
+::: {.callout-note}
+## Why This Order?
+
+This follows the visible light spectrum by **wavelength**:
+
+- Red: ~700 nm (longest)
+- Violet: ~400 nm (shortest)
+
+But wavelength order ≠ perceptual order!
+:::
 
 
 
@@ -328,21 +343,14 @@ p3 <- base_plot +
 
 ## Not just spatial data
 
-
-## Not just spatial data
-
-<div class="image-container">
-<div class="cropped">
+<div class="image-container" style="--max-width: 1200px; --img-scale: 0.7; position: relative;">
+<div class="cropped fragment fade-out" data-fragment-index="1" style="--crop-width: 62%; position: absolute;">
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
 ![](sources/12870_2011_Article_914_Fig2_HTML.webp)
 </div>
 </div>
-
-## Not just spatial data (2)
-
-<div class="image-container">
-![](sources/12870_2011_Article_914_Fig2_HTML.webp)
-</div>
-
 
 ::: {.notes}
 Haseneyer, G., Schmutzer, T., Seidel, M. et al. From RNA-seq to large-scale genotyping - genomics resources for rye (Secale cereale L.). BMC Plant Biol 11, 131 (2011). https://doi.org/10.1186/1471-2229-11-131
