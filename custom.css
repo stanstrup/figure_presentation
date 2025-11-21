@@ -42,6 +42,11 @@
   line-height: 1.3;
 }
 
+/* Code blocks that clip overflow without scrollbar */
+.reveal pre.code-clip {
+  overflow: hidden;
+}
+
 .reveal code {
   font-size: 0.85em;
 }

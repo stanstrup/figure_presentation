@@ -186,7 +186,7 @@ theme_classic(base_size = 12)
 - `axis.text`: `0.8× base_size`
 - `legend.text`: `0.8× base_size`
 
-Use base_size as your PRIMARY adjustment and only customize individual elements if  needed
+Use base_size as the PRIMARY adjustment - only customize individual elements if needed
 
 
 
@@ -264,12 +264,7 @@ p + theme_classic(base_size = 11)
 
 ![](plots/04_sizing/sizing_custom_theme.svg){width="100%"}
 
-```{r}
-#| label: sizing-manual-override
-#| echo: true
-#| eval: false
-#| code-overflow: clip
-
+```{.r .code-clip}
 p + theme_classic(base_size = 11) +
   theme(
     axis.title   = element_text(size = 14, face = "bold"),
