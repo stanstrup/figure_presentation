@@ -90,53 +90,21 @@ ggsave("sizing_large.svg", p,
 
 ::: {.columns}
 ::: {.column width="50%"}
-**Smaller canvas:**
+**Canvas is small (e.g. 3.5 × 3)**
 
 - Text size is fixed (e.g., 12pt)
-- Canvas is small (3.5 × 3)
+
 - Text takes up more space relative to plot
 - Points and lines stay proportional
 :::
 
 ::: {.column width="50%"}
-**Larger canvas:**
+**- Canvas is large (e.g. 10 × 8)**
 
 - Same text size (12pt)
-- Canvas is large (10 × 8)
 - Text looks tiny relative to plot
 - Same points and lines, more whitespace
-:::
-:::
 
-## The Zoom Fallacy
-
-**Wrong approach:**
-
-::: {.incremental}
-1. Create plot with default sizes
-2. Text too small in document
-3. Zoom/resize entire image 200%
-4. **Result**: Huge points/lines, barely larger text 😞
-:::
-
-## Why Zooming Fails
-
-::: {.columns}
-::: {.column width="50%"}
-**When you resize image:**
-
-- Points: 2× larger
-- Lines: 2× thicker
-- Text: only slightly larger
-- Proportions: all wrong
-:::
-
-::: {.column width="50%"}
-**Correct approach:**
-
-- Set final dimensions first
-- Use width/height to scale ALL elements
-- Let dimensions control text size
 :::
 :::
 
@@ -158,59 +126,61 @@ ggsave("sizing_large.svg", p,
    - Raster (PNG) with high DPI for specific requirements
 :::
 
-## Vector Graphics: Dimension Flexibility
+## Vector vs Raster: Key Differences
 
+::: {.columns}
+::: {.column width="50%"}
 ::: {.callout-note}
-## For Vector Formats (SVG, PDF)
+## Vector Formats (SVG, PDF)
 
-**The absolute dimensions don't matter for final quality!**
+**Dimensions control text/element proportions, not quality!**
 
-Vector graphics scale infinitely. What matters is:
-
-- **Aspect ratio** (width:height ratio)
-- **Relative proportions** of plot elements
+- Scale infinitely without quality loss
+- **DPI is ignored**
+- What matters: aspect ratio & relative proportions
 
 ```r
-# These create functionally identical vector graphics
-ggsave("small.svg", p, width = 3.5, height = 3)   # Small canvas
-ggsave("large.svg", p, width = 7, height = 6)     # Large canvas
-
-# The difference: text appears larger in small.svg
+# Text larger in small.svg
+ggsave("small.svg", p,
+       width = 3.5, height = 3)
+ggsave("large.svg", p,
+       width = 7, height = 6)
 ```
 :::
+:::
 
-
-
-
-## DPI: Only for Raster Formats
-
+::: {.column width="50%"}
 ::: {.callout-warning}
-## DPI is ONLY relevant for raster images (PNG, JPEG, TIFF)
+## Raster Formats (PNG, TIFF)
 
-**Vector formats (SVG, PDF) ignore DPI!**
+**DPI controls pixel count and quality!**
+
+- Fixed resolution, can pixelate when scaled
+- **DPI matters** (300+ for print)
+- pixels = width × DPI
 
 ```r
-# For vectors - DPI has no effect
-ggsave("plot.svg", p, width = 5, height = 4, dpi = 300)   # DPI ignored
-ggsave("plot.svg", p, width = 5, height = 4, dpi = 72)    # Same result!
-
-# For raster - DPI controls pixel count
-ggsave("plot.png", p, width = 5, height = 4, dpi = 300)   # 1500 × 1200 pixels
-ggsave("plot.png", p, width = 5, height = 4, dpi = 72)    # 360 × 288 pixels
+# 1500×1200 pixels
+ggsave("plot.png", p,
+       width = 5, height = 4,
+       dpi = 300)
+# 360×288 pixels
+ggsave("plot.png", p,
+       width = 5, height = 4,
+       dpi = 72)
 ```
-
-**DPI = Dots (pixels) Per Inch**
-
-- Higher DPI = more pixels = higher resolution raster
-- Vector graphics have **infinite resolution** regardless of DPI
+:::
+:::
 :::
 
-## Practical Example: Journal Figure
+
+## base_size Effect
+
 
 ```{r}
 #| label: sizing-journal-demo
-#| echo: true
-#| eval: false
+#| echo: false
+#| eval: true
 
 library(ggplot2)
 
@@ -231,7 +201,6 @@ p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
 ggsave("figure1_v2.svg", p2, width = 3.5, height = 3)
 ```
 
-## base_size Effect
 
 ```{r}
 #| label: base-size-demo-generate
@@ -267,17 +236,6 @@ ggsave("sources/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3
 
 Same dimensions (3.5 × 3), different text scaling!
 
-## Minimum Font Sizes
-
-**Rule of thumb for print:**
-
-- Minimum readable: **6-8 pt**
-- Comfortable reading: **10-12 pt**
-- Titles: **14-16 pt**
-
-::: {.fragment}
-**Test**: Print at actual size (not "fit to page")!
-:::
 
 ## The base_size Parameter
 
@@ -318,146 +276,3 @@ p + theme_classic(base_size = 11) +
 
 But usually just adjusting `width`, `height`, and `base_size` is enough!
 
-## Common Sizing Mistakes
-
-::: {.columns}
-::: {.column width="50%"}
-**❌ Bad**
-
-```{r}
-#| label: sizing-bad-example
-#| echo: true
-#| eval: false
-
-p <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point()
-
-# Save at random large size
-ggsave("plot.svg", p,
-       width = 10, height = 8)
-
-# Then resize in Word/PowerPoint
-# Text becomes tiny!
-```
-:::
-
-::: {.column width="50%"}
-**✅ Good**
-
-```{r}
-#| label: sizing-good-example
-#| echo: true
-#| eval: false
-
-p <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_classic(base_size = 11)
-
-# Save at FINAL size
-ggsave("plot.svg", p,
-       width = 3.5, height = 3)
-
-# No resizing needed!
-```
-:::
-:::
-
-## Designing for Multiple Outputs
-
-```{r}
-#| label: sizing-multiple-outputs
-#| echo: true
-#| eval: false
-
-# Create base plot
-p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
-
-# For paper (small, high detail) - use vector
-ggsave("paper.svg", p + theme_classic(base_size = 11),
-       width = 3.5, height = 3)
-
-# For presentation (large, readable from distance)
-ggsave("slides.svg", p + theme_classic(base_size = 18),
-       width = 10, height = 7)
-```
-
-Different outputs need different sizes!
-
-## Aspect Ratio Matters
-
-```{r}
-#| label: sizing-aspect-ratio
-#| echo: true
-#| eval: false
-
-# Wide plots for time series
-ggsave("timeseries.svg", width = 8, height = 4)
-
-# Square for correlation plots
-ggsave("correlation.svg", width = 5, height = 5)
-
-# Tall for many categories
-ggsave("categories.svg", width = 5, height = 8)
-```
-
-Choose dimensions based on data structure!
-
-## Multi-Panel Figures
-
-```{r}
-#| label: sizing-multi-panel
-#| echo: true
-#| eval: false
-
-library(patchwork)
-
-p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
-  theme_classic(base_size = 10)
-
-p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_point() +
-  theme_classic(base_size = 10)
-
-combined <- p1 + p2
-
-# Size for final combined figure
-ggsave("figure1.svg", combined, width = 7, height = 3.5)
-
-# Each subplot is now 3.5 × 3.5 inches
-# with 10pt text - readable!
-```
-
-## Testing Readability
-
-::: {.incremental}
-1. **Print at actual size** (100%, not "fit to page")
-2. **View PDF at 100% zoom** (not zoomed in/out)
-3. **Ask**: Can I comfortably read axis labels?
-4. **Check**: Are labels too large/small relative to plot area?
-:::
-
-## Working Backwards from Requirements
-
-::: {.callout-tip}
-## Design Process
-
-1. **Find out final size** (journal specs, poster dimensions)
-2. **Determine minimum font size** (usually 8-10 pt for print)
-3. **Set dimensions** to target width
-4. **Adjust base_size** if needed to achieve minimum readable text
-5. **Test**: Print at actual size
-6. **Fine-tune** if necessary
-:::
-
-## Key Takeaways
-
-::: {.callout-important}
-## Remember
-
-1. **Use DIMENSIONS to control text size** - not manual font sizes
-2. **Small dimensions = larger relative text**
-3. **Save at FINAL output size** from the start
-4. **Use base_size** for fine-tuning (not individual elements)
-5. **Vector formats** for publications (SVG, PDF)
-6. **DPI only matters** for raster formats (PNG, TIFF)
-7. **PRINT TEST** at actual size before submission
-:::
