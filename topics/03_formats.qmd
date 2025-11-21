@@ -1,5 +1,16 @@
 # Which image format for which purpose? {background-color="#3498db"}
 
+```{r}
+#| label: setup-formats
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(magick)
+library(glue)
+```
 
 ## What is a Raster Image?
 
@@ -24,8 +35,6 @@
 #| label: vector-curve-demo
 #| echo: false
 #| eval: true
-
-library(ggplot2)
 
 # Create a smooth curved line
 x <- seq(0, 4*pi, length.out = 200)
@@ -81,10 +90,6 @@ Because vectors are mathematical formulas, they can be scaled to **any size** wi
 #| eval: true
 #| fig-width: 12
 #| fig-height: 6
-
-library(ggplot2)
-library(magick)
-library(glue)
 
 # Create a smooth curve with text
 x <- seq(0, 4*pi, length.out = 200)
@@ -189,9 +194,6 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 #| fig-width: 12
 #| fig-height: 6
 
-library(ggplot2)
-library(magick)
-
 # Create a plot with sharp edges and text
 create_test_plot <- function() {
   ggplot(data.frame(x = c(0, 1, 1, 0, 0),
@@ -275,10 +277,6 @@ combined
 #| fig-height: 12
 
 # Generate comparison files
-library(ggplot2)
-library(magick)
-library(glue)
-
 comparison_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(size = 3, color = "steelblue") +
   geom_smooth(method = "lm", color = "darkred", linewidth = 1.5) +

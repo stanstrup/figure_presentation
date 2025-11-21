@@ -1,5 +1,20 @@
 # ggplot2 Themes {background-color="#9b59b6"}
 
+```{r}
+#| label: setup-themes
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(patchwork)
+library(cowplot)
+library(ggpubr)
+library(ggthemes)
+library(hrbrthemes)
+```
+
 ## The Default Problem
 
 
@@ -13,8 +28,6 @@
 #| eval: true
 #| fig-width: 8
 #| fig-height: 5
-
-library(ggplot2)
 
 # Default ggplot2 theme
 p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
@@ -226,9 +239,6 @@ p5
 #| fig-width: 14
 #| fig-height: 10
 
-library(ggplot2)
-library(patchwork)
-
 # Create base plot
 base_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(aes(color = factor(cyl)), size = 2) +
@@ -261,7 +271,6 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
 
 # cowplot - designed for publications
 # install.packages("cowplot")
-library(cowplot)
 
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
@@ -296,7 +305,6 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 # ggpubr - publication-ready themes and statistical annotations
 # install.packages("ggpubr")
-library(ggpubr)
 
 ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
   geom_boxplot(aes(fill = factor(cyl)), alpha = 0.7) +
@@ -383,8 +391,6 @@ ggplot(mtcars, aes(wt, mpg)) +
 
 # ggthemes - many professional themes
 # install.packages("ggthemes")
-library(ggthemes)
-library(patchwork)
 
 base_plot <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point(aes(color = factor(cyl)), size = 2) +
@@ -425,8 +431,6 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
 #| fig-width: 8
 #| fig-height: 5
 
-library(hrbrthemes)
-
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
   geom_smooth(method = "lm", se = FALSE) +
@@ -462,9 +466,6 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 #| label: global-theme
 #| echo: true
 #| eval: true
-
-library(ggplot2)
-library(patchwork)
 
 # At top of script
 theme_set(theme_bw(base_size = 12))
@@ -550,7 +551,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 #| eval: false
 
 # Check available fonts
-library(extrafont)
+# library(extrafont)
 font_import()  # First time only (takes a while)
 fonts()        # List available fonts
 
@@ -583,8 +584,6 @@ Check journal author guidelines!
 #| eval: true
 #| fig-width: 8
 #| fig-height: 5
-
-library(ggplot2)
 
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot(alpha = 0.7) +
@@ -632,9 +631,6 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 #| eval: true
 #| fig-width: 14
 #| fig-height: 6
-
-library(ggplot2)
-library(patchwork)
 
 # Define publication theme
 pub_theme <- theme_classic(base_size = 11) +
@@ -737,9 +733,6 @@ install.packages("patchwork")  # Combine multiple plots easily
 #| eval: true
 #| fig-width: 14
 #| fig-height: 6
-
-library(ggplot2)
-library(patchwork)
 
 # Before: Default theme
 before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
