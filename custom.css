@@ -43,7 +43,8 @@
 }
 
 /* Code blocks that clip overflow without scrollbar */
-.reveal pre.code-clip {
+.reveal pre.code-clip,
+.reveal pre.code-clip code {
   overflow: hidden;
 }
 
