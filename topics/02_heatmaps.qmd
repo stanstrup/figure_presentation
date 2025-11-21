@@ -15,21 +15,35 @@ Color scale: -20 to +20
 Result: Everything looks the same color! 😱
 :::
 
-## Visual Example
+## Visual Example: The Outlier Effect
+
+```{r}
+#| label: setup-heatmaps
+#| echo: false
+#| eval: true
+
+library(ggplot2)
+library(pheatmap)
+library(RColorBrewer)
+library(patchwork)
+```
 
 ```{r}
 #| label: heatmap-outlier-example
 #| echo: true
 #| eval: true
+#| fig-width: 10
+#| fig-height: 5
 
 # Simulate data with outlier
 set.seed(123)
 expr_matrix <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
+rownames(expr_matrix) <- paste0("Gene", 1:10)
+colnames(expr_matrix) <- paste0("Sample", 1:10)
 expr_matrix[5, 5] <- 20  # One extreme outlier
 
 # Default heatmap - terrible!
-library(pheatmap)
-pheatmap(expr_matrix)  # All data compressed to narrow range
+pheatmap(expr_matrix, main = "With outlier: All data compressed!")
 ```
 
 ::: {.fragment}
@@ -71,48 +85,42 @@ pheatmap(expr_matrix)  # All data compressed to narrow range
 **Result**: Dendrograms cluster on unscaled data while colors show scaled data!
 :::
 
-## Why This Matters
+## Why Scaling Matters for Clustering
 
 ```{r}
-#| label: heatmap-scale-issue
+#| label: scaling-demo
 #| echo: true
 #| eval: true
+#| fig-width: 12
+#| fig-height: 5
 
-library(gplots)  # or source the function
+# Create data where scaling matters
+set.seed(42)
+# Variable 1: mean 0, sd 1
+# Variable 2: mean 100, sd 10 (different scale!)
+demo_data <- data.frame(
+  var1 = rnorm(50, mean = 0, sd = 1),
+  var2 = rnorm(50, mean = 100, sd = 10)
+)
 
-# This looks correct but is misleading!
-heatmap.2(expr_matrix, scale = "column")
+# Without scaling: var2 dominates distance calculations
+# With scaling: both variables contribute equally
 
-# Dendrograms calculated on RAW data
-# Colors displayed on SCALED data
-# Clustering doesn't match what you see!
+p1 <- ggplot(demo_data, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Unscaled: var2 dominates",
+       subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
+  theme_classic()
+
+demo_scaled <- as.data.frame(scale(demo_data))
+p2 <- ggplot(demo_scaled, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Scaled: Equal contribution",
+       subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
+  theme_classic()
+
+p1 + p2
 ```
-
-## The Correct Approach: heat.clust
-
-```{r}
-#| label: heat-clust-example
-#| echo: true
-#| eval: true
-
-library(massageR)
-
-# Pre-scale data AND calculate dendrograms on scaled data
-z <- heat.clust(expr_matrix,
-                scaledim = "column",  # Scale by column
-                zlim = c(-3, 3),      # Cap at ±3
-                reorder = c("column", "row"))
-
-# Now pass pre-computed dendrograms
-heatmap.2(z$data,
-          Rowv = z$Rowv,
-          Colv = z$Colv,
-          scale = "none")  # Already scaled!
-
-# Dendrograms and colors now consistent!
-```
-
-Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps.html)
 
 ## Solution 1: Standard Deviation Cutoffs
 
@@ -120,7 +128,8 @@ Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps
 #| label: sd-cutoff
 #| echo: true
 #| eval: true
-#| code-line-numbers: "|2-3|5-6"
+#| fig-width: 10
+#| fig-height: 5
 
 # Cap at ±2 SD
 mean_val <- mean(expr_matrix, na.rm = TRUE)
@@ -141,14 +150,16 @@ Most common: ±2 or ±3 SD cutoff
 #| label: quantile-cutoff
 #| echo: true
 #| eval: true
+#| fig-width: 10
+#| fig-height: 5
 
 # Cap at 5th and 95th percentiles
 lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
 upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
 
-expr_capped <- pmin(pmax(expr_matrix, lower), upper)
+expr_quantile <- pmin(pmax(expr_matrix, lower), upper)
 
-pheatmap(expr_capped,
+pheatmap(expr_quantile,
          main = "Values capped at 5-95 percentiles")
 ```
 
@@ -160,6 +171,8 @@ Robust to extreme outliers
 #| label: manual-breaks
 #| echo: true
 #| eval: true
+#| fig-width: 10
+#| fig-height: 5
 
 # Define your own color breaks
 breaks <- seq(-3, 3, length.out = 100)
@@ -181,54 +194,77 @@ Full control over color mapping
 #| label: log-transform
 #| echo: true
 #| eval: true
+#| fig-width: 10
+#| fig-height: 5
 
-# Log transform data
-expr_log <- log10(expr_matrix + 1)  # +1 to handle zeros
+# Create positive data (e.g., count data)
+set.seed(123)
+count_matrix <- matrix(rpois(100, lambda = 50), nrow = 10)
+count_matrix[5, 5] <- 5000  # Extreme count
+rownames(count_matrix) <- paste0("Gene", 1:10)
+colnames(count_matrix) <- paste0("Sample", 1:10)
 
-pheatmap(expr_log,
-         main = "Log10 transformed")
+# Log transform BEFORE plotting
+count_log <- log10(count_matrix + 1)  # +1 to handle zeros
 
-# Or with ggplot2
-ggplot(heatmap_df, aes(x, y, fill = value)) +
-  geom_tile() +
-  scale_fill_viridis_c(trans = "log10")
+pheatmap(count_log,
+         main = "Log10 transformed counts")
 ```
 
-## Annotating Capped Values
-
-**Best practice**: Indicate when values are capped
-
-```{r}
-#| label: annotate-capped
-#| echo: true
-#| eval: true
-
-library(ComplexHeatmap)
-
-# Create annotation for outliers
-outliers <- expr_matrix > 3 | expr_matrix < -3
-
-Heatmap(expr_capped,
-        name = "Expression",
-        cell_fun = function(j, i, x, y, width, height, fill) {
-          if(outliers[i, j]) {
-            grid.text("*", x, y)  # Mark outliers with asterisk
-          }
-        })
-```
-
-## Color Scale Considerations
+## Proper Heatmap Workflow
 
 ::: {.callout-important}
-## Critical Elements
+## The Right Approach
 
-1. **Always include color scale bar** with numeric labels
-2. **Center at meaningful value** (often zero for diverging data)
-3. **Label extremes if capped**: "<-2 SD" or ">+3"
-4. **Use appropriate palette**:
-   - Diverging for data with meaningful zero (red-white-blue)
-   - Sequential for one-directional (viridis)
+1. **Scale your data FIRST** (before creating heatmap)
+2. **Calculate dendrograms on scaled data**
+3. **Pass pre-calculated dendrograms to heatmap function**
+4. **Set `scale = "none"`** in heatmap call
+
+```r
+# Proper workflow
+data_scaled <- t(scale(t(expr_matrix)))  # Scale by row
+data_capped <- pmin(pmax(data_scaled, -3), 3)  # Cap extremes
+
+# Calculate dendrograms on scaled data
+row_dend <- hclust(dist(data_capped))
+col_dend <- hclust(dist(t(data_capped)))
+
+# Plot with pre-computed dendrograms
+pheatmap(data_capped,
+         cluster_rows = row_dend,
+         cluster_cols = col_dend,
+         scale = "none")  # Already scaled!
+```
 :::
+
+## Complete Example: Proper Scaling
+
+```{r}
+#| label: proper-scaling-example
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Step 1: Scale by row (gene)
+data_scaled <- t(scale(t(expr_matrix)))
+
+# Step 2: Cap extremes at ±2.5
+data_capped <- pmin(pmax(data_scaled, -2.5), 2.5)
+
+# Step 3: Calculate dendrograms on scaled data
+row_dend <- hclust(dist(data_capped))
+col_dend <- hclust(dist(t(data_capped)))
+
+# Step 4: Plot with consistent scaling
+pheatmap(data_capped,
+         cluster_rows = row_dend,
+         cluster_cols = col_dend,
+         scale = "none",
+         color = colorRampPalette(brewer.pal(11, "RdBu"))(100),
+         main = "Properly scaled: dendrograms match colors!")
+```
 
 ## Diverging Scales for Centered Data
 
@@ -236,45 +272,16 @@ Heatmap(expr_capped,
 #| label: diverging-scale
 #| echo: true
 #| eval: true
+#| fig-width: 10
+#| fig-height: 5
 
-# When zero is meaningful (fold-change, difference, etc.)
-library(RColorBrewer)
-
-pheatmap(expr_capped,
-         color = colorRampPalette(
-           brewer.pal(11, "RdBu")
-         )(100),
-         breaks = seq(-3, 3, length.out = 101))
+# When zero is meaningful (fold-change, z-scores, etc.)
+pheatmap(data_capped,
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-2.5, 2.5, length.out = 101),
+         main = "Diverging scale: zero = white")
 
 # Zero = white, negative = blue, positive = red
-```
-
-## Real-World Example
-
-```{r}
-#| label: rnaseq-example
-#| echo: true
-#| eval: true
-
-# RNA-seq data
-library(DESeq2)
-
-# Log fold changes: often have outliers
-# Cap at ±4 for visualization
-results$log2FC_capped <- pmin(pmax(results$log2FoldChange, -4), 4)
-
-# Make heatmap
-library(ComplexHeatmap)
-Heatmap(log2FC_capped,
-        col = circlize::colorRamp2(
-          c(-4, 0, 4),
-          c("blue", "white", "red")
-        ),
-        heatmap_legend_param = list(
-          title = "log2 FC",
-          at = c(-4, -2, 0, 2, 4),
-          labels = c("≤-4", "-2", "0", "2", "≥4")
-        ))
 ```
 
 ## When NOT to Cap
@@ -289,6 +296,40 @@ Heatmap(log2FC_capped,
 **Alternative**: Use asterisks or separate panel for outliers
 :::
 
+## Comparison: Before and After
+
+```{r}
+#| label: heatmap-comparison
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
+
+# Side-by-side comparison
+library(gridExtra)
+
+# Before: with outlier
+p1 <- pheatmap(expr_matrix, main = "Uncapped: Pattern lost", silent = TRUE)
+
+# After: outlier capped
+p2 <- pheatmap(data_capped, main = "Capped at ±2.5 SD: Patterns visible", silent = TRUE)
+
+grid.arrange(p1[[4]], p2[[4]], ncol = 2)
+```
+
+## Color Scale Considerations
+
+::: {.callout-important}
+## Critical Elements
+
+1. **Always include color scale bar** with numeric labels
+2. **Center at meaningful value** (often zero for diverging data)
+3. **Label extremes if capped**: "<-2.5" or ">+2.5"
+4. **Use appropriate palette**:
+   - Diverging for data with meaningful zero (red-white-blue)
+   - Sequential for one-directional (viridis)
+:::
+
 ## Recommendations
 
 ::: {.callout-tip}
@@ -299,24 +340,6 @@ Heatmap(log2FC_capped,
 3. **Use quantiles** (5-95%) for robustness
 4. **Always annotate** what you did: "Values capped at ±2 SD"
 5. **Include color scale** with actual values
-6. **Test different scales** to ensure you're not hiding real patterns
+6. **Scale data BEFORE** passing to heatmap function
+7. **Calculate dendrograms** on the same scaled data
 :::
-
-## Comparison: Before and After
-
-```{r}
-#| label: heatmap-comparison
-#| echo: true
-#| eval: true
-
-library(patchwork)
-
-# Before: with outlier
-p1 <- pheatmap(expr_matrix, main = "Uncapped: Pattern lost", silent = TRUE)
-
-# After: outlier capped
-p2 <- pheatmap(expr_capped, main = "Capped at ±2 SD", silent = TRUE)
-
-# Side-by-side comparison
-p1[[4]] | p2[[4]]
-```
