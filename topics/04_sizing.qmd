@@ -1,5 +1,25 @@
 # Text Sizing {background-color="#1abc9c"}
 
+```{r}
+#| label: setup-sizing
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(patchwork)
+
+# Create the base plot used throughout
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
+       color = "Cylinders") +
+  theme_classic()
+```
+
 ## The Key Insight
 
 ::: {.callout-important}
@@ -11,13 +31,44 @@ Instead, use **smaller figure dimensions** to make text appear larger relative t
 
 ```r
 # Small dimensions = larger text relative to plot
-ggsave("figure.pdf", width = 3.5, height = 3)
+ggsave("figure.svg", width = 3.5, height = 3)
 
 # Large dimensions = smaller text relative to plot
-ggsave("figure.pdf", width = 10, height = 8)
+ggsave("figure.svg", width = 10, height = 8)
 ```
 
-Then use **DPI** (or vector formats) to get the resolution you need.
+Then use **vector formats (SVG/PDF)** for infinite resolution.
+:::
+
+## Visual Demonstration
+
+```{r}
+#| label: sizing-demo-generate
+#| echo: false
+#| eval: true
+#| output: false
+
+# Save at different sizes to demonstrate the effect
+ggsave("sources/sizing_small.svg", p, width = 3.5, height = 3)
+ggsave("sources/sizing_large.svg", p, width = 7, height = 6)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+**Small canvas (3.5 × 3 inches)**
+
+![](sources/sizing_small.svg){width="100%"}
+
+Text appears **large** relative to plot
+:::
+
+::: {.column width="50%"}
+**Large canvas (7 × 6 inches)**
+
+![](sources/sizing_large.svg){width="100%"}
+
+Text appears **small** relative to plot
+:::
 :::
 
 ## Why This Works
@@ -88,14 +139,14 @@ Then use **DPI** (or vector formats) to get the resolution you need.
    - Only fine-tune if text still too large/small
 
 3. **Use appropriate format**
-   - Vector (PDF) for publications - infinite resolution
+   - Vector (SVG, PDF) for publications - infinite resolution
    - Raster (PNG) with high DPI for specific requirements
 :::
 
 ## Vector Graphics: Dimension Flexibility
 
 ::: {.callout-note}
-## For Vector Formats (PDF, SVG)
+## For Vector Formats (SVG, PDF)
 
 **The absolute dimensions don't matter for final quality!**
 
@@ -106,10 +157,10 @@ Vector graphics scale infinitely. What matters is:
 
 ```r
 # These create functionally identical vector graphics
-ggsave("small.pdf", p, width = 3.5, height = 3)   # Small canvas
-ggsave("large.pdf", p, width = 7, height = 6)     # Large canvas
+ggsave("small.svg", p, width = 3.5, height = 3)   # Small canvas
+ggsave("large.svg", p, width = 7, height = 6)     # Large canvas
 
-# The difference: text appears larger in small.pdf
+# The difference: text appears larger in small.svg
 ```
 :::
 
@@ -118,12 +169,12 @@ ggsave("large.pdf", p, width = 7, height = 6)     # Large canvas
 ::: {.callout-warning}
 ## DPI is ONLY relevant for raster images (PNG, JPEG, TIFF)
 
-**Vector formats (PDF, SVG) ignore DPI!**
+**Vector formats (SVG, PDF) ignore DPI!**
 
 ```r
 # For vectors - DPI has no effect
-ggsave("plot.pdf", p, width = 5, height = 4, dpi = 300)   # DPI ignored
-ggsave("plot.pdf", p, width = 5, height = 4, dpi = 72)    # Same result!
+ggsave("plot.svg", p, width = 5, height = 4, dpi = 300)   # DPI ignored
+ggsave("plot.svg", p, width = 5, height = 4, dpi = 72)    # Same result!
 
 # For raster - DPI controls pixel count
 ggsave("plot.png", p, width = 5, height = 4, dpi = 300)   # 1500 × 1200 pixels
@@ -155,12 +206,48 @@ p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 # STEP 1: Save at journal single-column width (3.5 inches)
 # Text will appear appropriately large!
-ggsave("figure1.pdf", p, width = 3.5, height = 3, device = cairo_pdf)
+ggsave("figure1.svg", p, width = 3.5, height = 3)
 
 # STEP 2: If text still too small/large, adjust base_size
 p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
-ggsave("figure1_v2.pdf", p2, width = 3.5, height = 3, device = cairo_pdf)
+ggsave("figure1_v2.svg", p2, width = 3.5, height = 3)
 ```
+
+## base_size Effect
+
+```{r}
+#| label: base-size-demo-generate
+#| echo: false
+#| eval: true
+#| output: false
+
+# Save with different base_size values
+ggsave("sources/sizing_base8.svg", p + theme_classic(base_size = 8), width = 3.5, height = 3)
+ggsave("sources/sizing_base11.svg", p + theme_classic(base_size = 11), width = 3.5, height = 3)
+ggsave("sources/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3.5, height = 3)
+```
+
+::: {.columns}
+::: {.column width="33%"}
+**base_size = 8**
+
+![](sources/sizing_base8.svg){width="100%"}
+:::
+
+::: {.column width="33%"}
+**base_size = 11 (default)**
+
+![](sources/sizing_base11.svg){width="100%"}
+:::
+
+::: {.column width="33%"}
+**base_size = 14**
+
+![](sources/sizing_base14.svg){width="100%"}
+:::
+:::
+
+Same dimensions (3.5 × 3), different text scaling!
 
 ## Journal Requirements
 
@@ -240,7 +327,7 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 
 # Save at random large size
-ggsave("plot.pdf", p,
+ggsave("plot.svg", p,
        width = 10, height = 8)
 
 # Then resize in Word/PowerPoint
@@ -261,7 +348,7 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   theme_classic(base_size = 11)
 
 # Save at FINAL size
-ggsave("plot.pdf", p,
+ggsave("plot.svg", p,
        width = 3.5, height = 3)
 
 # No resizing needed!
@@ -279,13 +366,13 @@ ggsave("plot.pdf", p,
 # Create base plot
 p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 
-# For paper (small, high detail)
-ggsave("paper.pdf", p + theme_classic(base_size = 11),
+# For paper (small, high detail) - use vector
+ggsave("paper.svg", p + theme_classic(base_size = 11),
        width = 3.5, height = 3)
 
 # For presentation (large, readable from distance)
-ggsave("slides.png", p + theme_classic(base_size = 18),
-       width = 10, height = 7, dpi = 150)
+ggsave("slides.svg", p + theme_classic(base_size = 18),
+       width = 10, height = 7)
 ```
 
 Different outputs need different sizes!
@@ -298,13 +385,13 @@ Different outputs need different sizes!
 #| eval: false
 
 # Wide plots for time series
-ggsave("timeseries.pdf", width = 8, height = 4)
+ggsave("timeseries.svg", width = 8, height = 4)
 
 # Square for correlation plots
-ggsave("correlation.pdf", width = 5, height = 5)
+ggsave("correlation.svg", width = 5, height = 5)
 
 # Tall for many categories
-ggsave("categories.pdf", width = 5, height = 8)
+ggsave("categories.svg", width = 5, height = 8)
 ```
 
 Choose dimensions based on data structure!
@@ -327,7 +414,7 @@ p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_point() +
 combined <- p1 + p2
 
 # Size for final combined figure
-ggsave("figure1.pdf", combined, width = 7, height = 3.5)
+ggsave("figure1.svg", combined, width = 7, height = 3.5)
 
 # Each subplot is now 3.5 × 3.5 inches
 # with 10pt text - readable!
@@ -364,7 +451,7 @@ ggsave("figure1.pdf", combined, width = 7, height = 3.5)
 2. **Small dimensions = larger relative text**
 3. **Save at FINAL output size** from the start
 4. **Use base_size** for fine-tuning (not individual elements)
-5. **Vector formats** for publications (PDF, SVG)
+5. **Vector formats** for publications (SVG, PDF)
 6. **DPI only matters** for raster formats (PNG, TIFF)
 7. **PRINT TEST** at actual size before submission
 :::
