@@ -87,6 +87,68 @@ ggsave("sizing_large.svg", p,
 :::
 
 
+## base_size Effect (theme_classic(base_size = x))
+
+```{r}
+#| label: sizing-journal-demo
+#| echo: false
+#| eval: true
+
+library(ggplot2)
+
+# Create your plot with default theme
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
+       color = "Cylinders") +
+  theme_classic()
+
+# STEP 1: Save at journal single-column width (3.5 inches)
+# Text will appear appropriately large!
+ggsave("plots/04_sizing/figure1.svg", p, width = 3.5, height = 3)
+
+# STEP 2: If text still too small/large, adjust base_size
+p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
+ggsave("plots/04_sizing/figure1_v2.svg", p2, width = 3.5, height = 3)
+```
+
+```{r}
+#| label: base-size-demo-generate
+#| echo: false
+#| eval: true
+#| output: false
+
+# Save with different base_size values
+ggsave("plots/04_sizing/sizing_base8.svg", p + theme_classic(base_size = 8), width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_base11.svg", p + theme_classic(base_size = 11), width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3.5, height = 3)
+```
+
+::: {.columns}
+::: {.column width="33%"}
+**base_size = 8**
+
+![](plots/04_sizing/sizing_base8.svg){width="100%"}
+:::
+
+::: {.column width="33%"}
+**base_size = 11 (default)**
+
+![](plots/04_sizing/sizing_base11.svg){width="100%"}
+:::
+
+::: {.column width="33%"}
+**base_size = 14**
+
+![](plots/04_sizing/sizing_base14.svg){width="100%"}
+:::
+:::
+
+Other elements scale relative to `base_size`: `axis.title` 1.1×, `axis.text` 0.8×, `legend.text` 0.8×
+
+
+
 
 ## The Right Workflow
 
@@ -128,90 +190,6 @@ ggsave("sizing_large.svg", p,
 
 :::
 :::
-
-## base_size Effect (theme_classic(base_size = x))
-
-
-```{r}
-#| label: sizing-journal-demo
-#| echo: false
-#| eval: true
-
-library(ggplot2)
-
-# Create your plot with default theme
-p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
-       color = "Cylinders") +
-  theme_classic()
-
-# STEP 1: Save at journal single-column width (3.5 inches)
-# Text will appear appropriately large!
-ggsave("plots/04_sizing/figure1.svg", p, width = 3.5, height = 3)
-
-# STEP 2: If text still too small/large, adjust base_size
-p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
-ggsave("plots/04_sizing/figure1_v2.svg", p2, width = 3.5, height = 3)
-```
-
-
-```{r}
-#| label: base-size-demo-generate
-#| echo: false
-#| eval: true
-#| output: false
-
-# Save with different base_size values
-ggsave("plots/04_sizing/sizing_base8.svg", p + theme_classic(base_size = 8), width = 3.5, height = 3)
-ggsave("plots/04_sizing/sizing_base11.svg", p + theme_classic(base_size = 11), width = 3.5, height = 3)
-ggsave("plots/04_sizing/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3.5, height = 3)
-```
-
-
-
-```{r}
-#| label: sizing-base-size
-#| echo: true
-#| eval: false
-
-theme_classic(base_size = 12)
-```
-
-
-**Other elements scale relative to base_size:**
-
-- `axis.title`: `1.1× base_size`
-- `axis.text`: `0.8× base_size`
-- `legend.text`: `0.8× base_size`
-
-Use base_size as the PRIMARY adjustment - only customize individual elements if needed
-
-
-
-
-::: {.columns}
-::: {.column width="33%"}
-**base_size = 8**
-
-![](plots/04_sizing/sizing_base8.svg){width="100%"}
-:::
-
-::: {.column width="33%"}
-**base_size = 11 (default)**
-
-![](plots/04_sizing/sizing_base11.svg){width="100%"}
-:::
-
-::: {.column width="33%"}
-**base_size = 14**
-
-![](plots/04_sizing/sizing_base14.svg){width="100%"}
-:::
-:::
-
-
 
 
 
