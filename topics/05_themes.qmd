@@ -2,6 +2,11 @@
 
 ## The Default Problem
 
+
+:::: {.columns}
+::: {.column width="50%"}
+
+
 ```{r}
 #| label: theme-default
 #| echo: true
@@ -12,7 +17,7 @@
 library(ggplot2)
 
 # Default ggplot2 theme
-ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Default theme_gray()",
@@ -22,6 +27,24 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   theme(plot.title = element_text(face = "bold"))
 ```
 
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: theme-default-show
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+p
+
+```
+
+:::
+::::
+
+
 **Problems:**
 
 - Gray background (wastes ink, unprofessional)
@@ -30,6 +53,10 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 ## Built-in Theme: theme_bw()
 
+:::: {.columns}
+::: {.column width="50%"}
+
+
 ```{r}
 #| label: theme-bw
 #| echo: true
@@ -37,7 +64,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 #| fig-width: 8
 #| fig-height: 5
 
-ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+p2 <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   geom_point(size = 3) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "theme_bw() - White background, black border",
@@ -47,6 +74,23 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   theme_bw() +
   theme(plot.title = element_text(face = "bold"))
 ```
+:::
+
+::: {.column width="50%"}
+
+
+
+```{r}
+#| label: theme-bw-show
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+p2
+```
+:::
+::::
 
 **Good for publications** - Clean with reference gridlines
 
@@ -151,7 +195,7 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
 ```{r}
 #| label: theme-cowplot
 #| echo: true
-#| eval: false
+#| eval: true
 #| fig-width: 8
 #| fig-height: 5
 
@@ -186,7 +230,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ```{r}
 #| label: theme-ggpubr
 #| echo: true
-#| eval: false
+#| eval: true
 #| fig-width: 8
 #| fig-height: 5
 
@@ -222,7 +266,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 ```{r}
 #| label: theme-ggthemes
 #| echo: true
-#| eval: false
+#| eval: true
 #| fig-width: 14
 #| fig-height: 10
 
@@ -260,28 +304,16 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
   )
 ```
 
-::: {.callout-note}
-## Install Package to See Examples
-
-To see these themes in action, install the package:
-```r
-install.packages("ggthemes")
-```
-
-Then change `eval: false` to `eval: true` in the code chunk above.
-:::
 
 ## Modern Typography: hrbrthemes
 
 ```{r}
 #| label: theme-hrbrthemes
 #| echo: true
-#| eval: false
+#| eval: true
 #| fig-width: 8
 #| fig-height: 5
 
-# hrbrthemes - modern professional typography
-# install.packages("hrbrthemes")
 library(hrbrthemes)
 
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +

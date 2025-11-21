@@ -68,6 +68,46 @@
   font-size: 0.75em;
 }
 
+/* Rotated table column headers */
+.reveal table.rotated-headers {
+  border-collapse: collapse;
+}
+
+.reveal table.rotated-headers thead {
+  border-bottom: 1px solid #666;
+}
+
+.reveal table.rotated-headers th.rotate {
+  height: 100px;
+  white-space: nowrap;
+  vertical-align: bottom;
+  padding: 0;
+}
+
+.reveal table.rotated-headers th.rotate > div {
+  transform: rotate(-45deg);
+  width: 30px;
+  transform-origin: center bottom;
+  margin: 0 auto;
+}
+
+.reveal table.rotated-headers th.rotate > div > span {
+  padding: 5px 10px;
+  display: block;
+}
+
+.reveal table.rotated-headers th.row-header {
+  text-align: left;
+  font-weight: bold;
+  padding-right: 1em;
+}
+
+.reveal table.rotated-headers td {
+  text-align: center;
+  padding: 0.3em 0.5em;
+  min-width: 40px;
+}
+
 /* Adjust fragment text */
 .reveal .fragment {
   font-size: inherit;

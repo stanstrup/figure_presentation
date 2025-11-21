@@ -53,6 +53,7 @@ ggsave("large.pdf", p, width = 9, height = 6)
 ```
 
 **Why this works:**
+
 - Width/height control the **canvas size**
 - Text scales proportionally with canvas
 - No explicit font size changes needed!
@@ -66,6 +67,7 @@ ggsave("large.pdf", p, width = 9, height = 6)
 **The absolute dimensions (3" vs 9") don't actually matter!**
 
 What matters is:
+
 - **Aspect ratio** (width:height ratio)
 - **Relative proportions** of plot elements
 
@@ -98,6 +100,7 @@ ggsave("plot.png", p, width = 5, height = 4, dpi = 72)    # 360 × 288 pixels
 ```
 
 **DPI = Dots (pixels) Per Inch**
+
 - Higher DPI = more pixels = higher resolution raster
 - Vector graphics have **infinite resolution** regardless of DPI
 :::
