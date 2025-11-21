@@ -126,51 +126,6 @@ ggsave("sizing_large.svg", p,
    - Raster (PNG) with high DPI for specific requirements
 :::
 
-## Vector vs Raster: Key Differences
-
-::: {.columns}
-::: {.column width="50%"}
-::: {.callout-note}
-## Vector Formats (SVG, PDF)
-
-**Dimensions control text/element proportions, not quality!**
-
-- Scale infinitely without quality loss
-- **DPI is ignored**
-- What matters: aspect ratio & relative proportions
-:::
-
-```{.r style="font-size: 1.1em;"}
-# Text larger in small.svg
-ggsave("small.svg", p,
-       width = 3.5, height = 3)
-ggsave("large.svg", p,
-       width = 7, height = 6)
-```
-:::
-
-::: {.column width="50%"}
-::: {.callout-warning}
-## Raster Formats (PNG, TIFF)
-
-**DPI controls pixel count and quality!**
-
-- Fixed resolution, can pixelate when scaled
-- **DPI matters** (300+ for print)
-- pixels = width × DPI
-:::
-
-```{.r style="font-size: 1.1em;"}
-# 1500×1200 pixels
-ggsave("plot.png", p,
-       width = 5, height = 4, dpi = 300)
-# 360×288 pixels
-ggsave("plot.png", p,
-       width = 5, height = 4, dpi = 72)
-```
-:::
-:::
-
 
 ## base_size Effect
 
@@ -256,7 +211,6 @@ theme_classic(base_size = 12)
 
 ## When to Manually Set Sizes
 
-Only after trying dimensions first:
 
 ```{r}
 #| label: sizing-manual-generate
@@ -325,3 +279,49 @@ p + theme_classic(base_size = 11) +
 
 Usually just adjusting `width`, `height`, and `base_size` is enough!
 
+
+
+## Vector vs Raster: Key Differences
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.callout-note}
+## Vector Formats (SVG, PDF)
+
+**Dimensions control text/element proportions, not quality!**
+
+- Scale infinitely without quality loss
+- **DPI is ignored**
+- What matters: aspect ratio & relative proportions
+:::
+
+```{.r style="font-size: 1.1em;"}
+# Text larger in small.svg
+ggsave("small.svg", p,
+       width = 3.5, height = 3)
+ggsave("large.svg", p,
+       width = 7, height = 6)
+```
+:::
+
+::: {.column width="50%"}
+::: {.callout-warning}
+## Raster Formats (PNG, TIFF)
+
+**DPI controls pixel count and quality!**
+
+- Fixed resolution, can pixelate when scaled
+- **DPI matters** (300+ for print)
+- pixels = width × DPI
+:::
+
+```{.r style="font-size: 1.1em;"}
+# 1500×1200 pixels
+ggsave("plot.png", p,
+       width = 5, height = 4, dpi = 300)
+# 360×288 pixels
+ggsave("plot.png", p,
+       width = 5, height = 4, dpi = 72)
+```
+:::
+:::
