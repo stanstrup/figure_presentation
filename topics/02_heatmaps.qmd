@@ -20,7 +20,7 @@ Result: Everything looks the same color! 😱
 ```{r}
 #| label: heatmap-outlier-example
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Simulate data with outlier
 set.seed(123)
@@ -76,7 +76,9 @@ pheatmap(expr_matrix)  # All data compressed to narrow range
 ```{r}
 #| label: heatmap-scale-issue
 #| echo: true
-#| eval: false
+#| eval: true
+
+library(gplots)  # or source the function
 
 # This looks correct but is misleading!
 heatmap.2(expr_matrix, scale = "column")
@@ -91,9 +93,9 @@ heatmap.2(expr_matrix, scale = "column")
 ```{r}
 #| label: heat-clust-example
 #| echo: true
-#| eval: false
+#| eval: true
 
-library(massageR)  # or source the function
+library(massageR)
 
 # Pre-scale data AND calculate dendrograms on scaled data
 z <- heat.clust(expr_matrix,
@@ -117,7 +119,7 @@ Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps
 ```{r}
 #| label: sd-cutoff
 #| echo: true
-#| eval: false
+#| eval: true
 #| code-line-numbers: "|2-3|5-6"
 
 # Cap at ±2 SD
@@ -138,7 +140,7 @@ Most common: ±2 or ±3 SD cutoff
 ```{r}
 #| label: quantile-cutoff
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Cap at 5th and 95th percentiles
 lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
@@ -157,7 +159,7 @@ Robust to extreme outliers
 ```{r}
 #| label: manual-breaks
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Define your own color breaks
 breaks <- seq(-3, 3, length.out = 100)
@@ -178,7 +180,7 @@ Full control over color mapping
 ```{r}
 #| label: log-transform
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Log transform data
 expr_log <- log10(expr_matrix + 1)  # +1 to handle zeros
@@ -199,7 +201,7 @@ ggplot(heatmap_df, aes(x, y, fill = value)) +
 ```{r}
 #| label: annotate-capped
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(ComplexHeatmap)
 
@@ -233,7 +235,7 @@ Heatmap(expr_capped,
 ```{r}
 #| label: diverging-scale
 #| echo: true
-#| eval: false
+#| eval: true
 
 # When zero is meaningful (fold-change, difference, etc.)
 library(RColorBrewer)
@@ -252,7 +254,7 @@ pheatmap(expr_capped,
 ```{r}
 #| label: rnaseq-example
 #| echo: true
-#| eval: false
+#| eval: true
 
 # RNA-seq data
 library(DESeq2)
@@ -305,7 +307,7 @@ Heatmap(log2FC_capped,
 ```{r}
 #| label: heatmap-comparison
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(patchwork)
 

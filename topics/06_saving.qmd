@@ -30,6 +30,7 @@ dev.off()  # CRITICAL! Must close device
 ## dev.off() Works with ALL R Plots
 
 The `dev.off()` approach works for:
+
 - Base R plots (`plot()`, `hist()`, `barplot()`, etc.)
 - Lattice plots
 - ggplot2 plots
@@ -293,6 +294,7 @@ ggsave("figures/figure1.png", p1, width = 7, height = 5, dpi = 300)
 ## dev.off() is the Universal Approach
 
 The device approach works for **ALL** R plotting systems:
+
 - Base R graphics
 - Lattice
 - ggplot2 (though ggsave() is easier)
@@ -334,11 +336,13 @@ dev.off()
 ## When to Use dev.off() vs ggsave()
 
 **Use ggsave():**
+
 - When working with ggplot2 objects
 - Cleaner syntax
 - No need to manage device lifecycle
 
 **Use dev.off():**
+
 - Base R plots
 - Lattice plots
 - Complex multi-plot layouts with par() or layout()
