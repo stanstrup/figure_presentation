@@ -41,6 +41,7 @@ But when you print or open in Illustrator... **it's perfect!**
 ## The Thin Line Problem
 
 ```{r}
+#| label: render-thin-lines
 #| echo: true
 #| eval: false
 
@@ -56,6 +57,7 @@ ggplot(mtcars, aes(wt, mpg)) +
 ## Transparency Rendering
 
 ```{r}
+#| label: render-transparency
 #| echo: true
 #| eval: false
 
@@ -83,6 +85,7 @@ ggplot(mtcars, aes(wt, mpg)) +
 **Solution:**
 
 ```{r}
+#| label: render-font-embed
 #| echo: true
 #| eval: false
 
@@ -105,6 +108,7 @@ ggsave("plot.pdf", p, width = 7, height = 5, device = cairo_pdf)
 ## Real-World Example
 
 ```{r}
+#| label: render-real-world
 #| echo: true
 #| eval: false
 
@@ -132,6 +136,7 @@ ggsave("complex.pdf", p, width = 3.5, height = 3)
 - White lines between tiles
 
 ```{r}
+#| label: render-tiles
 #| echo: true
 #| eval: false
 
@@ -180,6 +185,7 @@ ggplot(mtcars, aes(wt, mpg, fill = hp)) +
 ## Avoiding Rendering Problems
 
 ```{r}
+#| label: render-avoid-problems
 #| echo: true
 #| eval: false
 
@@ -227,6 +233,7 @@ theme_classic(base_size = 10)  # Not 6
 ### Issue: Thin lines disappear
 
 ```{r}
+#| label: render-issue-thin
 #| echo: true
 #| eval: false
 
@@ -240,6 +247,7 @@ geom_line(linewidth = 0.5)  # Minimum for reliable rendering
 ### Issue: Fonts look wrong
 
 ```{r}
+#| label: render-issue-fonts
 #| echo: true
 #| eval: false
 
@@ -253,6 +261,7 @@ ggsave("plot.pdf", device = cairo_pdf)  # Embeds fonts
 ## Advanced: Controlling PDF Version
 
 ```{r}
+#| label: render-pdf-version
 #| echo: true
 #| eval: false
 
@@ -270,6 +279,7 @@ Check journal requirements!
 ## Debugging Rendering Issues
 
 ```{r}
+#| label: render-debugging
 #| echo: true
 #| eval: false
 

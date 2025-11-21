@@ -18,6 +18,7 @@ Result: Everything looks the same color! 😱
 ## Visual Example
 
 ```{r}
+#| label: heatmap-outlier-example
 #| echo: true
 #| eval: false
 
@@ -73,6 +74,7 @@ pheatmap(expr_matrix)  # All data compressed to narrow range
 ## Why This Matters
 
 ```{r}
+#| label: heatmap-scale-issue
 #| echo: true
 #| eval: false
 
@@ -87,6 +89,7 @@ heatmap.2(expr_matrix, scale = "column")
 ## The Correct Approach: heat.clust
 
 ```{r}
+#| label: heat-clust-example
 #| echo: true
 #| eval: false
 
@@ -112,6 +115,7 @@ Source: [stanstrup.github.io/heatmaps.html](https://stanstrup.github.io/heatmaps
 ## Solution 1: Standard Deviation Cutoffs
 
 ```{r}
+#| label: sd-cutoff
 #| echo: true
 #| eval: false
 #| code-line-numbers: "|2-3|5-6"
@@ -132,6 +136,7 @@ Most common: ±2 or ±3 SD cutoff
 ## Solution 2: Quantile-Based
 
 ```{r}
+#| label: quantile-cutoff
 #| echo: true
 #| eval: false
 
@@ -150,6 +155,7 @@ Robust to extreme outliers
 ## Solution 3: Manual Breaks
 
 ```{r}
+#| label: manual-breaks
 #| echo: true
 #| eval: false
 
@@ -170,6 +176,7 @@ Full control over color mapping
 **For positive values only** (e.g., counts, intensities)
 
 ```{r}
+#| label: log-transform
 #| echo: true
 #| eval: false
 
@@ -190,6 +197,7 @@ ggplot(heatmap_df, aes(x, y, fill = value)) +
 **Best practice**: Indicate when values are capped
 
 ```{r}
+#| label: annotate-capped
 #| echo: true
 #| eval: false
 
@@ -223,6 +231,7 @@ Heatmap(expr_capped,
 ## Diverging Scales for Centered Data
 
 ```{r}
+#| label: diverging-scale
 #| echo: true
 #| eval: false
 
@@ -241,6 +250,7 @@ pheatmap(expr_capped,
 ## Real-World Example
 
 ```{r}
+#| label: rnaseq-example
 #| echo: true
 #| eval: false
 
@@ -293,6 +303,7 @@ Heatmap(log2FC_capped,
 ## Comparison: Before and After
 
 ```{r}
+#| label: heatmap-comparison
 #| echo: true
 #| eval: false
 

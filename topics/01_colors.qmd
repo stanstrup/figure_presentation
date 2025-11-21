@@ -3,6 +3,7 @@
 ## What is the Rainbow Scale?
 
 ```{r}
+#| label: setup-libraries
 #| echo: false
 #| eval: true
 
@@ -15,7 +16,10 @@ library(colorspace)
 library(dichromat)
 
 n <- 100      # number of final colors in the gradient
-k <- 12       # number of anchor colors to sample from rainbow()
+k <- 10       # number of anchor colors to sample from rainbow()
+
+# Rainbow end point: 5/6 gives red to magenta (full spectrum without wrap-around)
+rainbow_end <- 5/6
 
 # -------------------------------------------------------------------------
 # Helper: Find nearest R named color to a given hex
@@ -35,7 +39,8 @@ nearest_named_color <- function(hex) {
 # -------------------------------------------------------------------------
 # Generate rainbow anchor colors
 # -------------------------------------------------------------------------
-anchors_true <- rainbow(k)
+# Use start=0 (red) and end=5/6 (magenta) to get full spectrum without wrap
+anchors_true <- rainbow(k, start = 0, end = rainbow_end)
 
 # Replace each with nearest named color
 anchors_named <- sapply(anchors_true, nearest_named_color)
@@ -48,6 +53,7 @@ manual_colors <- manual_crp(n)
 **Interactive Challenge: Can you order these colors?**
 
 ```{r}
+#| label: rainbow-challenge
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -87,6 +93,7 @@ Ask the audience to mentally arrange these numbered colors in rainbow order befo
 ## The Correct Rainbow Order
 
 ```{r}
+#| label: rainbow-answer
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -127,6 +134,7 @@ ggplot(correct_data, aes(x = x, y = y)) +
 
 
 ```{r}
+#| label: rainbow-implementations
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -135,7 +143,7 @@ ggplot(correct_data, aes(x = x, y = y)) +
 # -------------------------------------------------------------------------
 # Build data frames for ggplot (reversed to match the dot visualization)
 # -------------------------------------------------------------------------
-native <- data.frame(x = n:1, y = 1, color = rev(rainbow(n)))
+native <- data.frame(x = n:1, y = 1, color = rev(rainbow(n, end = rainbow_end)))
 manual <- data.frame(x = n:1, y = 1, color = rev(manual_colors))
 jet    <- data.frame(x = n:1, y = 1, color = mixOmics::color.jet(n))
 
@@ -176,6 +184,7 @@ p1 / p2 / p3 +
 
 
 ```{r}
+#| label: rainbow-implementations-desaturated
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -186,7 +195,7 @@ library(colorspace)
 # -------------------------------------------------------------------------
 # Build data frames for ggplot (reversed to match the dot visualization)
 # -------------------------------------------------------------------------
-native <- data.frame(x = n:1, y = 1, color = desaturate(rev(rainbow(n))))
+native <- data.frame(x = n:1, y = 1, color = desaturate(rev(rainbow(n, end = rainbow_end))))
 manual <- data.frame(x = n:1, y = 1, color = desaturate(rev(manual_colors)))
 jet    <- data.frame(x = n:1, y = 1, color = desaturate(mixOmics::color.jet(n)))
 
@@ -249,6 +258,7 @@ But wavelength order ≠ perceptual order!
 ::: {.column width="50%"}
 
 ```{r}
+#| label: tale-of-two-colormaps-rainbow
 #| echo: false
 #| eval: true
 #| fig-width: 6
@@ -264,7 +274,7 @@ faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
   theme(legend.position = "bottom")
 
 p1 <- faithful_plot +
-  scale_fill_gradientn(colors = rainbow(256)) +
+  scale_fill_gradientn(colors = rainbow(256, end = rainbow_end)) +
   labs(title = "Colormap A: Do you see sharp edges?", subtitle = "Rainbow scale")
 
 p2 <- faithful_plot +
@@ -279,6 +289,7 @@ p1
 ::: {.column width="50%"}
 ::: {.fragment}
 ```{r}
+#| label: tale-of-two-colormaps-viridis
 #| echo: false
 #| eval: true
 #| fig-width: 6
@@ -302,6 +313,7 @@ The data is **smooth**, yet Colormap A creates false boundaries!
 ## Perceptual Non-Uniformity: Demonstrated
 
 ```{r}
+#| label: perceptual-non-uniformity
 #| echo: false
 #| eval: true
 #| fig-width: 14
@@ -321,7 +333,7 @@ base_plot <- ggplot(gradient_data, aes(x, y, fill = z)) +
         plot.title = element_text(face = "bold"))
 
 p1 <- base_plot +
-  scale_fill_gradientn(colors = rainbow(7)) +
+  scale_fill_gradientn(colors = rainbow(7, end = rainbow_end)) +
   labs(title = "Rainbow: False boundaries appear!",
        subtitle = "Yellow-green and cyan-blue transitions 'pop'")
 
@@ -360,7 +372,7 @@ Haseneyer, G., Schmutzer, T., Seidel, M. et al. From RNA-seq to large-scale geno
 ## Medical Consequences
 
 
-::::: {.columns}
+:::: {.columns}
 :::: {.column width="50%"}
 
 ::: {.callout-important}
@@ -393,10 +405,67 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 ::::
 :::
 
-:::::
+::::
 
 
 
+
+
+
+## Comparison: Rainbow vs Better Alternatives
+
+```{r}
+#| label: rainbow-vs-alternatives
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+# Helper function to display color scales
+img <- function(obj, nam) {
+  image(1:length(obj), 1, as.matrix(1:length(obj)), col=obj,
+        main = nam, ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+}
+
+n_col <- 128
+
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(rev(rainbow(n_col, end = rainbow_end)), "rainbow")
+img(rev(turbo(n_col)), "turbo")
+img(rev(heat.colors(n_col)), "heat")
+img(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "ggplot default")
+img(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "brewer blues")
+img(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col)), "brewer yellow-green-blue")
+img(rev(viridis(n_col)), "viridis")
+img(rev(magma(n_col)), "magma")
+```
+
+**Notice how rainbow and heat have sharp transitions while viridis/magma are smooth!**
+
+
+## Desaturated
+
+```{r}
+#| label: rainbow-vs-alternatives-desaturated
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+n_col <- 128
+
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(desaturate(rev(rainbow(n_col, end = rainbow_end))), "rainbow")
+img(desaturate(rev(turbo(n_col))), "turbo")
+img(desaturate(rev(heat.colors(n_col))), "heat")
+img(desaturate(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col)))), "ggplot default")
+img(desaturate(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col))), "brewer blues")
+img(desaturate(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col))), "brewer yellow-green-blue")
+img(desaturate(rev(viridis(n_col))), "viridis")
+img(desaturate(rev(magma(n_col))), "magma")
+```
+
+**Rainbow loses all information when desaturated! Viridis/magma remain readable.**
 
 
 
@@ -404,18 +473,13 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 ## The Viridis Color Scales
 
 ```{r}
+#| label: viridis-scales
 #| echo: false
 #| eval: true
 #| fig-width: 12
 #| fig-height: 9
 
 n_col <- 128
-
-# Helper function to display color scales
-img <- function(obj, nam) {
-  image(1:length(obj), 1, as.matrix(1:length(obj)), col=obj,
-        main = nam, ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-}
 
 par(mfrow=c(8, 1), mar=rep(1, 4))
 img(rev(viridis(n_col)), "viridis")
@@ -428,67 +492,49 @@ img(rev(rocket(n_col)), "rocket")
 img(rev(turbo(n_col)), "turbo")
 ```
 
-**All viridis scales are perceptually uniform and colorblind-friendly!**
+**All viridis scales are perceptually uniform**
 
-
-## Comparison: Rainbow vs Better Alternatives
+## The Viridis Color Scales, desaturated
 
 ```{r}
+#| label: viridis-scales-desaturated
 #| echo: false
 #| eval: true
 #| fig-width: 12
-#| fig-height: 8
+#| fig-height: 9
 
-par(mfrow=c(7, 1), mar=rep(1, 4))
-img(rev(rainbow(n_col)), "rainbow")
-img(rev(heat.colors(n_col)), "heat")
-img(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "ggplot default")
-img(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "brewer blues")
-img(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col)), "brewer yellow-green-blue")
-img(rev(viridis(n_col)), "viridis")
-img(rev(magma(n_col)), "magma")
-```
+n_col <- 128
 
-**Notice how rainbow and heat have sharp transitions while viridis/magma are smooth!**
-
-
-## Desaturated (Black & White Printing)
-
-```{r}
-#| echo: false
-#| eval: true
-#| fig-width: 12
-#| fig-height: 8
-
-par(mfrow=c(7, 1), mar=rep(1, 4))
-img(desaturate(rev(rainbow(n_col))), "rainbow")
-img(desaturate(rev(heat.colors(n_col))), "heat")
-img(desaturate(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col)))), "ggplot default")
-img(desaturate(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col))), "brewer blues")
-img(desaturate(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col))), "brewer yellow-green-blue")
+par(mfrow=c(8, 1), mar=rep(1, 4))
 img(desaturate(rev(viridis(n_col))), "viridis")
 img(desaturate(rev(magma(n_col))), "magma")
+img(desaturate(rev(plasma(n_col))), "plasma")
+img(desaturate(rev(inferno(n_col))), "inferno")
+img(desaturate(rev(cividis(n_col))), "cividis")
+img(desaturate(rev(mako(n_col))), "mako")
+img(desaturate(rev(rocket(n_col))), "rocket")
+img(desaturate(rev(turbo(n_col))), "turbo")
 ```
-
-**Rainbow loses all information when desaturated! Viridis/magma remain readable.**
 
 
 ## Green-Blind Vision (Deuteranopia)
 
 ```{r}
+#| label: green-blind-vision
 #| echo: false
 #| eval: true
 #| fig-width: 12
 #| fig-height: 8
 
-par(mfrow=c(7, 1), mar=rep(1, 4))
-img(dichromat(rev(rainbow(n_col)), "deutan"), "rainbow")
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(dichromat(rev(rainbow(n_col, end = rainbow_end)), "deutan"), "rainbow")
 img(dichromat(rev(heat.colors(n_col)), "deutan"), "heat")
 img(dichromat(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "deutan"), "ggplot default")
 img(dichromat(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "deutan"), "brewer blues")
 img(dichromat(gradient_n_pal(brewer_pal(type="seq", palette = "YlGnBu")(9))(seq(0, 1, length=n_col)), "deutan"), "brewer yellow-green-blue")
 img(dichromat(rev(viridis(n_col)), "deutan"), "viridis")
 img(dichromat(rev(magma(n_col)), "deutan"), "magma")
+img(dichromat(rev(turbo(n_col)), "deutan"), "magma")
 ```
 
 **For ~8% of men, rainbow is nearly useless! Viridis/magma stay distinct.**
@@ -506,6 +552,8 @@ img(dichromat(rev(magma(n_col)), "deutan"), "magma")
 | **Viridis** | ✅ Perceptually uniform<br>✅ Colorblind safe<br>✅ B&W photocopy safe<br>✅ Projection safe<br>✅ Engaging colors | ⚠️ Very popular (less unique) | **DEFAULT CHOICE** for most data |
 | **Magma/Inferno** | ✅ All viridis benefits<br>✅ Warmer aesthetic<br>✅ High contrast endpoints | ⚠️ Dark end can be hard to see | Dark backgrounds, presentations |
 | **Cividis** | ✅ Optimized for colorblindness<br>✅ All viridis benefits | ⚠️ Less saturated (less engaging) | When colorblind audience is priority |
+
+: {tbl-colwidths="[15,30,35,20]"}
 
 ::: {.callout-tip}
 ## Quick Decision Guide
@@ -525,6 +573,7 @@ img(dichromat(rev(magma(n_col)), "deutan"), "magma")
 ## Viridis Family: Show All Options
 
 ```{r}
+#| label: viridis-family-demo
 #| echo: true
 #| eval: true
 #| fig-width: 14
@@ -569,83 +618,12 @@ p6 <- base_plot + scale_fill_viridis_c(option = "rocket") +
 
 **All are perceptually uniform and colorblind-friendly!**
 
-## Viridis: Grayscale Conversion Test
-
-```{r}
-#| echo: true
-#| eval: true
-#| fig-width: 14
-#| fig-height: 8
-
-library(ggplot2)
-library(patchwork)
-
-# Create test data
-test_data <- data.frame(
-  x = rep(1:100, each = 20),
-  y = rep(1:20, 100),
-  value = rep(1:100, each = 20)
-)
-
-# Function to convert to grayscale
-convert_to_gray <- function(p) {
-  p + theme(plot.background = element_rect(fill = "white", color = NA)) +
-    scale_fill_gradient(low = "black", high = "white")
-}
-
-# Viridis in color
-p1 <- ggplot(test_data, aes(x, y, fill = value)) +
-  geom_raster() +
-  scale_fill_viridis_c() +
-  theme_void() +
-  labs(title = "Viridis (Color)") +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        legend.position = "bottom")
-
-# Viridis converted to grayscale (simulated by using lightness values)
-# Extract lightness progression from viridis
-p2 <- ggplot(test_data, aes(x, y, fill = value)) +
-  geom_raster() +
-  scale_fill_gradient(low = "#000000", high = "#FFFFFF") +
-  theme_void() +
-  labs(title = "Viridis (B&W - still readable!)") +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        legend.position = "bottom")
-
-# Rainbow in color
-p3 <- ggplot(test_data, aes(x, y, fill = value)) +
-  geom_raster() +
-  scale_fill_gradientn(colors = rainbow(10)) +
-  theme_void() +
-  labs(title = "Rainbow (Color)") +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        legend.position = "bottom")
-
-# Rainbow converted to grayscale (loses information)
-# Rainbow varies in hue but not monotonically in lightness
-p4 <- ggplot(test_data, aes(x, y, fill = value)) +
-  geom_raster() +
-  scale_fill_gradient2(low = "#404040", mid = "#CCCCCC", high = "#606060", midpoint = 50) +
-  theme_void() +
-  labs(title = "Rainbow (B&W - information lost!)") +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        legend.position = "bottom")
-
-(p1 | p2) / (p3 | p4) +
-  plot_annotation(
-    title = "Grayscale Conversion Test: Viridis vs Rainbow",
-    subtitle = "Viridis increases monotonically in lightness - Rainbow does not!",
-    theme = theme(plot.title = element_text(size = 18, face = "bold"),
-                  plot.subtitle = element_text(size = 12))
-  )
-```
-
-
 # Colors for qualitative data {background-color="#e74c3c"}
 
 ## ColorBrewer: All Palettes
 
 ```{r}
+#| label: colorbrewer-palettes
 #| echo: true
 #| eval: true
 #| fig-width: 14
@@ -753,6 +731,7 @@ Even though ColorBrewer includes yellow in some palettes (e.g., "YlOrRd", "RdYlB
 :::
 
 ```{r}
+#| label: yellow-warning-demo
 #| echo: true
 #| eval: true
 #| fig-width: 12
@@ -858,6 +837,7 @@ In a room of 100 people:
 ## Quick Reference: Code Examples
 
 ```{r}
+#| label: code-examples
 #| echo: true
 #| eval: false
 

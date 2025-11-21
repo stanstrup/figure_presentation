@@ -37,6 +37,7 @@ Instead:
 **Enhanced Metafile - native PowerPoint vector format**
 
 ```{r}
+#| label: ppt-emf
 #| echo: true
 #| eval: false
 
@@ -59,6 +60,7 @@ ggsave("plot.emf", width = 8, height = 6, device = "emf")
 ## Option 2: PDF (All Platforms)
 
 ```{r}
+#| label: ppt-pdf
 #| echo: true
 #| eval: false
 
@@ -77,6 +79,7 @@ ggsave("plot.pdf", my_plot, width = 8, height = 6, device = cairo_pdf)
 ## Option 3: SVG (Modern)
 
 ```{r}
+#| label: ppt-svg
 #| echo: true
 #| eval: false
 
@@ -96,6 +99,7 @@ ggsave("plot.svg", my_plot, width = 8, height = 6)
 **If vector doesn't work:**
 
 ```{r}
+#| label: ppt-png
 #| echo: true
 #| eval: false
 
@@ -162,6 +166,7 @@ Critical settings:
 **Design plots for final size:**
 
 ```{r}
+#| label: ppt-slide-size
 #| echo: true
 #| eval: false
 
@@ -198,6 +203,7 @@ ggsave("slide_plot.pdf", p, width = 8, height = 6)
 ## Creating Presentation-Ready Plots
 
 ```{r}
+#| label: ppt-presentation-ready
 #| echo: true
 #| eval: false
 
@@ -223,6 +229,7 @@ ggsave("presentation.pdf", p_present, width = 10, height = 7)
 **Tip:** Save separate plots for each "step"
 
 ```{r}
+#| label: ppt-animations
 #| echo: true
 #| eval: false
 
@@ -246,6 +253,7 @@ ggsave("step3.pdf", p3, width = 8, height = 6)
 **For plots on colored slide backgrounds:**
 
 ```{r}
+#| label: ppt-transparency
 #| echo: true
 #| eval: false
 
@@ -297,6 +305,7 @@ ggsave("transparent.png", p,
 ## Complete Workflow Example
 
 ```{r}
+#| label: ppt-complete-example
 #| echo: true
 #| eval: false
 
