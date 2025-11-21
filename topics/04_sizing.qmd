@@ -42,15 +42,15 @@ Then use **vector formats (SVG/PDF)** for infinite resolution.
 #| output: false
 
 # Save at different sizes to demonstrate the effect
-ggsave("sources/sizing_small.svg", p, width = 3.5, height = 3)
-ggsave("sources/sizing_large.svg", p, width = 7, height = 6)
+ggsave("plots/04_sizing/sizing_small.svg", p, width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_large.svg", p, width = 7, height = 6)
 ```
 
 ::: {.columns}
 ::: {.column width="50%"}
 **Small canvas (3.5 × 3 inches)**
 
-![](sources/sizing_small.svg){width="100%"}
+![](plots/04_sizing/sizing_small.svg){width="100%"}
 
 Text appears **large** relative to plot
 
@@ -69,7 +69,7 @@ ggsave("sizing_small.svg", p,
 ::: {.column width="50%"}
 **Large canvas (7 × 6 inches)**
 
-![](sources/sizing_large.svg){width="100%"}
+![](plots/04_sizing/sizing_large.svg){width="100%"}
 
 Text appears **small** relative to plot
 
@@ -147,11 +147,11 @@ p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 # STEP 1: Save at journal single-column width (3.5 inches)
 # Text will appear appropriately large!
-ggsave("figure1.svg", p, width = 3.5, height = 3)
+ggsave("plots/04_sizing/figure1.svg", p, width = 3.5, height = 3)
 
 # STEP 2: If text still too small/large, adjust base_size
 p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
-ggsave("figure1_v2.svg", p2, width = 3.5, height = 3)
+ggsave("plots/04_sizing/figure1_v2.svg", p2, width = 3.5, height = 3)
 ```
 
 
@@ -162,28 +162,28 @@ ggsave("figure1_v2.svg", p2, width = 3.5, height = 3)
 #| output: false
 
 # Save with different base_size values
-ggsave("sources/sizing_base8.svg", p + theme_classic(base_size = 8), width = 3.5, height = 3)
-ggsave("sources/sizing_base11.svg", p + theme_classic(base_size = 11), width = 3.5, height = 3)
-ggsave("sources/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_base8.svg", p + theme_classic(base_size = 8), width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_base11.svg", p + theme_classic(base_size = 11), width = 3.5, height = 3)
+ggsave("plots/04_sizing/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3.5, height = 3)
 ```
 
 ::: {.columns}
 ::: {.column width="33%"}
 **base_size = 8**
 
-![](sources/sizing_base8.svg){width="100%"}
+![](plots/04_sizing/sizing_base8.svg){width="100%"}
 :::
 
 ::: {.column width="33%"}
 **base_size = 11 (default)**
 
-![](sources/sizing_base11.svg){width="100%"}
+![](plots/04_sizing/sizing_base11.svg){width="100%"}
 :::
 
 ::: {.column width="33%"}
 **base_size = 14**
 
-![](sources/sizing_base14.svg){width="100%"}
+![](plots/04_sizing/sizing_base14.svg){width="100%"}
 :::
 :::
 
@@ -233,15 +233,15 @@ p_custom <- p_default +
     legend.text = element_text(size = 11)
   )
 
-ggsave("sources/sizing_default_theme.svg", p_default, width = 4, height = 3)
-ggsave("sources/sizing_custom_theme.svg", p_custom, width = 4, height = 3)
+ggsave("plots/04_sizing/sizing_default_theme.svg", p_default, width = 4, height = 3)
+ggsave("plots/04_sizing/sizing_custom_theme.svg", p_custom, width = 4, height = 3)
 ```
 
 ::: {.columns}
 ::: {.column width="50%"}
 **Default (base_size = 11)**
 
-![](sources/sizing_default_theme.svg){width="100%"}
+![](plots/04_sizing/sizing_default_theme.svg){width="100%"}
 
 ```{r}
 #| label: sizing-default-code
@@ -256,7 +256,7 @@ p + theme_classic(base_size = 11)
 ::: {.column width="50%"}
 **With manual adjustments**
 
-![](sources/sizing_custom_theme.svg){width="100%"}
+![](plots/04_sizing/sizing_custom_theme.svg){width="100%"}
 
 ```{r}
 #| label: sizing-manual-override
