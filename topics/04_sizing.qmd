@@ -268,16 +268,14 @@ p + theme_classic(base_size = 11)
 #| label: sizing-manual-override
 #| echo: true
 #| eval: false
-#| code-overflow: wrap
+#| code-overflow: clip
 
 p + theme_classic(base_size = 11) +
   theme(
-    axis.title = element_text(
-      size = 14, face = "bold"),
-    axis.text = element_text(size = 12),
-    legend.title = element_text(
-      size = 12, face = "bold"),
-    legend.text = element_text(size = 11)
+    axis.title   = element_text(size = 14, face = "bold"),
+    axis.text    = element_text(size = 12),
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text  = element_text(size = 11)
   )
 ```
 :::
