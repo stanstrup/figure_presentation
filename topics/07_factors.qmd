@@ -5,6 +5,7 @@
 **R's default behavior:**
 
 ```{r}
+#| label: factors-default-behavior
 #| echo: true
 #| eval: false
 
@@ -58,6 +59,7 @@ Makes sense!
 ## Solution 1: Manual Ordering
 
 ```{r}
+#| label: factors-manual-ordering
 #| echo: true
 #| eval: true
 
@@ -84,6 +86,7 @@ Full control over order
 **Part of tidyverse, designed for factor manipulation**
 
 ```{r}
+#| label: factors-forcats-intro
 #| echo: true
 #| eval: false
 
@@ -101,6 +104,7 @@ mtcars %>%
 ## fct_reorder(): Order by Another Variable
 
 ```{r}
+#| label: factors-fct-reorder
 #| echo: true
 #| eval: false
 
@@ -121,6 +125,7 @@ Bars ordered by height!
 ## fct_infreq(): Order by Frequency
 
 ```{r}
+#| label: factors-fct-infreq
 #| echo: true
 #| eval: false
 
@@ -138,6 +143,7 @@ Great for survey data
 ## fct_rev(): Reverse Order
 
 ```{r}
+#| label: factors-fct-rev
 #| echo: true
 #| eval: false
 
@@ -153,6 +159,7 @@ mtcars %>%
 ## fct_relevel(): Move Specific Levels
 
 ```{r}
+#| label: factors-fct-relevel
 #| echo: true
 #| eval: false
 
@@ -170,6 +177,7 @@ Common in experimental data!
 ## Common Use Case: Ordered Bar Chart
 
 ```{r}
+#| label: factors-ordered-bar
 #| echo: true
 #| eval: false
 
@@ -193,6 +201,7 @@ Much easier to read than alphabetical!
 ## Time-Based Ordering
 
 ```{r}
+#| label: factors-time-ordering
 #| echo: true
 #| eval: false
 
@@ -216,6 +225,7 @@ ggplot(month_data, aes(month, value)) +
 ## Legend Ordering
 
 ```{r}
+#| label: factors-legend-ordering
 #| echo: true
 #| eval: false
 
@@ -234,6 +244,7 @@ ggplot(mtcars, aes(x = wt,
 ## Facet Ordering
 
 ```{r}
+#| label: factors-facet-ordering
 #| echo: true
 #| eval: false
 
@@ -251,6 +262,7 @@ mtcars %>%
 ## forcats Cheat Sheet
 
 ```{r}
+#| label: factors-cheatsheet
 #| echo: true
 #| eval: false
 
@@ -268,6 +280,7 @@ fct_explicit_na(f)       # Make NA a visible level
 ## Real-World Example: Survey Data
 
 ```{r}
+#| label: factors-survey-example
 #| echo: true
 #| eval: false
 
@@ -293,6 +306,7 @@ ggplot(survey, aes(x = response)) +
 ## Real-World Example: Treatment Groups
 
 ```{r}
+#| label: factors-treatment-example
 #| echo: true
 #| eval: false
 
@@ -318,6 +332,7 @@ ggplot(clinical, aes(treatment, response)) +
 ## Combining Operations
 
 ```{r}
+#| label: factors-combining
 #| echo: true
 #| eval: false
 
@@ -342,6 +357,7 @@ mtcars %>%
 **Before (alphabetical):**
 
 ```{r}
+#| label: factors-before
 #| echo: true
 #| eval: false
 
@@ -360,6 +376,7 @@ ggplot(msleep,
 **After (by median):**
 
 ```{r}
+#| label: factors-after
 #| echo: true
 #| eval: false
 
@@ -383,6 +400,7 @@ ggplot(msleep,
 ### Pattern 1: Sorted bar chart
 
 ```{r}
+#| label: factors-pattern-sorted-bar
 #| echo: true
 #| eval: false
 
@@ -396,6 +414,7 @@ mtcars %>%
 ### Pattern 2: Control group first
 
 ```{r}
+#| label: factors-pattern-control
 #| echo: true
 #| eval: false
 
@@ -408,6 +427,7 @@ mtcars %>%
 ### Pattern 3: Chronological grouping
 
 ```{r}
+#| label: factors-pattern-chrono
 #| echo: true
 #| eval: false
 
@@ -421,6 +441,7 @@ mtcars %>%
 ## Debugging Factor Issues
 
 ```{r}
+#| label: factors-debugging
 #| echo: true
 #| eval: false
 
@@ -453,6 +474,7 @@ mtcars$cyl_char <- as.character(mtcars$cyl)
 ## Complete Example
 
 ```{r}
+#| label: factors-complete-example
 #| echo: true
 #| eval: false
 

@@ -16,6 +16,7 @@ Device = where R sends the graphics output
 ## Old Way: Manual Device Management
 
 ```{r}
+#| label: saving-old-way
 #| echo: true
 #| eval: false
 #| code-line-numbers: "|1|2|3"
@@ -51,6 +52,7 @@ The `dev.off()` approach works for:
 **For ggplot2 objects** (recommended!)
 
 ```{r}
+#| label: saving-ggsave-basic
 #| echo: true
 #| eval: false
 
@@ -68,6 +70,7 @@ No `dev.off()` needed! ✨
 ## ggsave() Full Control
 
 ```{r}
+#| label: saving-ggsave-full
 #| echo: true
 #| eval: false
 #| code-line-numbers: "|2|3|4|5|6|7"
@@ -88,6 +91,7 @@ ggsave(
 ### PDF (Vector - Best for Publications)
 
 ```{r}
+#| label: saving-pdf
 #| echo: true
 #| eval: false
 
@@ -105,6 +109,7 @@ Use `cairo_pdf` for better font support!
 ## PNG (High Resolution Raster)
 
 ```{r}
+#| label: saving-png
 #| echo: true
 #| eval: false
 
@@ -122,6 +127,7 @@ ggsave("plot.png",
 ## TIFF (Journal Requirements)
 
 ```{r}
+#| label: saving-tiff
 #| echo: true
 #| eval: false
 
@@ -136,6 +142,7 @@ ggsave("plot.tiff",
 ## SVG (Web and Illustrator)
 
 ```{r}
+#| label: saving-svg
 #| echo: true
 #| eval: false
 
@@ -155,6 +162,7 @@ SVG files can be larger than PDF for complex plots
 **❌ Wrong**
 
 ```{r}
+#| label: saving-wrong
 #| echo: true
 #| eval: false
 
@@ -172,6 +180,7 @@ ggsave("plot.png",
 **✅ Correct**
 
 ```{r}
+#| label: saving-correct
 #| echo: true
 #| eval: false
 
@@ -194,6 +203,7 @@ ggsave("plot.png",
 ### Using R (magick package)
 
 ```{r}
+#| label: saving-magick
 #| echo: true
 #| eval: false
 
@@ -207,6 +217,7 @@ image_write(img, "plot.png", format = "png")
 ### Using R (pdftools package)
 
 ```{r}
+#| label: saving-pdftools
 #| echo: true
 #| eval: false
 
@@ -238,6 +249,7 @@ done
 ## Batch Saving Multiple Plots
 
 ```{r}
+#| label: saving-batch
 #| echo: true
 #| eval: false
 
@@ -262,6 +274,7 @@ iwalk(plots, ~ggsave(
 ## File Organization
 
 ```{r}
+#| label: saving-organization
 #| echo: true
 #| eval: false
 
@@ -288,6 +301,7 @@ The device approach works for **ALL** R plotting systems:
 :::
 
 ```{r}
+#| label: saving-base-r
 #| echo: true
 #| eval: false
 
@@ -335,6 +349,7 @@ dev.off()
 ## Checking Output Quality
 
 ```{r}
+#| label: saving-quality-check
 #| echo: true
 #| eval: false
 
@@ -374,6 +389,7 @@ file.info("test.pdf")$size / 1024  # Size in KB
 ## Complete Example
 
 ```{r}
+#| label: saving-complete-example
 #| echo: true
 #| eval: false
 

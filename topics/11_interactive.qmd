@@ -21,6 +21,7 @@
 **ggplotly()**
 
 ```{r}
+#| label: interactive-ggplotly-basic
 #| echo: true
 #| eval: false
 
@@ -39,6 +40,7 @@ Convert ggplot2 to interactive!
 **plot_ly()**
 
 ```{r}
+#| label: interactive-plotly-basic
 #| echo: true
 #| eval: false
 
@@ -57,6 +59,7 @@ Build interactively from scratch
 ## Basic ggplotly Example
 
 ```{r}
+#| label: interactive-example
 #| echo: true
 #| eval: false
 
@@ -83,6 +86,7 @@ Try hovering over points!
 ## Customizing Tooltips
 
 ```{r}
+#| label: interactive-tooltips
 #| echo: true
 #| eval: false
 
@@ -110,6 +114,7 @@ Can't just save as PDF or PNG traditionally.
 ## Solution 1: Save as HTML (Keep Interactivity)
 
 ```{r}
+#| label: interactive-save-html
 #| echo: true
 #| eval: false
 
@@ -145,6 +150,7 @@ pip install kaleido
 Then in R:
 
 ```{r}
+#| label: interactive-save-static
 #| echo: true
 #| eval: false
 
@@ -239,6 +245,7 @@ Perfect for modern scientific reports!
 ## Advanced plotly Features
 
 ```{r}
+#| label: interactive-advanced
 #| echo: true
 #| eval: false
 
@@ -262,6 +269,7 @@ p %>% layout(
 ## 3D Plots
 
 ```{r}
+#| label: interactive-3d
 #| echo: true
 #| eval: false
 
@@ -280,6 +288,7 @@ Great for exploring multivariate data
 ## Linked Plots (crosstalk)
 
 ```{r}
+#| label: interactive-crosstalk
 #| echo: true
 #| eval: false
 
@@ -301,6 +310,7 @@ subplot(p1, p2)
 ## Time Series with Range Slider
 
 ```{r}
+#| label: interactive-timeseries
 #| echo: true
 #| eval: false
 
@@ -325,6 +335,7 @@ plot_ly(ts_data, x = ~date, y = ~price, type = 'scatter', mode = 'lines') %>%
 ## Animations
 
 ```{r}
+#| label: interactive-animations
 #| echo: true
 #| eval: false
 
@@ -345,6 +356,7 @@ plot_ly(gapminder,
 **Interactive HTML can be large:**
 
 ```{r}
+#| label: interactive-filesize
 #| echo: true
 #| eval: false
 
@@ -361,6 +373,7 @@ ggplotly(p)
 ## Hybrid Approach: Both Versions
 
 ```{r}
+#| label: interactive-hybrid
 #| echo: true
 #| eval: false
 
@@ -392,6 +405,7 @@ saveWidget(p_interactive, "figure1_interactive.html")
 ## Publishing to RPubs
 
 ```{r}
+#| label: interactive-rpubs
 #| echo: true
 #| eval: false
 
@@ -417,6 +431,7 @@ saveWidget(p_interactive, "figure1_interactive.html")
 ## Alternative: ggiraph
 
 ```{r}
+#| label: interactive-ggiraph
 #| echo: true
 #| eval: false
 
@@ -454,6 +469,7 @@ Better ggplot2 compatibility than plotly!
 ## Complete Example
 
 ```{r}
+#| label: interactive-complete-example
 #| echo: true
 #| eval: false
 

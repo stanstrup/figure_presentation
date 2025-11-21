@@ -21,6 +21,7 @@
 ## What is a Vector Image?
 
 ```{r}
+#| label: vector-curve-demo
 #| echo: false
 #| eval: true
 
@@ -75,6 +76,7 @@ Because vectors are mathematical formulas, they can be scaled to **any size** wi
 
 
 ```{r}
+#| label: vector-raster-comparison
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -134,6 +136,7 @@ vector
 ## Vector vs. Raster Comparison (2)
 
 ```{r}
+#| label: vector-raster-comparison-2
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -180,6 +183,7 @@ Both **PDF** and **TIFF** can contain EITHER vector OR raster data:
 ## JPEG Compression Artifacts
 
 ```{r}
+#| label: jpeg-artifacts
 #| echo: false
 #| eval: true
 #| fig-width: 12
@@ -264,6 +268,7 @@ combined
 ## File Format Comparison
 
 ```{r}
+#| label: file-format-comparison
 #| echo: false
 #| eval: true
 #| fig-width: 12

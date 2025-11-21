@@ -36,6 +36,7 @@
 ## Export for Editability
 
 ```{r}
+#| label: editing-export
 #| echo: true
 #| eval: false
 
@@ -102,6 +103,7 @@ Illustrator/Inkscape = Final polish only
 ## Workflow Example
 
 ```{r}
+#| label: editing-workflow
 #| echo: true
 #| eval: false
 
@@ -176,6 +178,7 @@ project/
 **In R (patchwork)**
 
 ```{r}
+#| label: editing-patchwork
 #| echo: true
 #| eval: false
 
@@ -229,6 +232,7 @@ Fully reproducible!
 ## Example: Multi-Panel Figure
 
 ```{r}
+#| label: editing-multi-panel
 #| echo: true
 #| eval: false
 
@@ -270,6 +274,7 @@ walk2(list(p1, p2, p3, p4),
 **Instead of post-processing:**
 
 ```{r}
+#| label: editing-combining-tools
 #| echo: true
 #| eval: false
 

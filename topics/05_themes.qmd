@@ -3,6 +3,7 @@
 ## The Default Problem
 
 ```{r}
+#| label: theme-default
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -30,6 +31,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Built-in Theme: theme_bw()
 
 ```{r}
+#| label: theme-bw
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -51,6 +53,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Built-in Theme: theme_classic()
 
 ```{r}
+#| label: theme-classic
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -72,6 +75,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Built-in Theme: theme_minimal()
 
 ```{r}
+#| label: theme-minimal
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -93,6 +97,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Built-in Theme: theme_void()
 
 ```{r}
+#| label: theme-void
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -111,6 +116,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Side-by-Side Comparison
 
 ```{r}
+#| label: theme-comparison
 #| echo: false
 #| eval: true
 #| fig-width: 14
@@ -143,6 +149,7 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
 ## Publication-Ready Package: cowplot
 
 ```{r}
+#| label: theme-cowplot
 #| echo: true
 #| eval: false
 #| fig-width: 8
@@ -177,6 +184,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Publication Package: ggpubr
 
 ```{r}
+#| label: theme-ggpubr
 #| echo: true
 #| eval: false
 #| fig-width: 8
@@ -212,6 +220,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 ## Specialized Themes: ggthemes
 
 ```{r}
+#| label: theme-ggthemes
 #| echo: true
 #| eval: false
 #| fig-width: 14
@@ -265,6 +274,7 @@ Then change `eval: false` to `eval: true` in the code chunk above.
 ## Modern Typography: hrbrthemes
 
 ```{r}
+#| label: theme-hrbrthemes
 #| echo: true
 #| eval: false
 #| fig-width: 8
@@ -303,6 +313,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 **Set once, apply to all plots:**
 
 ```{r}
+#| label: global-theme
 #| echo: true
 #| eval: true
 #| fig-width: 14
@@ -337,6 +348,7 @@ p1 + p2 + p3 +
 ## Custom Theme for Publications
 
 ```{r}
+#| label: custom-pub-theme
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -373,6 +385,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ## Font Considerations
 
 ```{r}
+#| label: font-considerations
 #| echo: true
 #| eval: false
 
@@ -405,6 +418,7 @@ Check journal author guidelines!
 ## Theme Elements You Can Customize
 
 ```{r}
+#| label: theme-elements
 #| echo: true
 #| eval: true
 #| fig-width: 8
@@ -453,6 +467,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 ## Consistent Multi-Plot Style
 
 ```{r}
+#| label: multi-plot-style
 #| echo: true
 #| eval: true
 #| fig-width: 14
@@ -514,6 +529,7 @@ p1 + p2 + p3 +
 ## Package Installation Reference
 
 ```{r}
+#| label: install-packages
 #| echo: true
 #| eval: false
 
@@ -556,6 +572,7 @@ install.packages("patchwork")  # Combine multiple plots easily
 ## Complete Example: Before & After
 
 ```{r}
+#| label: before-after
 #| echo: true
 #| eval: true
 #| fig-width: 14
