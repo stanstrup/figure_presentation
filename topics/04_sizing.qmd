@@ -121,9 +121,9 @@ ggsave("sizing_large.svg", p,
 2. **Adjust `base_size` if needed**
    - Only fine-tune if text still too large/small
 
-3. **Use appropriate format**
-   - Vector (SVG, PDF) for publications - infinite resolution
-   - Raster (PNG) with high DPI for specific requirements
+3. **Adjust individual elements if needed**
+   - Use `theme()` to customize specific text sizes
+   - Only if steps 1-2 don't achieve desired result
 :::
 
 
