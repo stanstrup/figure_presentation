@@ -29,15 +29,8 @@ p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 Instead, use **smaller figure dimensions** to make text appear larger relative to the plot.
 
-```r
-# Small dimensions = larger text relative to plot
-ggsave("figure.svg", width = 3.5, height = 3)
-
-# Large dimensions = smaller text relative to plot
-ggsave("figure.svg", width = 10, height = 8)
-```
-
 Then use **vector formats (SVG/PDF)** for infinite resolution.
+
 :::
 
 ## Visual Demonstration
@@ -60,6 +53,17 @@ ggsave("sources/sizing_large.svg", p, width = 7, height = 6)
 ![](sources/sizing_small.svg){width="100%"}
 
 Text appears **large** relative to plot
+
+```{r}
+#| label: sizing-demo-generate2
+#| echo: true
+#| eval: false
+#| code-overflow: wrap
+
+ggsave("sizing_small.svg", p,
+       width = 3.5, height = 3)
+```
+
 :::
 
 ::: {.column width="50%"}
@@ -68,6 +72,17 @@ Text appears **large** relative to plot
 ![](sources/sizing_large.svg){width="100%"}
 
 Text appears **small** relative to plot
+
+```{r}
+#| label: sizing-demo-generate3
+#| echo: true
+#| eval: false
+#| code-overflow: wrap
+
+ggsave("sizing_large.svg", p,
+       width = 7, height = 6)
+```
+
 :::
 :::
 
@@ -131,7 +146,7 @@ Text appears **small** relative to plot
 ## Three-Step Process
 
 1. **Set dimensions to match final output size**
-   - Journal single column: ~3.5 inches
+   - Journal single column: ~3.5 inches (Always check specific journal guidelines!)
    - Journal double column: ~7 inches
    - Presentation: ~10 inches
 
@@ -163,6 +178,9 @@ ggsave("large.svg", p, width = 7, height = 6)     # Large canvas
 # The difference: text appears larger in small.svg
 ```
 :::
+
+
+
 
 ## DPI: Only for Raster Formats
 
@@ -248,18 +266,6 @@ ggsave("sources/sizing_base14.svg", p + theme_classic(base_size = 14), width = 3
 :::
 
 Same dimensions (3.5 × 3), different text scaling!
-
-## Journal Requirements
-
-| Journal Type | Single Column | Double Column |
-|--------------|---------------|---------------|
-| Nature/Science | 89 mm (3.5") | 183 mm (7.2") |
-| PLOS | 8.3 cm (3.27") | 17.3 cm (6.81") |
-| Cell | 85 mm (3.35") | 174 mm (6.85") |
-
-::: {.callout-note}
-Always check specific journal guidelines!
-:::
 
 ## Minimum Font Sizes
 
