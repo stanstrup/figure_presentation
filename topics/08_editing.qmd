@@ -269,29 +269,334 @@ walk2(list(p1, p2, p3, p4),
 7. **When in doubt, regenerate from R**
 :::
 
-## Tools for Combining in R
+## The patchwork Package
 
-**Instead of post-processing:**
+**A better alternative to manual composition!**
+
+```{r}
+#| label: setup-patchwork
+#| echo: false
+#| eval: true
+#| message: false
+
+library(ggplot2)
+library(patchwork)
+
+# Create sample plots
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue") +
+  labs(title = "Scatter") +
+  theme_classic(base_size = 10)
+
+p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Boxplot") +
+  theme_classic(base_size = 10)
+
+p3 <- ggplot(mtcars, aes(mpg)) +
+  geom_histogram(bins = 15, fill = "coral") +
+  labs(title = "Histogram") +
+  theme_classic(base_size = 10)
+
+p4 <- ggplot(mtcars, aes(hp, mpg)) +
+  geom_point() + geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "With trend") +
+  theme_classic(base_size = 10)
+```
+
+::: {.callout-tip}
+## Why patchwork?
+
+- **Fully reproducible** - no manual editing needed
+- **Intuitive syntax** - `|` for side-by-side, `/` for stacked
+- **Automatic labeling** - A, B, C, etc.
+- **Flexible layouts** - complex arrangements possible
+:::
+
+## patchwork: Basic Operators
+
+```{r}
+#| label: patchwork-operators
+#| echo: true
+#| eval: false
+
+library(patchwork)
+
+# Side by side (horizontal)
+p1 | p2
+
+# Stacked (vertical)
+p1 / p2
+
+# Combine both
+(p1 | p2) / (p3 | p4)
+
+# Addition also works for side-by-side
+p1 + p2
+```
+
+## patchwork: Side by Side
+
+```{r}
+#| label: patchwork-horizontal
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+p1 | p2 | p3
+```
+
+## patchwork: Stacked Layout
+
+```{r}
+#| label: patchwork-vertical
+#| echo: true
+#| eval: true
+#| fig-width: 6
+#| fig-height: 8
+
+p1 / p2 / p3
+```
+
+## patchwork: Grid Layout
+
+```{r}
+#| label: patchwork-grid
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4)
+```
+
+## Adding Panel Labels (A, B, C...)
+
+```{r}
+#| label: patchwork-labels
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Customizing Panel Labels
+
+```{r}
+#| label: patchwork-labels-custom
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(
+    tag_levels = 'A',
+    tag_prefix = '(',
+    tag_suffix = ')'
+  ) &
+  theme(plot.tag = element_text(face = 'bold', size = 14))
+```
+
+Labels become **(A)**, **(B)**, etc. with bold styling
+
+## Label Style Options
+
+```{r}
+#| label: patchwork-label-options
+#| echo: true
+#| eval: false
+
+# Uppercase letters: 'A' → A, B, C, D
+plot_annotation(tag_levels = 'A')
+
+# Lowercase letters: 'a' → a, b, c, d
+plot_annotation(tag_levels = 'a')
+
+# Numbers: '1' → 1, 2, 3, 4
+plot_annotation(tag_levels = '1')
+
+# Roman numerals: 'I' → I, II, III, IV
+plot_annotation(tag_levels = 'I')
+
+# Custom labels
+plot_annotation(tag_levels = list(c('Panel A', 'Panel B', 'Panel C', 'Panel D')))
+```
+
+## Complex Layouts with wrap_plots()
+
+```{r}
+#| label: patchwork-wrap
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+wrap_plots(p1, p2, p3, p4, ncol = 3) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Unequal Panel Sizes
+
+```{r}
+#| label: patchwork-widths
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# First plot takes 2x width
+p1 + p2 + p3 +
+  plot_layout(widths = c(2, 1, 1)) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Nested Layouts
+
+```{r}
+#| label: patchwork-nested
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Large plot on left, two stacked on right
+p1 | (p2 / p3) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Adding Overall Title and Caption
+
+```{r}
+#| label: patchwork-annotation
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(
+    title = 'Figure 1: mtcars Dataset Analysis',
+    subtitle = 'Exploring relationships between vehicle characteristics',
+    caption = 'Data source: R datasets package',
+    tag_levels = 'A'
+  ) &
+  theme(plot.tag = element_text(face = 'bold'))
+```
+
+## Shared Legends with plot_layout()
+
+```{r}
+#| label: patchwork-legend
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Create plots with same color mapping
+pa <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point() + theme_classic(base_size = 10)
+pb <- ggplot(mtcars, aes(hp, mpg, color = factor(cyl))) +
+  geom_point() + theme_classic(base_size = 10)
+
+pa + pb +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Saving patchwork Figures
+
+```{r}
+#| label: patchwork-save
+#| echo: true
+#| eval: false
+
+# Create combined figure
+combined <- (p1 | p2) / (p3 | p4) +
+  plot_annotation(tag_levels = 'A')
+
+# Save as vector (recommended)
+ggsave("figure1.svg", combined, width = 10, height = 8)
+ggsave("figure1.pdf", combined, width = 10, height = 8)
+
+# Save as high-res raster if needed
+ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
+```
+
+## patchwork vs Manual Editing
+
+::: {.columns}
+::: {.column width="50%"}
+**patchwork (in R)**
+
+✅ Fully reproducible
+
+✅ Easy to update
+
+✅ Automatic alignment
+
+✅ Consistent styling
+
+✅ Version controlled
+
+⚠️ Less layout flexibility
+:::
+
+::: {.column width="50%"}
+**Illustrator/Inkscape**
+
+✅ Pixel-perfect control
+
+✅ Mix with non-R content
+
+✅ Complex annotations
+
+❌ Not reproducible
+
+❌ Manual re-editing
+
+❌ Easy to break
+:::
+:::
+
+## When to Use patchwork
+
+**Use patchwork when:**
+
+- All panels are ggplot2 objects
+- Need reproducible figures
+- Simple to moderately complex layouts
+- Sharing code with collaborators
+- Figures may need updates
+
+**Use Illustrator/Inkscape when:**
+
+- Need pixel-perfect alignment
+- Adding photos, diagrams, or non-R content
+- Very complex custom layouts
+- Final publication polish only
+
+## Other R Alternatives
 
 ```{r}
 #| label: editing-combining-tools
 #| echo: true
 #| eval: false
 
-# patchwork
-library(patchwork)
-(p1 | p2) / (p3 | p4) + plot_annotation(tag_levels = 'A')
-
-# cowplot
+# cowplot - also good for multi-panel
 library(cowplot)
 plot_grid(p1, p2, p3, p4, labels = "AUTO", ncol = 2)
 
-# gridExtra
+# gridExtra - basic functionality
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 ```
 
-All fully reproducible!
+**Recommendation:** Use patchwork for most cases - most intuitive syntax!
 
 ## Powerpoint
 
