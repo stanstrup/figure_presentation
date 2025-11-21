@@ -92,29 +92,32 @@
 
 
 /* Both containers have the same width and alignment */
+/* Use --max-width CSS variable to set max-width dynamically, default 1200px */
 .image-container {
   width: 80vw;       /* full container width */
-  max-width: 1200px; /* optional: don't exceed natural size */
+  max-width: var(--max-width, 1200px);
   overflow: hidden;
   margin: auto;      /* center container on slide */
   text-align: left;  /* important for cropped image */
 }
 
 /* Cropped container shows only part of the image */
+/* Use --crop-width CSS variable to set width dynamically, default 62% */
 .cropped {
-  width: 62%;        /* fraction of the container visible */
+  width: var(--crop-width, 62%);
   overflow: hidden;
   display: inline-block;
   vertical-align: top;
 }
 
 /* Keep image at natural size, scale to fit viewport if needed */
+/* Use --img-scale CSS variable to set scale dynamically, default 0.7 */
 .image-container img {
   width: auto !important;
   height: auto !important;
   max-width: none !important;
   object-fit: none !important;
   object-position: left top;
-  transform: scale(0.7);       /* scale to fit screen */
+  transform: scale(var(--img-scale, 0.7));
   transform-origin: top left;
 }
