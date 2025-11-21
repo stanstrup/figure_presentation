@@ -1,5 +1,47 @@
 # Text Sizing {background-color="#1abc9c"}
 
+## The Key Insight
+
+::: {.callout-important}
+## The Smart Way to Control Text Size
+
+**Don't manually set font sizes for every element!**
+
+Instead, use **smaller figure dimensions** to make text appear larger relative to the plot.
+
+```r
+# Small dimensions = larger text relative to plot
+ggsave("figure.pdf", width = 3.5, height = 3)
+
+# Large dimensions = smaller text relative to plot
+ggsave("figure.pdf", width = 10, height = 8)
+```
+
+Then use **DPI** (or vector formats) to get the resolution you need.
+:::
+
+## Why This Works
+
+::: {.columns}
+::: {.column width="50%"}
+**Smaller canvas:**
+
+- Text size is fixed (e.g., 12pt)
+- Canvas is small (3.5 × 3)
+- Text takes up more space relative to plot
+- Points and lines stay proportional
+:::
+
+::: {.column width="50%"}
+**Larger canvas:**
+
+- Same text size (12pt)
+- Canvas is large (10 × 8)
+- Text looks tiny relative to plot
+- Same points and lines, more whitespace
+:::
+:::
+
 ## The Zoom Fallacy
 
 **Wrong approach:**
@@ -11,7 +53,7 @@
 4. **Result**: Huge points/lines, barely larger text 😞
 :::
 
-## Why This Fails
+## Why Zooming Fails
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -32,54 +74,43 @@
 :::
 :::
 
-## Key Concept: Width/Height Controls Text Scaling
+## The Right Workflow
 
-::: {.callout-note}
-## The Smart Way to Size Text
+::: {.callout-tip}
+## Three-Step Process
 
-**You DON'T need to explicitly set text sizes!**
+1. **Set dimensions to match final output size**
+   - Journal single column: ~3.5 inches
+   - Journal double column: ~7 inches
+   - Presentation: ~10 inches
 
-Just use the `width` and `height` parameters in `ggsave()`:
+2. **Adjust `base_size` if needed**
+   - Only fine-tune if text still too large/small
 
-```r
-# Same plot, different dimensions = different text scaling
-p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
-
-# Small figure → smaller text
-ggsave("small.pdf", p, width = 3, height = 2)
-
-# Large figure → larger text
-ggsave("large.pdf", p, width = 9, height = 6)
-```
-
-**Why this works:**
-
-- Width/height control the **canvas size**
-- Text scales proportionally with canvas
-- No explicit font size changes needed!
+3. **Use appropriate format**
+   - Vector (PDF) for publications - infinite resolution
+   - Raster (PNG) with high DPI for specific requirements
 :::
 
-## Vector Graphics: Absolute Size Doesn't Matter
+## Vector Graphics: Dimension Flexibility
 
-::: {.callout-important}
-## For Vector Formats (PDF, EPS, SVG)
+::: {.callout-note}
+## For Vector Formats (PDF, SVG)
 
-**The absolute dimensions (3" vs 9") don't actually matter!**
+**The absolute dimensions don't matter for final quality!**
 
-What matters is:
+Vector graphics scale infinitely. What matters is:
 
 - **Aspect ratio** (width:height ratio)
 - **Relative proportions** of plot elements
 
 ```r
-# These create IDENTICAL vector graphics (just different canvas sizes)
-ggsave("small.pdf", p, width = 3, height = 3)   # 3" × 3"
-ggsave("large.pdf", p, width = 9, height = 9)   # 9" × 9"
+# These create functionally identical vector graphics
+ggsave("small.pdf", p, width = 3.5, height = 3)   # Small canvas
+ggsave("large.pdf", p, width = 7, height = 6)     # Large canvas
 
-# When you zoom either PDF to the same size, they look identical!
+# The difference: text appears larger in small.pdf
 ```
-
-**For vectors:** Think of width/height as **scaling factors**, not absolute sizes.
 :::
 
 ## DPI: Only for Raster Formats
@@ -87,7 +118,7 @@ ggsave("large.pdf", p, width = 9, height = 9)   # 9" × 9"
 ::: {.callout-warning}
 ## DPI is ONLY relevant for raster images (PNG, JPEG, TIFF)
 
-**Vector formats (PDF, EPS) ignore DPI!**
+**Vector formats (PDF, SVG) ignore DPI!**
 
 ```r
 # For vectors - DPI has no effect
@@ -105,55 +136,30 @@ ggsave("plot.png", p, width = 5, height = 4, dpi = 72)    # 360 × 288 pixels
 - Vector graphics have **infinite resolution** regardless of DPI
 :::
 
-## The Practical Approach
-
-::: {.callout-tip}
-## Simplified Workflow
-
-**For vectors (recommended for publications):**
-
-1. Set a comfortable working size: `width = 6, height = 4`
-2. Adjust `base_size` if text feels too large/small
-3. Save as PDF - dimensions are just a starting point
-4. Journal/editor can scale the PDF as needed without quality loss
-
-**For raster (if required):**
-
-1. Find required dimensions from journal
-2. Set `width` and `height` to those exact dimensions
-3. Set `dpi = 300` (or journal requirement)
-4. This ensures correct pixel count for print quality
-
-```r
-# Vector approach (flexible)
-ggsave("figure.pdf", p, width = 6, height = 4)
-
-# Raster approach (precise)
-ggsave("figure.png", p, width = 3.5, height = 3, dpi = 300, units = "in")
-```
-:::
-
-## The Right Way
+## Practical Example: Journal Figure
 
 ```{r}
-#| label: sizing-right-way
+#| label: sizing-journal-demo
 #| echo: true
 #| eval: false
-#| code-line-numbers: "|1-3|5-10|12"
 
-# Step 1: Know your final dimensions
-# e.g., journal single column = 3.5 inches
+library(ggplot2)
 
-p <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(size = 3) +  # Explicit point size
-  theme_classic(base_size = 14) +  # Base text size
-  theme(
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12),
-    legend.text = element_text(size = 12)
-  )
+# Create your plot with default theme
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
+       color = "Cylinders") +
+  theme_classic()
 
-ggsave("plot.pdf", p, width = 3.5, height = 3, units = "in")
+# STEP 1: Save at journal single-column width (3.5 inches)
+# Text will appear appropriately large!
+ggsave("figure1.pdf", p, width = 3.5, height = 3, device = cairo_pdf)
+
+# STEP 2: If text still too small/large, adjust base_size
+p2 <- p + theme_classic(base_size = 10)  # Slightly smaller base
+ggsave("figure1_v2.pdf", p2, width = 3.5, height = 3, device = cairo_pdf)
 ```
 
 ## Journal Requirements
@@ -180,15 +186,12 @@ Always check specific journal guidelines!
 **Test**: Print at actual size (not "fit to page")!
 :::
 
-## The Math of Sizing
+## The base_size Parameter
 
 ```{r}
-#| label: sizing-math
+#| label: sizing-base-size
 #| echo: true
 #| eval: false
-
-# If final width is 3.5 inches
-# and you want 12 pt axis labels:
 
 # base_size sets the base text size in pts
 theme_classic(base_size = 12)
@@ -197,9 +200,30 @@ theme_classic(base_size = 12)
 # - axis.title: 1.1× base_size
 # - axis.text: 0.8× base_size
 # - legend.text: 0.8× base_size
+
+# Use base_size as your PRIMARY adjustment
+# Only customize individual elements if really needed
 ```
 
-Use `base_size` as your starting point!
+## When to Manually Set Sizes
+
+Only after trying dimensions first:
+
+```{r}
+#| label: sizing-manual-override
+#| echo: true
+#| eval: false
+
+# If you MUST fine-tune individual elements:
+p + theme_classic(base_size = 11) +
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.text = element_text(size = 10)
+  )
+```
+
+But usually just adjusting `width`, `height`, and `base_size` is enough!
 
 ## Common Sizing Mistakes
 
@@ -215,11 +239,12 @@ Use `base_size` as your starting point!
 p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point()
 
-# Save at random size
+# Save at random large size
 ggsave("plot.pdf", p,
        width = 10, height = 8)
 
 # Then resize in Word/PowerPoint
+# Text becomes tiny!
 ```
 :::
 
@@ -235,7 +260,7 @@ p <- ggplot(mtcars, aes(wt, mpg)) +
   geom_point() +
   theme_classic(base_size = 11)
 
-# Save at final size
+# Save at FINAL size
 ggsave("plot.pdf", p,
        width = 3.5, height = 3)
 
@@ -255,24 +280,15 @@ ggsave("plot.pdf", p,
 p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 
 # For paper (small, high detail)
-p + theme_classic(base_size = 11)
-ggsave("paper.pdf", width = 3.5, height = 3, dpi = 300)
+ggsave("paper.pdf", p + theme_classic(base_size = 11),
+       width = 3.5, height = 3)
 
 # For presentation (large, readable from distance)
-p + theme_classic(base_size = 18)
-ggsave("slides.png", width = 10, height = 7, dpi = 150)
+ggsave("slides.png", p + theme_classic(base_size = 18),
+       width = 10, height = 7, dpi = 150)
 ```
 
 Different outputs need different sizes!
-
-## Testing Readability
-
-::: {.incremental}
-1. **Print at actual size** (100%, not "fit to page")
-2. **View PDF at 100% zoom** (not zoomed in/out)
-3. **Ask**: Can I comfortably read axis labels?
-4. **Check**: Are labels too large/small relative to plot area?
-:::
 
 ## Aspect Ratio Matters
 
@@ -305,7 +321,7 @@ library(patchwork)
 p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
   theme_classic(base_size = 10)
 
-p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line() +
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_point() +
   theme_classic(base_size = 10)
 
 combined <- p1 + p2
@@ -317,28 +333,14 @@ ggsave("figure1.pdf", combined, width = 7, height = 3.5)
 # with 10pt text - readable!
 ```
 
-## Controlling Individual Elements
+## Testing Readability
 
-```{r}
-#| label: sizing-individual-elements
-#| echo: true
-#| eval: false
-#| code-line-numbers: "|2|3|4|5|6|7"
-
-theme_classic(base_size = 12) +
-  theme(
-    axis.title.x = element_text(size = 14),
-    axis.title.y = element_text(size = 14),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10),
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10),
-    plot.title = element_text(size = 16, face = "bold"),
-    strip.text = element_text(size = 11)  # facet labels
-  )
-```
-
-Full control over every text element!
+::: {.incremental}
+1. **Print at actual size** (100%, not "fit to page")
+2. **View PDF at 100% zoom** (not zoomed in/out)
+3. **Ask**: Can I comfortably read axis labels?
+4. **Check**: Are labels too large/small relative to plot area?
+:::
 
 ## Working Backwards from Requirements
 
@@ -347,45 +349,22 @@ Full control over every text element!
 
 1. **Find out final size** (journal specs, poster dimensions)
 2. **Determine minimum font size** (usually 8-10 pt for print)
-3. **Set base_size** to achieve minimum
-4. **Create plot at final dimensions**
+3. **Set dimensions** to target width
+4. **Adjust base_size** if needed to achieve minimum readable text
 5. **Test**: Print at actual size
-6. **Adjust** if needed
+6. **Fine-tune** if necessary
 :::
-
-## Example: Journal Submission
-
-```{r}
-#| label: sizing-journal-example
-#| echo: true
-#| eval: false
-
-# Journal requires:
-# - Single column: 85 mm wide
-# - Minimum 7 pt font
-# - Maximum height: 240 mm
-
-# Convert mm to inches: 85mm = 3.35"
-# Set base_size to get 7pt minimum (axis.text = 0.8 × base)
-# 7 / 0.8 = 8.75, round to 9
-
-my_plot <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_classic(base_size = 9) +
-  labs(title = "Fuel Efficiency")
-
-ggsave("journal_fig.pdf", my_plot,
-       width = 3.35, height = 4, units = "in", device = cairo_pdf)
-```
 
 ## Key Takeaways
 
 ::: {.callout-important}
 ## Remember
 
-- **NEVER resize image** to make text larger
-- **SET SIZES EXPLICITLY** for final output
-- **DESIGN AT FINAL DIMENSIONS** from the start
-- **PRINT TEST** at actual size
-- **base_size** is your friend - use it!
+1. **Use DIMENSIONS to control text size** - not manual font sizes
+2. **Small dimensions = larger relative text**
+3. **Save at FINAL output size** from the start
+4. **Use base_size** for fine-tuning (not individual elements)
+5. **Vector formats** for publications (PDF, SVG)
+6. **DPI only matters** for raster formats (PNG, TIFF)
+7. **PRINT TEST** at actual size before submission
 :::
