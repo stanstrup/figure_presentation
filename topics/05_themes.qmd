@@ -312,7 +312,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 
 library(ggpubr)
 
-ggplot(mtcars, aes(x = wt, y = mpg)) +
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(size = 3, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE,
               color = "darkred", formula = y ~ x) +
@@ -335,26 +335,10 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 #| label: ggpubr-regression
 #| echo: false
 #| eval: true
-#| fig-width: 10
-#| fig-height: 7
+#| fig-width: 7
+#| fig-height: 5
 
-library(ggpubr)
-
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(size = 3, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE,
-              color = "darkred", formula = y ~ x) +
-  stat_regline_equation(
-    aes(label = paste(after_stat(eq.label),
-                      after_stat(rr.label),
-                      sep = "~~~")),
-    label.x = 3, label.y = 30,
-    formula = y ~ x
-  ) +
-  labs(title = "Linear Regression with Equation",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon") +
-  theme_pubr()
+p
 ```
 
 **Key function:** `stat_regline_equation()`
