@@ -177,11 +177,14 @@ iwalk(plot_data$plot, ~ggsave(
 #| echo: true
 #| eval: false
 
-# Good practice: separate directory
-dir.create("figures", showWarnings = FALSE)
+library(glue)
 
-ggsave("figures/figure1.pdf", p1, width = 7, height = 5)
-ggsave("figures/figure1.png", p1, width = 7, height = 5, dpi = 300)
+# Good practice: separate directory
+fig_dir <- "figures"
+dir.create(fig_dir, showWarnings = FALSE)
+
+ggsave(glue("{fig_dir}/figure1.pdf"), p1, width = 7, height = 5)
+ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
 
 # Save both vector and raster versions!
 ```
