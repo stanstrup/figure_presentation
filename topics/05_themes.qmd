@@ -341,6 +341,67 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
   )
 ```
 
+## ggpubr: Adding Regression Equations
+
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: ggpubr-regression-code
+#| echo: true
+#| eval: false
+
+library(ggpubr)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "darkred") +
+  stat_regline_equation(
+    aes(label = paste(after_stat(eq.label),
+                      after_stat(rr.label),
+                      sep = "~~~")),
+    label.x = 3, label.y = 30
+  ) +
+  labs(title = "Linear Regression with Equation",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon") +
+  theme_pubr()
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+#| label: ggpubr-regression
+#| echo: false
+#| eval: true
+#| fig-width: 10
+#| fig-height: 7
+
+library(ggpubr)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "darkred") +
+  stat_regline_equation(
+    aes(label = paste(after_stat(eq.label),
+                      after_stat(rr.label),
+                      sep = "~~~")),
+    label.x = 3, label.y = 30
+  ) +
+  labs(title = "Linear Regression with Equation",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon") +
+  theme_pubr()
+```
+
+**Key function:** `stat_regline_equation()`
+
+- Automatically calculates and displays equation
+- Shows R² value
+- Customizable position and formatting
+:::
+:::
 
 ## Modern Typography: hrbrthemes
 
@@ -644,33 +705,6 @@ p1 + p2 + p3 +
 :::
 :::
 
-## Quick Reference
-
-| Theme | Use Case | Package |
-|-------|----------|---------|
-| `theme_classic()` | Traditional journals, minimal | ggplot2 |
-| `theme_bw()` | Modern publications, gridlines | ggplot2 |
-| `theme_minimal()` | Presentations, reports | ggplot2 |
-| `theme_void()` | Maps, custom designs | ggplot2 |
-| `theme_pubr()` | Publication with stats | ggpubr |
-| `theme_few()` | Data visualization best practices | ggthemes |
-| `theme_tufte()` | Minimalist Tufte style | ggthemes |
-| `theme_ipsum()` | Modern typography | hrbrthemes |
-
-## Package Installation Reference
-
-```{r}
-#| label: install-packages
-#| echo: true
-#| eval: false
-
-# Install publication-ready theme packages
-install.packages("ggpubr")     # Publication themes + stats
-install.packages("ggthemes")   # Professional magazine/journal themes
-install.packages("hrbrthemes") # Modern typography (requires fonts)
-install.packages("patchwork")  # Combine multiple plots easily
-```
-
 ## Recommendations
 
 ::: {.callout-tip}
@@ -701,12 +735,12 @@ install.packages("patchwork")  # Combine multiple plots easily
 
 ## Complete Example: Before & After
 
+::: {.columns}
+::: {.column width="40%"}
 ```{r}
-#| label: before-after
+#| label: before-after-code
 #| echo: true
-#| eval: true
-#| fig-width: 14
-#| fig-height: 6
+#| eval: false
 
 # Before: Default theme
 before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
@@ -740,3 +774,47 @@ before + after +
     theme = theme(plot.title = element_text(size = 16, face = "bold"))
   )
 ```
+:::
+
+::: {.column width="60%"}
+```{r}
+#| label: before-after
+#| echo: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 9
+
+# Before: Default theme
+before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "BEFORE: Default theme_gray()",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders")
+# Uses default theme_gray()
+
+# After: Publication theme
+after <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "AFTER: Publication-ready theme",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_classic(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold"),
+    legend.position = "top"
+  ) +
+  scale_color_brewer(palette = "Set1")
+
+before + after +
+  plot_annotation(
+    title = "Theme Transformation: Default → Publication Ready",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+:::
+:::
