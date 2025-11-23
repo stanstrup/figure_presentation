@@ -300,6 +300,71 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 :::
 :::
 
+## ggpubr: Adding Regression Equations
+
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: ggpubr-regression-code
+#| echo: true
+#| eval: false
+
+library(ggpubr)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "darkred", formula = y ~ x) +
+  stat_regline_equation(
+    aes(label = paste(after_stat(eq.label),
+                      after_stat(rr.label),
+                      sep = "~~~")),
+    label.x = 3, label.y = 30,
+    formula = y ~ x
+  ) +
+  labs(title = "Linear Regression with Equation",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon") +
+  theme_pubr()
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+#| label: ggpubr-regression
+#| echo: false
+#| eval: true
+#| fig-width: 10
+#| fig-height: 7
+
+library(ggpubr)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "darkred", formula = y ~ x) +
+  stat_regline_equation(
+    aes(label = paste(after_stat(eq.label),
+                      after_stat(rr.label),
+                      sep = "~~~")),
+    label.x = 3, label.y = 30,
+    formula = y ~ x
+  ) +
+  labs(title = "Linear Regression with Equation",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon") +
+  theme_pubr()
+```
+
+**Key function:** `stat_regline_equation()`
+
+- Automatically calculates and displays equation
+- Shows R² value
+- Customizable position and formatting
+:::
+:::
+
+
 ## Specialized Themes: ggthemes
 
 ```{r}
@@ -341,67 +406,6 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
   )
 ```
 
-## ggpubr: Adding Regression Equations
-
-::: {.columns}
-::: {.column width="40%"}
-```{r}
-#| label: ggpubr-regression-code
-#| echo: true
-#| eval: false
-
-library(ggpubr)
-
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(size = 3, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE,
-              color = "darkred") +
-  stat_regline_equation(
-    aes(label = paste(after_stat(eq.label),
-                      after_stat(rr.label),
-                      sep = "~~~")),
-    label.x = 3, label.y = 30
-  ) +
-  labs(title = "Linear Regression with Equation",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon") +
-  theme_pubr()
-```
-:::
-
-::: {.column width="60%"}
-```{r}
-#| label: ggpubr-regression
-#| echo: false
-#| eval: true
-#| fig-width: 10
-#| fig-height: 7
-
-library(ggpubr)
-
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(size = 3, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE,
-              color = "darkred") +
-  stat_regline_equation(
-    aes(label = paste(after_stat(eq.label),
-                      after_stat(rr.label),
-                      sep = "~~~")),
-    label.x = 3, label.y = 30
-  ) +
-  labs(title = "Linear Regression with Equation",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon") +
-  theme_pubr()
-```
-
-**Key function:** `stat_regline_equation()`
-
-- Automatically calculates and displays equation
-- Shows R² value
-- Customizable position and formatting
-:::
-:::
 
 ## Modern Typography: hrbrthemes
 
