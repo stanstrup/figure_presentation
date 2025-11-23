@@ -101,24 +101,6 @@ ggsave(
 ```
 
 
-## Converting PDF to High-Res PNG
-
-**Why?** Keep vector source, generate raster as needed
-
-### Using R (magick package)
-
-```{r}
-#| label: saving-magick
-#| echo: true
-#| eval: false
-
-library(magick)
-
-# Read PDF and convert
-img <- image_read_pdf("plot.pdf", density = 300)
-image_write(img, "plot.png", format = "png")
-```
-
 
 ## Batch Saving: Result
 
@@ -169,13 +151,13 @@ iris_setosa <- iris %>% filter(Species == "setosa")
 
 ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
   geom_point(size = 2, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred",
+              formula = y ~ x) +
   stat_regline_equation(
     aes(label = after_stat(eq.label)),
     formula = y ~ x
   ) +
-  stat_cor(aes(label = after_stat(rr.label)),
-           formula = y ~ x) +
+  stat_cor(aes(label = after_stat(rr.label))) +
   labs(title = "Iris setosa",
        x = "Sepal Length (cm)",
        y = "Sepal Width (cm)") +
@@ -252,13 +234,13 @@ library(ggpubr)
 make_species_plot <- function(data, species) {
   ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
     geom_point(size = 2, color = "steelblue") +
-    geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+    geom_smooth(method = "lm", se = TRUE, color = "darkred",
+                formula = y ~ x) +
     stat_regline_equation(
       aes(label = after_stat(eq.label)),
       formula = y ~ x
     ) +
-    stat_cor(aes(label = after_stat(rr.label)),
-             formula = y ~ x) +
+    stat_cor(aes(label = after_stat(rr.label))) +
     labs(title = glue("Iris {species}"),
          x = "Sepal Length (cm)",
          y = "Sepal Width (cm)") +
@@ -268,11 +250,11 @@ make_species_plot <- function(data, species) {
 # Nest data by Species and apply plotting
 plot_data <- iris %>%
   nest(data = -Species) %>%
-  mutate(plot = map2(data, Species, make_species_plot))
+  mutate(plot = map2(data, as.character(Species), make_species_plot))
 
 # Save all plots using iwalk
 iwalk(plot_data$plot, ~ggsave(
-  filename = glue("{fig_dir}/iris_{plot_data$Species[.y]}.pdf"),
+  filename = glue("{fig_dir}/iris_{as.character(plot_data$Species[.y])}.pdf"),
   plot = .x,
   width = 6, height = 5
 ))
