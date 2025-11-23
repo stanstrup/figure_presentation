@@ -120,6 +120,93 @@ image_write(img, "plot.png", format = "png")
 ```
 
 
+## Batch Saving: Result
+
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-show-data
+#| echo: true
+#| eval: false
+
+# View the resulting tibble
+plot_data
+```
+
+```
+# A tibble: 3 × 3
+  Species    data               plot
+  <fct>      <list>             <list>
+1 setosa     <tibble [50 × 4]>  <gg>
+2 versicolor <tibble [50 × 4]>  <gg>
+3 virginica  <tibble [50 × 4]>  <gg>
+```
+
+**Each row contains:**
+
+- Species name
+- Nested data for that species
+- A ggplot object with regression
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-example-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 4.5
+#| message: false
+#| warning: false
+
+library(ggpubr)
+
+# Example for setosa
+iris_setosa <- iris %>% filter(Species == "setosa")
+
+ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(size = 2, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  stat_regline_equation(
+    aes(label = after_stat(eq.label)),
+    formula = y ~ x
+  ) +
+  stat_cor(aes(label = after_stat(rr.label)),
+           formula = y ~ x) +
+  labs(title = "Iris setosa",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)") +
+  theme_classic(base_size = 11)
+```
+
+**Example:** Setosa species plot
+:::
+:::
+
+## File Organization
+
+```{r}
+#| label: saving-organization
+#| echo: true
+#| eval: false
+
+library(glue)
+
+# Good practice: separate directory
+fig_dir <- "figures"
+dir.create(fig_dir, showWarnings = FALSE)
+
+ggsave(glue("{fig_dir}/figure1.pdf"), p1, width = 7, height = 5)
+ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
+
+# Save both vector and raster versions!
+```
+
+
+
 ## Using magick for Conversion
 
 ```{r}
@@ -159,37 +246,35 @@ for (file in pdf_files) {
 #| eval: false
 
 library(tidyverse)
+library(ggpubr)
 
 # Define plotting function
-make_plot <- function(data, title) {
-  if (title == "mtcars") {
-    ggplot(data, aes(wt, mpg)) +
-      geom_point() +
-      labs(title = "Weight vs MPG")
-  } else if (title == "iris") {
-    ggplot(data, aes(Sepal.Length, Sepal.Width,
-                     color = Species)) +
-      geom_point() +
-      labs(title = "Sepal dimensions")
-  } else if (title == "faithful") {
-    ggplot(data, aes(eruptions)) +
-      geom_histogram(bins = 30) +
-      labs(title = "Eruption duration")
-  }
+make_species_plot <- function(data, species) {
+  ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
+    geom_point(size = 2, color = "steelblue") +
+    geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+    stat_regline_equation(
+      aes(label = after_stat(eq.label)),
+      formula = y ~ x
+    ) +
+    stat_cor(aes(label = after_stat(rr.label)),
+             formula = y ~ x) +
+    labs(title = glue("Iris {species}"),
+         x = "Sepal Length (cm)",
+         y = "Sepal Width (cm)") +
+    theme_classic(base_size = 12)
 }
 
-# Create tibble and apply plotting
-plot_data <- tibble(
-  title = c("mtcars", "iris", "faithful"),
-  data = list(mtcars, iris, faithful)
-) %>%
-  mutate(plot = map2(data, title, make_plot))
+# Nest data by Species and apply plotting
+plot_data <- iris %>%
+  nest(data = -Species) %>%
+  mutate(plot = map2(data, Species, make_species_plot))
 
 # Save all plots using iwalk
 iwalk(plot_data$plot, ~ggsave(
-  filename = glue("{fig_dir}/figure_{plot_data$title[.y]}.pdf"),
+  filename = glue("{fig_dir}/iris_{plot_data$Species[.y]}.pdf"),
   plot = .x,
-  width = 7, height = 5
+  width = 6, height = 5
 ))
 ```
 
@@ -198,83 +283,14 @@ iwalk(plot_data$plot, ~ggsave(
 ::: {.column width="50%"}
 **Workflow:**
 
-1. Define plotting function
-2. Create tibble with data
+1. Nest iris data by Species
+2. Define plotting function with regression
 3. Use `map2()` to apply function
 4. Save with `iwalk()`
 
-**Result:** Organized data structure with all plots
+**Result:** One plot per species with regression line and stats
 :::
 :::
-
-## Batch Saving: Result
-
-::: {.columns}
-::: {.column width="50%"}
-
-```{r}
-#| label: saving-batch-show-data
-#| echo: true
-#| eval: false
-
-# View the resulting tibble
-plot_data
-```
-
-```
-# A tibble: 3 × 3
-  title    data               plot
-  <chr>    <list>             <list>
-1 mtcars   <df [32 × 11]>     <gg>
-2 iris     <df [150 × 5]>     <gg>
-3 faithful <df [272 × 2]>     <gg>
-```
-
-**Each row contains:**
-
-- Dataset name
-- The data itself
-- A ggplot object
-
-:::
-
-::: {.column width="50%"}
-
-```{r}
-#| label: saving-batch-example-plot
-#| echo: false
-#| eval: true
-#| fig-width: 6
-#| fig-height: 4
-
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(size = 2, color = "steelblue") +
-  labs(title = "Weight vs MPG") +
-  theme_classic(base_size = 12)
-```
-
-**Example output:** One of the generated plots
-:::
-:::
-
-## File Organization
-
-```{r}
-#| label: saving-organization
-#| echo: true
-#| eval: false
-
-library(glue)
-
-# Good practice: separate directory
-fig_dir <- "figures"
-dir.create(fig_dir, showWarnings = FALSE)
-
-ggsave(glue("{fig_dir}/figure1.pdf"), p1, width = 7, height = 5)
-ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
-
-# Save both vector and raster versions!
-```
 
 
 ## Recommendations
