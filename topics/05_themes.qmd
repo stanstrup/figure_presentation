@@ -45,7 +45,7 @@ p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ::: {.column width="50%"}
 ```{r}
 #| label: theme-default-show
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 8
 #| fig-height: 5
@@ -95,7 +95,7 @@ p2 <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 
 ```{r}
 #| label: theme-bw-show
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 8
 #| fig-height: 5
@@ -262,6 +262,8 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
 
 ## Publication-Ready Package: cowplot
 
+::: {.columns}
+::: {.column width="50%"}
 ```{r}
 #| label: theme-cowplot
 #| echo: true
@@ -282,7 +284,9 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   theme_cowplot() +
   theme(plot.title = element_text(face = "bold", size = 12))
 ```
+:::
 
+::: {.column width="50%"}
 ::: {.callout-tip}
 ## cowplot Package
 
@@ -293,9 +297,13 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 - Great default sizes and spacings
 - `plot_grid()` for multi-panel figures
 :::
+:::
+:::
 
 ## Publication Package: ggpubr
 
+::: {.columns}
+::: {.column width="50%"}
 ```{r}
 #| label: theme-ggpubr
 #| echo: true
@@ -317,7 +325,9 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
         plot.title = element_text(face = "bold")) +
   scale_fill_brewer(palette = "Set2")
 ```
+:::
 
+::: {.column width="50%"}
 ::: {.callout-tip}
 ## ggpubr Package
 
@@ -327,6 +337,8 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 - `theme_pubclean()` - Even more minimal
 - Built-in statistical comparison functions
 - Easy to add p-values and significance brackets
+:::
+:::
 :::
 
 ## theme_cowplot() vs theme_pubr()
