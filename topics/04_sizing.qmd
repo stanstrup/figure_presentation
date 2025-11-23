@@ -1,4 +1,4 @@
-# Text Sizing {background-color="#1abc9c"}
+# Text and Element Sizing {background-color="#1abc9c"}
 
 ```{r}
 #| label: setup-sizing
@@ -145,8 +145,13 @@ ggsave("plots/04_sizing/sizing_base14.svg", p + theme_classic(base_size = 14), w
 :::
 :::
 
-Other elements scale relative to `base_size`: `axis.title` 1.1×, `axis.text` 0.8×, `legend.text` 0.8×
+**Other elements scale relative to base_size:**
 
+- `axis.title`: `1.1× base_size`
+- `axis.text`: `0.8× base_size`
+- `legend.text`: `0.8× base_size`
+
+Use base_size as the PRIMARY adjustment - only customize individual elements if needed
 
 
 
@@ -171,25 +176,8 @@ Other elements scale relative to `base_size`: `axis.title` 1.1×, `axis.text` 0.
 
 ### Why This Works
 
-::: {.columns}
-::: {.column width="50%"}
-**Canvas is small (e.g. 3.5 × 3)**
-
-- Text size is fixed (e.g., 12pt)
-
-- Text takes up more space relative to plot
-- Points and lines stay proportional
-:::
-
-::: {.column width="50%"}
-**- Canvas is large (e.g. 10 × 8)**
-
-- Same text size (12pt)
-- Text looks tiny relative to plot
-- Same points and lines, more whitespace
-
-:::
-:::
+- Text/points/lines have **fixed** sizes
+- If the canvas is small they appear larger
 
 
 

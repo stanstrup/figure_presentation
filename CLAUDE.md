@@ -10,7 +10,7 @@ plots/
 ├── 03_formats/
 ├── 04_sizing/
 ├── 06_saving/
-├── 08_editing/
+├── 07_editing/
 ├── 09_powerpoint/
 ├── 10_rendering/
 └── 11_interactive/

@@ -93,11 +93,11 @@ keep-source: true
 
 
 
-{{< include topics/07_factors.qmd >}}
+{{< include topics/07_editing.qmd >}}
 
 
 
-{{< include topics/08_editing.qmd >}}
+{{< include topics/08_factors.qmd >}}
 
 
 
