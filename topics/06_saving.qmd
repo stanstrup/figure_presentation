@@ -252,9 +252,9 @@ plot_data <- iris %>%
   nest(data = -Species) %>%
   mutate(plot = map2(data, as.character(Species), make_species_plot))
 
-# Save all plots using iwalk
-iwalk(plot_data$plot, ~ggsave(
-  filename = glue("{fig_dir}/iris_{as.character(plot_data$Species[.y])}.pdf"),
+# Save all plots using walk2
+walk2(plot_data$plot, plot_data$Species, ~ggsave(
+  filename = glue("{fig_dir}/iris_{.y}.pdf"),
   plot = .x,
   width = 6, height = 5
 ))
@@ -268,7 +268,7 @@ iwalk(plot_data$plot, ~ggsave(
 1. Nest iris data by Species
 2. Define plotting function with regression
 3. Use `map2()` to apply function
-4. Save with `iwalk()`
+4. Save with `walk2()` using plot and Species columns
 
 **Result:** One plot per species with regression line and stats
 :::
