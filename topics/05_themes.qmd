@@ -338,6 +338,57 @@ p
 :::
 :::
 
+## ggpubr: Pairwise Comparisons
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| label: ggpubr-comparisons-code
+#| echo: true
+#| eval: true
+
+library(ggpubr)
+
+# Specify which pairs to compare
+my_comparisons <- list(
+  c("0.5", "1"),
+  c("1", "2"),
+  c("0.5", "2")
+)
+
+p <- ggboxplot(ToothGrowth,
+               x = "dose",
+               y = "len",
+               color = "dose",
+               palette = "jco") +
+  stat_compare_means(comparisons = my_comparisons) +
+  stat_compare_means(label.y = 50) +
+  labs(title = "Pairwise Comparisons with Significance Brackets",
+       x = "Dose (mg/day)",
+       y = "Tooth Length")
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: ggpubr-comparisons-show
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+**Key features:**
+
+- Define specific pairwise comparisons
+- Automatic significance brackets
+- Global p-value at top
+- Wilcoxon test by default
+:::
+:::
+
 ## Modern Typography: hrbrthemes
 
 ::: {.columns}
