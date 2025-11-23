@@ -136,6 +136,9 @@ for (file in pdf_files) {
 
 ## Batch Saving Multiple Plots
 
+::: {.columns}
+::: {.column width="50%"}
+
 ```{r}
 #| label: saving-batch
 #| echo: true
@@ -143,32 +146,102 @@ for (file in pdf_files) {
 
 library(tidyverse)
 
-# Create tibble with data, plots, and titles
+# Define plotting function
+make_plot <- function(data, title) {
+  if (title == "mtcars") {
+    ggplot(data, aes(wt, mpg)) +
+      geom_point() +
+      labs(title = "Weight vs MPG")
+  } else if (title == "iris") {
+    ggplot(data, aes(Sepal.Length, Sepal.Width,
+                     color = Species)) +
+      geom_point() +
+      labs(title = "Sepal dimensions")
+  } else if (title == "faithful") {
+    ggplot(data, aes(eruptions)) +
+      geom_histogram(bins = 30) +
+      labs(title = "Eruption duration")
+  }
+}
+
+# Create tibble and apply plotting
 plot_data <- tibble(
   title = c("mtcars", "iris", "faithful"),
-  data = list(mtcars, iris, faithful),
-  plot = list(
-    ggplot(mtcars, aes(wt, mpg)) +
-      geom_point() +
-      labs(title = "mtcars: Weight vs MPG"),
-    ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
-      geom_point() +
-      labs(title = "iris: Sepal dimensions"),
-    ggplot(faithful, aes(eruptions)) +
-      geom_histogram(bins = 30) +
-      labs(title = "faithful: Eruption duration")
-  )
-)
+  data = list(mtcars, iris, faithful)
+) %>%
+  mutate(plot = map2(data, title, make_plot))
 
 # Save all plots using iwalk
 iwalk(plot_data$plot, ~ggsave(
-  filename = paste0("figure_", plot_data$title[.y], ".pdf"),
+  filename = glue("figure_{plot_data$title[.y]}.pdf"),
   plot = .x,
   width = 7, height = 5
 ))
-
-# Creates: figure_mtcars.pdf, figure_iris.pdf, figure_faithful.pdf
 ```
+
+:::
+
+::: {.column width="50%"}
+**Workflow:**
+
+1. Define plotting function
+2. Create tibble with data
+3. Use `map2()` to apply function
+4. Save with `iwalk()`
+
+**Result:** Organized data structure with all plots
+:::
+:::
+
+## Batch Saving: Result
+
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-show-data
+#| echo: true
+#| eval: false
+
+# View the resulting tibble
+plot_data
+```
+
+```
+# A tibble: 3 × 3
+  title    data               plot
+  <chr>    <list>             <list>
+1 mtcars   <df [32 × 11]>     <gg>
+2 iris     <df [150 × 5]>     <gg>
+3 faithful <df [272 × 2]>     <gg>
+```
+
+**Each row contains:**
+
+- Dataset name
+- The data itself
+- A ggplot object
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-example-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 4
+
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 2, color = "steelblue") +
+  labs(title = "Weight vs MPG") +
+  theme_classic(base_size = 12)
+```
+
+**Example output:** One of the generated plots
+:::
+:::
 
 ## File Organization
 
@@ -189,92 +262,6 @@ ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
 # Save both vector and raster versions!
 ```
 
-## Saving Base R Plots (and ALL Non-ggplot2 Graphics)
-
-::: {.callout-important}
-## dev.off() is the Universal Approach
-
-The device approach works for **ALL** R plotting systems:
-
-- Base R graphics
-- ggplot2 (though ggsave() is easier)
-- Grid graphics
-- Custom plotting functions
-:::
-
-```{r}
-#| label: saving-base-r
-#| echo: true
-#| eval: false
-
-# For non-ggplot2 plots, use device functions
-# ALWAYS works, regardless of plotting system
-cairo_pdf("baseplot.pdf", width = 7, height = 5)
-  plot(x, y)
-  abline(lm(y ~ x))
-  # Can have multiple plotting commands here
-  points(x2, y2, col = "red")
-  legend("topright", legend = c("Data", "Fit"), col = c("black", "blue"))
-dev.off()  # Close device - file is now saved
-
-# Or for PNG
-png("baseplot.png", width = 7, height = 5,
-    units = "in", res = 300, type = "cairo")
-  plot(x, y)
-  # Multiple commands work here too
-  lines(lowess(x, y), col = "blue", lwd = 2)
-dev.off()
-
-# For lattice plots
-library(lattice)
-pdf("lattice_plot.pdf", width = 6, height = 4)
-  print(xyplot(mpg ~ wt, data = mtcars))  # Note: print() needed for lattice
-dev.off()
-```
-
-::: {.callout-tip}
-## When to Use dev.off() vs ggsave()
-
-**Use ggsave():**
-
-- When working with ggplot2 objects
-- Cleaner syntax
-- No need to manage device lifecycle
-
-**Use dev.off():**
-
-- Base R plots
-- Lattice plots
-- Complex multi-plot layouts with par() or layout()
-- When you need fine control over device settings
-- When combining multiple plot types in one figure
-:::
-
-## Checking Output Quality
-
-```{r}
-#| label: saving-quality-check
-#| echo: true
-#| eval: false
-
-# Save plot
-ggsave("test.pdf", p, width = 7, height = 5)
-
-# Check file size
-file.info("test.pdf")$size / 1024  # Size in KB
-
-# View at 100% zoom in PDF viewer
-# Print at actual size to test
-```
-
-## Resolution Guidelines Reminder
-
-| Purpose | Format | DPI |
-|---------|--------|-----|
-| Draft/screen | PNG | 72-150 |
-| Presentation | PNG/PDF | 150-200 |
-| Print journal | PDF/TIFF | 300-600 |
-| High-quality journal | TIFF | 600-1200 |
 
 ## Recommendations
 
@@ -282,12 +269,11 @@ file.info("test.pdf")$size / 1024  # Size in KB
 ## Best Practices
 
 1. **Always use ggsave()** for ggplot2 (not manual devices)
-2. **Always specify width, height, units**
-3. **Use cairo_pdf** for PDF output
-4. **Specify DPI** for all raster formats (≥300 for print)
+2. **Always specify width, height, units and DPI (for raster output)**
+3. **Increase DPI from the default** for all raster formats set ≥300
+4. **Use cairo_pdf** for PDF output
 5. **Save both PDF and PNG** versions
 6. **Organize** figures in dedicated directory
-7. **Test output** by printing at actual size
 :::
 
 ## Complete Example
