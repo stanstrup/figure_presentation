@@ -9,7 +9,6 @@
 
 library(ggplot2)
 library(patchwork)
-library(cowplot)
 library(ggpubr)
 library(ggthemes)
 library(hrbrthemes)
@@ -260,46 +259,6 @@ p6 <- base_plot + theme_light() + labs(title = "theme_light()")
   )
 ```
 
-## Publication-Ready Package: cowplot
-
-::: {.columns}
-::: {.column width="50%"}
-```{r}
-#| label: theme-cowplot
-#| echo: true
-#| eval: true
-#| fig-width: 8
-#| fig-height: 5
-
-# cowplot - designed for publications
-# install.packages("cowplot")
-
-ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "cowplot::theme_cowplot() - Publication ready",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders") +
-  theme_cowplot() +
-  theme(plot.title = element_text(face = "bold", size = 12))
-```
-:::
-
-::: {.column width="50%"}
-::: {.callout-tip}
-## cowplot Package
-
-**Designed specifically for publication-quality figures**
-
-- Clean, professional appearance
-- Optimized for combining multiple plots
-- Great default sizes and spacings
-- `plot_grid()` for multi-panel figures
-:::
-:::
-:::
-
 ## Publication Package: ggpubr
 
 ::: {.columns}
@@ -340,57 +299,6 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 :::
 :::
 :::
-
-## theme_cowplot() vs theme_pubr()
-
-::: {.columns}
-::: {.column width="50%"}
-**theme_cowplot()**
-
-- No panel border
-- Axis lines on left and bottom only
-- Optimized for `plot_grid()` multi-panel layouts
-- Larger default font sizes
-- No gridlines at all
-
-```{r}
-#| label: cowplot-example
-#| echo: false
-#| eval: true
-#| fig-width: 5
-#| fig-height: 3
-
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_cowplot() +
-  labs(title = "theme_cowplot()")
-```
-:::
-
-::: {.column width="50%"}
-**theme_pubr()**
-
-- Very similar to theme_cowplot()
-- Includes `border = TRUE` option
-- Designed for `ggpubr` stat functions
-- Includes `legend` position shortcuts
-
-```{r}
-#| label: pubr-example
-#| echo: false
-#| eval: true
-#| fig-width: 5
-#| fig-height: 3
-
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
-  theme_pubr() +
-  labs(title = "theme_pubr()")
-```
-:::
-:::
-
-**In practice**: Nearly identical! Choose based on which package you're already using.
 
 ## Specialized Themes: ggthemes
 
