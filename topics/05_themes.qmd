@@ -364,6 +364,46 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 :::
 :::
 
+## Modern Typography: hrbrthemes
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| label: theme-hrbrthemes
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 7
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x) +
+  facet_wrap(~gear, labeller = label_both) +
+  labs(title = "hrbrthemes::theme_ipsum() - Modern typography",
+       subtitle = "Clean, professional, with excellent fonts and facets",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon",
+       color = "Cylinders") +
+  theme_ipsum() +
+  scale_color_ipsum()
+```
+:::
+
+::: {.column width="50%"}
+::: {.callout-note}
+## hrbrthemes Package
+
+**Modern professional typography**
+
+- Uses high-quality fonts (requires font installation)
+- `theme_ipsum()` - Modern, clean, professional
+- `theme_ipsum_rc()` - Roboto Condensed font
+- Excellent for presentations and reports
+- Works beautifully with facets
+- May require: `extrafont::font_import()`
+:::
+:::
+:::
 
 ## Specialized Themes: ggthemes
 
@@ -405,46 +445,6 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
     theme = theme(plot.title = element_text(size = 18, face = "bold"))
   )
 ```
-
-
-## Modern Typography: hrbrthemes
-
-::: {.columns}
-::: {.column width="50%"}
-```{r}
-#| label: theme-hrbrthemes
-#| echo: true
-#| eval: true
-#| fig-width: 8
-#| fig-height: 5
-
-ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "hrbrthemes::theme_ipsum() - Modern typography",
-       subtitle = "Clean, professional, with excellent fonts",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders") +
-  theme_ipsum() +
-  scale_color_ipsum()
-```
-:::
-
-::: {.column width="50%"}
-::: {.callout-note}
-## hrbrthemes Package
-
-**Modern professional typography**
-
-- Uses high-quality fonts (requires font installation)
-- `theme_ipsum()` - Modern, clean, professional
-- `theme_ipsum_rc()` - Roboto Condensed font
-- Excellent for presentations and reports
-- May require: `extrafont::font_import()`
-:::
-:::
-:::
 
 ## Setting Global Theme
 
