@@ -5,11 +5,13 @@
 **Every plot needs a "device"**
 
 ::: {.fragment}
-Device = where R sends the graphics output
+Device = where R sends the graphics output (device = "the printer")
 
 - Screen (RStudio viewer)
 - PDF file
+- SVG file
 - PNG file
+- JPEG file
 - etc.
 :::
 
@@ -19,7 +21,6 @@ Device = where R sends the graphics output
 #| label: saving-old-way
 #| echo: true
 #| eval: false
-#| code-line-numbers: "|1|2|3"
 
 pdf("myplot.pdf", width = 7, height = 5)
   plot(x, y)
@@ -32,7 +33,6 @@ dev.off()  # CRITICAL! Must close device
 The `dev.off()` approach works for:
 
 - Base R plots (`plot()`, `hist()`, `barplot()`, etc.)
-- Lattice plots
 - ggplot2 plots
 - Any R graphics output
 
@@ -68,13 +68,12 @@ ggsave("myplot.pdf", plot = p, width = 6, height = 4)
 
 No `dev.off()` needed! ✨
 
-## ggsave() Full Control
+### Full Control
 
 ```{r}
 #| label: saving-ggsave-full
 #| echo: true
 #| eval: false
-#| code-line-numbers: "|2|3|4|5|6|7"
 
 ggsave(
   filename = "figure1.pdf",
@@ -87,115 +86,6 @@ ggsave(
 )
 ```
 
-## Format-Specific Settings
-
-### PDF (Vector - Best for Publications)
-
-```{r}
-#| label: saving-pdf
-#| echo: true
-#| eval: false
-
-# Standard PDF
-ggsave("plot.pdf", width = 7, height = 5)
-
-# Better: cairo_pdf for font embedding & Unicode
-ggsave("plot.pdf", width = 7, height = 5, device = cairo_pdf)
-```
-
-::: {.callout-tip}
-Use `cairo_pdf` for better font support!
-:::
-
-## PNG (High Resolution Raster)
-
-```{r}
-#| label: saving-png
-#| echo: true
-#| eval: false
-
-# 300 DPI for print
-ggsave("plot.png",
-       width = 7, height = 5,
-       dpi = 300,
-       type = "cairo")  # Better antialiasing
-
-# Size calculation:
-# 7 inches × 300 DPI = 2100 pixels wide
-# 5 inches × 300 DPI = 1500 pixels tall
-```
-
-## TIFF (Journal Requirements)
-
-```{r}
-#| label: saving-tiff
-#| echo: true
-#| eval: false
-
-# Some journals require TIFF
-ggsave("plot.tiff",
-       width = 7,
-       height = 5,
-       dpi = 600,              # High quality
-       compression = "lzw")    # Lossless compression
-```
-
-## SVG (Web and Illustrator)
-
-```{r}
-#| label: saving-svg
-#| echo: true
-#| eval: false
-
-# Scalable Vector Graphics
-# Great for web, editable in Inkscape/Illustrator
-ggsave("plot.svg", width = 8, height = 6)
-```
-
-::: {.callout-note}
-SVG files can be larger than PDF for complex plots
-:::
-
-## Common Mistakes
-
-::: {.columns}
-::: {.column width="50%"}
-**❌ Wrong**
-
-```{r}
-#| label: saving-wrong
-#| echo: true
-#| eval: false
-
-# No explicit size
-ggsave("plot.pdf")
-
-# Forgetting DPI for raster
-ggsave("plot.png",
-       width = 7, height = 5)
-# Defaults to 72 DPI!
-```
-:::
-
-::: {.column width="50%"}
-**✅ Correct**
-
-```{r}
-#| label: saving-correct
-#| echo: true
-#| eval: false
-
-# Always specify size
-ggsave("plot.pdf",
-       width = 7, height = 5)
-
-# Always specify DPI for raster
-ggsave("plot.png",
-       width = 7, height = 5,
-       dpi = 300)
-```
-:::
-:::
 
 ## Converting PDF to High-Res PNG
 
@@ -215,36 +105,33 @@ img <- image_read_pdf("plot.pdf", density = 300)
 image_write(img, "plot.png", format = "png")
 ```
 
-### Using R (pdftools package)
+
+## Using magick for Conversion
 
 ```{r}
-#| label: saving-pdftools
+#| label: saving-magick-convert
 #| echo: true
 #| eval: false
 
-library(pdftools)
+library(magick)
 
-# Convert to PNG at 300 DPI
-pdf_convert("plot.pdf",
-            format = "png",
-            dpi = 300,
-            filenames = "plot.png")
-```
-
-## Command Line (ImageMagick)
-
-```bash
 # Convert PDF to 300 DPI PNG
-convert -density 300 plot.pdf -quality 100 plot.png
+img <- image_read_pdf("plot.pdf", density = 300)
+image_write(img, "plot.png", format = "png", quality = 100)
 
-# With better antialiasing
-convert -density 300 -quality 100 -alpha remove \
-        plot.pdf plot.png
+# With better antialiasing (remove alpha channel)
+img <- image_read_pdf("plot.pdf", density = 300)
+img <- image_background(img, "white")  # Remove alpha
+image_write(img, "plot.png", format = "png", quality = 100)
 
-# Batch convert all PDFs
-for file in *.pdf; do
-  convert -density 300 "$file" "${file%.pdf}.png"
-done
+# Batch convert all PDFs in directory
+pdf_files <- list.files(pattern = "\\.pdf$")
+for (file in pdf_files) {
+  img <- image_read_pdf(file, density = 300)
+  img <- image_background(img, "white")
+  out_file <- sub("\\.pdf$", ".png", file)
+  image_write(img, out_file, format = "png", quality = 100)
+}
 ```
 
 ## Batch Saving Multiple Plots
@@ -296,7 +183,6 @@ ggsave("figures/figure1.png", p1, width = 7, height = 5, dpi = 300)
 The device approach works for **ALL** R plotting systems:
 
 - Base R graphics
-- Lattice
 - ggplot2 (though ggsave() is easier)
 - Grid graphics
 - Custom plotting functions
