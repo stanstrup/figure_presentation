@@ -154,12 +154,13 @@ ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
   geom_smooth(method = "lm", se = TRUE, color = "darkred",
               formula = y ~ x) +
   stat_regline_equation(
-    aes(label = paste(after_stat(eq.label), after_stat(p.label), sep = "~~~~")),
-    formula = y ~ x
+    aes(label = after_stat(eq.label)),
+    formula = y ~ x,
+    label.y = 1.0
   ) +
   stat_cor(
     aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-    label.y = 0.95
+    label.y = 0.92
   ) +
   labs(title = "Iris setosa",
        x = "Sepal Length (cm)",
@@ -244,13 +245,14 @@ make_species_plot <- function(data, species) {
                 formula = y ~ x) +
     
     stat_regline_equation(
-      aes(label = paste(after_stat(eq.label), after_stat(p.label), sep = "~~~~")),
-      formula = y ~ x
+      aes(label = after_stat(eq.label)),
+      formula = y ~ x,
+      label.y = 1.0
     ) +
 
     stat_cor(
       aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-      label.y = 0.95
+      label.y = 0.92
     ) +
     
     labs(title = glue("Iris {species}"),
