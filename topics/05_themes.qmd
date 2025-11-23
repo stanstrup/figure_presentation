@@ -303,7 +303,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 ## ggpubr: Adding Regression Equations
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="50%"}
 ```{r}
 #| label: ggpubr-regression-code
 #| echo: true
@@ -329,7 +329,7 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 ```
 :::
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 ```{r}
 #| label: ggpubr-regression
 #| echo: false
@@ -367,7 +367,7 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 ## Modern Typography: hrbrthemes
 
 ::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
 ```{r}
 #| label: theme-hrbrthemes
 #| echo: true
@@ -389,7 +389,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 ```
 :::
 
-::: {.column width="50%"}
+::: {.column width="40%"}
 ::: {.callout-note}
 ## hrbrthemes Package
 
@@ -402,6 +402,95 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 - Works beautifully with facets
 - May require: `extrafont::font_import()`
 :::
+:::
+:::
+
+## ggpubr: Arranging Multiple Plots
+
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: ggpubr-ggarrange-code
+#| echo: true
+#| eval: false
+
+library(ggpubr)
+
+# Create individual plots
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE,
+              formula = y ~ x) +
+  stat_cor(method = "pearson") +
+  labs(x = "Weight", y = "MPG") +
+  theme_pubr()
+
+p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(x = "Cylinders", y = "MPG") +
+  theme_pubr()
+
+p3 <- ggplot(mtcars, aes(hp, mpg)) +
+  geom_point(color = "coral") +
+  geom_smooth(method = "lm", se = FALSE,
+              formula = y ~ x) +
+  labs(x = "Horsepower", y = "MPG") +
+  theme_pubr()
+
+# Arrange with ggarrange
+ggarrange(p1, p2, p3,
+          ncol = 2, nrow = 2,
+          labels = c("A", "B", "C"),
+          font.label = list(size = 14,
+                            face = "bold"))
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+#| label: ggpubr-ggarrange
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 10
+
+library(ggpubr)
+
+# Create individual plots
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE,
+              formula = y ~ x) +
+  stat_cor(method = "pearson") +
+  labs(x = "Weight", y = "MPG") +
+  theme_pubr()
+
+p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(x = "Cylinders", y = "MPG") +
+  theme_pubr()
+
+p3 <- ggplot(mtcars, aes(hp, mpg)) +
+  geom_point(color = "coral") +
+  geom_smooth(method = "lm", se = FALSE,
+              formula = y ~ x) +
+  labs(x = "Horsepower", y = "MPG") +
+  theme_pubr()
+
+# Arrange with ggarrange
+ggarrange(p1, p2, p3,
+          ncol = 2, nrow = 2,
+          labels = c("A", "B", "C"),
+          font.label = list(size = 14,
+                            face = "bold"))
+```
+
+**Key function:** `ggarrange()`
+
+- Alternative to patchwork for combining plots
+- Built-in panel labeling (A, B, C)
+- `stat_cor()` adds correlation statistics
+- Works seamlessly with ggpubr themes
 :::
 :::
 
@@ -534,13 +623,13 @@ Check journal author guidelines!
 ## Theme Elements You Can Customize
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="50%"}
 ```{r}
 #| label: theme-elements-code
 #| echo: true
 #| eval: false
 
-ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+p <- ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot(alpha = 0.7) +
   facet_wrap(~gear, labeller = label_both) +
   labs(title = "Customized Theme Elements",
@@ -571,42 +660,15 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 ```
 :::
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 ```{r}
 #| label: theme-elements
 #| echo: false
 #| eval: true
-#| fig-width: 10
-#| fig-height: 7
+#| fig-width: 7
+#| fig-height: 5
 
-ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
-  geom_boxplot(alpha = 0.7) +
-  facet_wrap(~gear, labeller = label_both) +
-  labs(title = "Customized Theme Elements",
-       x = "Cylinders",
-       y = "Miles Per Gallon",
-       fill = "Cylinders") +
-  theme_minimal() +
-  theme(
-    # Axis elements
-    axis.title = element_text(size = 12, face = "bold", color = "navy"),
-    axis.text = element_text(size = 10, color = "gray30"),
-    # Legend
-    legend.position = "bottom",
-    legend.title = element_text(face = "bold"),
-    legend.background = element_rect(fill = "gray95", color = "gray50"),
-    # Panel
-    panel.grid.major = element_line(color = "gray80", linewidth = 0.3),
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "white"),
-    # Facet strips
-    strip.background = element_rect(fill = "steelblue", color = "navy"),
-    strip.text = element_text(color = "white", face = "bold", size = 11),
-    # Plot
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    plot.background = element_rect(fill = "white", color = NA)
-  ) +
-  scale_fill_brewer(palette = "Set2")
+p
 ```
 
 **Customizable elements:**
@@ -619,95 +681,6 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 :::
 :::
 
-## Consistent Multi-Plot Style
-
-::: {.columns}
-::: {.column width="40%"}
-```{r}
-#| label: multi-plot-style-code
-#| echo: true
-#| eval: false
-
-# Define publication theme
-pub_theme <- theme_classic(base_size = 11) +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    axis.title = element_text(face = "bold")
-  )
-
-# Create multiple plots with same style
-p1 <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(color = "steelblue", size = 2) +
-  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
-  labs(title = "Panel A: Scatter plot", x = "Weight", y = "MPG") +
-  pub_theme
-
-p2 <- ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Panel B: Boxplot", x = "Species", y = "Sepal Length") +
-  pub_theme +
-  theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set2")
-
-p3 <- ggplot(faithful, aes(eruptions)) +
-  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
-  labs(title = "Panel C: Histogram", x = "Eruption Duration", y = "Count") +
-  pub_theme
-
-# Combine into multi-panel figure
-p1 + p2 + p3 +
-  plot_annotation(
-    title = "Multi-panel figure with consistent theme",
-    theme = theme(plot.title = element_text(size = 16, face = "bold"))
-  )
-```
-:::
-
-::: {.column width="60%"}
-```{r}
-#| label: multi-plot-style
-#| echo: false
-#| eval: true
-#| fig-width: 14
-#| fig-height: 9
-
-# Define publication theme
-pub_theme <- theme_classic(base_size = 11) +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    axis.title = element_text(face = "bold")
-  )
-
-# Create multiple plots with same style
-p1 <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(color = "steelblue", size = 2) +
-  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
-  labs(title = "Panel A: Scatter plot", x = "Weight", y = "MPG") +
-  pub_theme
-
-p2 <- ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Panel B: Boxplot", x = "Species", y = "Sepal Length") +
-  pub_theme +
-  theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set2")
-
-p3 <- ggplot(faithful, aes(eruptions)) +
-  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
-  labs(title = "Panel C: Histogram", x = "Eruption Duration", y = "Count") +
-  pub_theme
-
-# Combine into multi-panel figure
-p1 + p2 + p3 +
-  plot_annotation(
-    title = "Multi-panel figure with consistent theme",
-    theme = theme(plot.title = element_text(size = 16, face = "bold"))
-  )
-```
-
-**All panels have consistent, professional appearance!**
-:::
-:::
 
 ## Recommendations
 
@@ -729,7 +702,6 @@ p1 + p2 + p3 +
    - Minimize non-data ink
 
 5. **Use publication packages** for multi-panel figures
-   - `cowplot::plot_grid()` for complex layouts
    - `patchwork` for intuitive combining syntax
    - `ggpubr::ggarrange()` for automatic labeling
 
@@ -737,88 +709,3 @@ p1 + p2 + p3 +
    - Print preview before submission
 :::
 
-## Complete Example: Before & After
-
-::: {.columns}
-::: {.column width="40%"}
-```{r}
-#| label: before-after-code
-#| echo: true
-#| eval: false
-
-# Before: Default theme
-before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "BEFORE: Default theme_gray()",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders")
-# Uses default theme_gray()
-
-# After: Publication theme
-after <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "AFTER: Publication-ready theme",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders") +
-  theme_classic(base_size = 12) +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    axis.title = element_text(face = "bold"),
-    legend.position = "top"
-  ) +
-  scale_color_brewer(palette = "Set1")
-
-before + after +
-  plot_annotation(
-    title = "Theme Transformation: Default → Publication Ready",
-    theme = theme(plot.title = element_text(size = 16, face = "bold"))
-  )
-```
-:::
-
-::: {.column width="60%"}
-```{r}
-#| label: before-after
-#| echo: false
-#| eval: true
-#| fig-width: 14
-#| fig-height: 9
-
-# Before: Default theme
-before <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "BEFORE: Default theme_gray()",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders")
-# Uses default theme_gray()
-
-# After: Publication theme
-after <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "AFTER: Publication-ready theme",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders") +
-  theme_classic(base_size = 12) +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    axis.title = element_text(face = "bold"),
-    legend.position = "top"
-  ) +
-  scale_color_brewer(palette = "Set1")
-
-before + after +
-  plot_annotation(
-    title = "Theme Transformation: Default → Publication Ready",
-    theme = theme(plot.title = element_text(size = 16, face = "bold"))
-  )
-```
-:::
-:::
