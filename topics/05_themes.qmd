@@ -512,7 +512,7 @@ Check journal author guidelines!
 ```{r}
 #| label: theme-elements-code
 #| echo: true
-#| eval: false
+#| eval: true
 
 p <- ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot(alpha = 0.7) +
