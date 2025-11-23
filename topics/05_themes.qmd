@@ -290,12 +290,13 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 ::: {.callout-tip}
 ## ggpubr Package
 
-**Publication-ready themes + statistical tests**
+**Publication-ready themes + statistical annotations**
 
 - `theme_pubr()` - Clean publication theme
 - `theme_pubclean()` - Even more minimal
-- Built-in statistical comparison functions
-- Easy to add p-values and significance brackets
+- `stat_regline_equation()` - Automatic regression equations
+- `stat_cor()` - Correlation statistics
+- `stat_compare_means()` - p-values and significance brackets
 :::
 :::
 :::
@@ -402,95 +403,6 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 - Works beautifully with facets
 - May require: `extrafont::font_import()`
 :::
-:::
-:::
-
-## ggpubr: Arranging Multiple Plots
-
-::: {.columns}
-::: {.column width="40%"}
-```{r}
-#| label: ggpubr-ggarrange-code
-#| echo: true
-#| eval: false
-
-library(ggpubr)
-
-# Create individual plots
-p1 <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(color = "steelblue") +
-  geom_smooth(method = "lm", se = FALSE,
-              formula = y ~ x) +
-  stat_cor(method = "pearson") +
-  labs(x = "Weight", y = "MPG") +
-  theme_pubr()
-
-p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(x = "Cylinders", y = "MPG") +
-  theme_pubr()
-
-p3 <- ggplot(mtcars, aes(hp, mpg)) +
-  geom_point(color = "coral") +
-  geom_smooth(method = "lm", se = FALSE,
-              formula = y ~ x) +
-  labs(x = "Horsepower", y = "MPG") +
-  theme_pubr()
-
-# Arrange with ggarrange
-ggarrange(p1, p2, p3,
-          ncol = 2, nrow = 2,
-          labels = c("A", "B", "C"),
-          font.label = list(size = 14,
-                            face = "bold"))
-```
-:::
-
-::: {.column width="60%"}
-```{r}
-#| label: ggpubr-ggarrange
-#| echo: false
-#| eval: true
-#| fig-width: 12
-#| fig-height: 10
-
-library(ggpubr)
-
-# Create individual plots
-p1 <- ggplot(mtcars, aes(wt, mpg)) +
-  geom_point(color = "steelblue") +
-  geom_smooth(method = "lm", se = FALSE,
-              formula = y ~ x) +
-  stat_cor(method = "pearson") +
-  labs(x = "Weight", y = "MPG") +
-  theme_pubr()
-
-p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(x = "Cylinders", y = "MPG") +
-  theme_pubr()
-
-p3 <- ggplot(mtcars, aes(hp, mpg)) +
-  geom_point(color = "coral") +
-  geom_smooth(method = "lm", se = FALSE,
-              formula = y ~ x) +
-  labs(x = "Horsepower", y = "MPG") +
-  theme_pubr()
-
-# Arrange with ggarrange
-ggarrange(p1, p2, p3,
-          ncol = 2, nrow = 2,
-          labels = c("A", "B", "C"),
-          font.label = list(size = 14,
-                            face = "bold"))
-```
-
-**Key function:** `ggarrange()`
-
-- Alternative to patchwork for combining plots
-- Built-in panel labeling (A, B, C)
-- `stat_cor()` adds correlation statistics
-- Works seamlessly with ggpubr themes
 :::
 :::
 
@@ -705,7 +617,5 @@ p
    - `patchwork` for intuitive combining syntax
    - `ggpubr::ggarrange()` for automatic labeling
 
-6. **Test in grayscale** - themes should work in B&W too
-   - Print preview before submission
 :::
 
