@@ -361,9 +361,16 @@ p <- ggboxplot(ToothGrowth,
                y = "len",
                color = "dose",
                palette = "jco") +
-  stat_compare_means(comparisons = my_comparisons) +
-  stat_compare_means(label.y = 50) +
-  labs(title = "Pairwise Comparisons with Significance Brackets",
+  stat_compare_means(
+    comparisons = my_comparisons,
+    method = "t.test",
+    p.adjust.method = "BH"  # Benjamini-Hochberg correction
+  ) +
+  stat_compare_means(
+    method = "anova",
+    label.y = 50
+  ) +
+  labs(title = "Pairwise Comparisons with Multiple Testing Correction",
        x = "Dose (mg/day)",
        y = "Tooth Length")
 ```
@@ -383,9 +390,12 @@ p
 **Key features:**
 
 - Define specific pairwise comparisons
+- `method = "t.test"` for pairwise tests
+- `p.adjust.method = "BH"` for multiple testing correction
+- `method = "anova"` for overall test
 - Automatic significance brackets
-- Global p-value at top
-- Wilcoxon test by default
+
+**Other correction methods:** "holm", "hochberg", "bonferroni", "BY", "fdr"
 :::
 :::
 
