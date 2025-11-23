@@ -341,45 +341,49 @@ p
 ## ggpubr: Pairwise Comparisons
 
 ::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
 ```{r}
 #| label: ggpubr-comparisons-code
 #| echo: true
 #| eval: true
 
-library(ggpubr)
-
-# Specify which pairs to compare
-my_comparisons <- list(
-  c("0.5", "1"),
-  c("1", "2"),
-  c("0.5", "2")
-)
+# Automatically generate all pairwise comparisons
+dose_levels <- levels(factor(ToothGrowth$dose))
+my_comparisons <- combn(dose_levels, 2, simplify = FALSE)
 
 p <- ggboxplot(ToothGrowth,
-               x = "dose",
-               y = "len",
-               color = "dose",
-               palette = "jco") +
+               x = "dose", y = "len", color = "dose", palette = "jco") +
   stat_compare_means(
-    comparisons = my_comparisons,
-    method = "t.test",
-    p.adjust.method = "holm"  # Holm correction
-  ) +
+                      comparisons = my_comparisons,
+                      method = "t.test",
+                      p.adjust.method = "BH"  # Holm correction
+                    ) +
   stat_compare_means(
-    method = "anova",
-    label.y = 50
-  ) +
+                      method = "anova",
+                      label.y = 50
+                    ) +
   labs(title = "Pairwise Comparisons with Multiple Testing Correction",
        x = "Dose (mg/day)",
        y = "Tooth Length")
-
-# Alternative: Use Tukey's HSD for all pairwise comparisons
-# p + stat_compare_means(method = "tukey_hsd")
 ```
+
+
+**Key features:**
+
+- `combn(levels, 2)` generates all pairs automatically
+- `method = "t.test"` for pairwise tests
+- `p.adjust.method = "BH"` for multiple testing correction
+- `method = "anova"` for overall test
+- Automatic significance brackets
+
+**Other methods:** "holm", "bonferroni", "hochberg", "BY", "fdr"
+
+**Alternative:** `method = "tukey_hsd"` for Tukey's HSD
+
+
 :::
 
-::: {.column width="50%"}
+::: {.column width="40%"}
 ```{r}
 #| label: ggpubr-comparisons-show
 #| echo: false
@@ -390,19 +394,17 @@ p <- ggboxplot(ToothGrowth,
 p
 ```
 
-**Key features:**
-
-- Define specific pairwise comparisons
-- `method = "t.test"` for pairwise tests
-- `p.adjust.method = "holm"` for multiple testing correction
-- `method = "anova"` for overall test
-- Automatic significance brackets
 
 **Correction methods:** "holm", "BH", "bonferroni", "hochberg", "BY", "fdr"
 
 **Alternative:** `method = "tukey_hsd"` for Tukey's HSD (all pairwise)
+
+
 :::
 :::
+
+
+
 
 ## Modern Typography: hrbrthemes
 
