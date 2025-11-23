@@ -432,42 +432,6 @@ p1 + p2 + p3 +
 :::
 ::::
 
-## Custom Theme for Publications
-
-```{r}
-#| label: custom-pub-theme
-#| echo: true
-#| eval: true
-#| fig-width: 8
-#| fig-height: 5
-
-# Define your publication theme
-my_pub_theme <- theme_classic(base_size = 11) +
-  theme(
-    # Axis styling
-    axis.line = element_line(linewidth = 0.5),
-    axis.ticks = element_line(linewidth = 0.5),
-    axis.title = element_text(size = 12, face = "bold"),
-    # Bold titles
-    plot.title = element_text(face = "bold", size = 14),
-    # Legend
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    # Background
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# Apply to plot
-ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Custom Publication Theme",
-       x = "Weight (1000 lbs)",
-       y = "Miles Per Gallon",
-       color = "Cylinders") +
-  my_pub_theme
-```
 
 ## Font Considerations
 
@@ -504,12 +468,51 @@ Check journal author guidelines!
 
 ## Theme Elements You Can Customize
 
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: theme-elements-code
+#| echo: true
+#| eval: false
+
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~gear, labeller = label_both) +
+  labs(title = "Customized Theme Elements",
+       x = "Cylinders",
+       y = "Miles Per Gallon",
+       fill = "Cylinders") +
+  theme_minimal() +
+  theme(
+    # Axis elements
+    axis.title = element_text(size = 12, face = "bold", color = "navy"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    # Legend
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    legend.background = element_rect(fill = "gray95", color = "gray50"),
+    # Panel
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    # Facet strips
+    strip.background = element_rect(fill = "steelblue", color = "navy"),
+    strip.text = element_text(color = "white", face = "bold", size = 11),
+    # Plot
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  scale_fill_brewer(palette = "Set2")
+```
+:::
+
+::: {.column width="60%"}
 ```{r}
 #| label: theme-elements
-#| echo: true
+#| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 10
+#| fig-height: 7
 
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot(alpha = 0.7) +
@@ -548,15 +551,60 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 - `panel.grid` - Gridlines
 - `plot.background`, `panel.background` - Backgrounds
 - `strip.background`, `strip.text` - Facet labels
+:::
+:::
 
 ## Consistent Multi-Plot Style
 
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: multi-plot-style-code
+#| echo: true
+#| eval: false
+
+# Define publication theme
+pub_theme <- theme_classic(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold")
+  )
+
+# Create multiple plots with same style
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue", size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  labs(title = "Panel A: Scatter plot", x = "Weight", y = "MPG") +
+  pub_theme
+
+p2 <- ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Panel B: Boxplot", x = "Species", y = "Sepal Length") +
+  pub_theme +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set2")
+
+p3 <- ggplot(faithful, aes(eruptions)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  labs(title = "Panel C: Histogram", x = "Eruption Duration", y = "Count") +
+  pub_theme
+
+# Combine into multi-panel figure
+p1 + p2 + p3 +
+  plot_annotation(
+    title = "Multi-panel figure with consistent theme",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+:::
+
+::: {.column width="60%"}
 ```{r}
 #| label: multi-plot-style
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 14
-#| fig-height: 6
+#| fig-height: 9
 
 # Define publication theme
 pub_theme <- theme_classic(base_size = 11) +
@@ -593,6 +641,8 @@ p1 + p2 + p3 +
 ```
 
 **All panels have consistent, professional appearance!**
+:::
+:::
 
 ## Quick Reference
 
@@ -602,7 +652,6 @@ p1 + p2 + p3 +
 | `theme_bw()` | Modern publications, gridlines | ggplot2 |
 | `theme_minimal()` | Presentations, reports | ggplot2 |
 | `theme_void()` | Maps, custom designs | ggplot2 |
-| `theme_cowplot()` | Publication multi-panels | cowplot |
 | `theme_pubr()` | Publication with stats | ggpubr |
 | `theme_few()` | Data visualization best practices | ggthemes |
 | `theme_tufte()` | Minimalist Tufte style | ggthemes |
@@ -616,7 +665,6 @@ p1 + p2 + p3 +
 #| eval: false
 
 # Install publication-ready theme packages
-install.packages("cowplot")    # Publication multi-panel figures
 install.packages("ggpubr")     # Publication themes + stats
 install.packages("ggthemes")   # Professional magazine/journal themes
 install.packages("hrbrthemes") # Modern typography (requires fonts)
