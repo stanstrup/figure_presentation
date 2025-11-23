@@ -141,22 +141,33 @@ for (file in pdf_files) {
 #| echo: true
 #| eval: false
 
-# Create list of plots
-plots <- list(
-  p1 = ggplot(mtcars, aes(wt, mpg)) + geom_point(),
-  p2 = ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line(),
-  p3 = ggplot(faithful, aes(eruptions)) + geom_histogram()
+library(tidyverse)
+
+# Create tibble with data, plots, and titles
+plot_data <- tibble(
+  title = c("mtcars", "iris", "faithful"),
+  data = list(mtcars, iris, faithful),
+  plot = list(
+    ggplot(mtcars, aes(wt, mpg)) +
+      geom_point() +
+      labs(title = "mtcars: Weight vs MPG"),
+    ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
+      geom_point() +
+      labs(title = "iris: Sepal dimensions"),
+    ggplot(faithful, aes(eruptions)) +
+      geom_histogram(bins = 30) +
+      labs(title = "faithful: Eruption duration")
+  )
 )
 
-# Save all at once
-library(purrr)
-iwalk(plots, ~ggsave(
-  filename = paste0(.y, ".pdf"),
+# Save all plots using iwalk
+iwalk(plot_data$plot, ~ggsave(
+  filename = paste0("figure_", plot_data$title[.y], ".pdf"),
   plot = .x,
   width = 7, height = 5
 ))
 
-# Creates: p1.pdf, p2.pdf, p3.pdf
+# Creates: figure_mtcars.pdf, figure_iris.pdf, figure_faithful.pdf
 ```
 
 ## File Organization
