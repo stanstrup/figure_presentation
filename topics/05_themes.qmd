@@ -304,7 +304,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 
 ```{r}
 #| label: theme-ggthemes
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 14
 #| fig-height: 10
@@ -344,6 +344,8 @@ p6 <- base_plot + theme_gdocs() + scale_color_gdocs() +
 
 ## Modern Typography: hrbrthemes
 
+::: {.columns}
+::: {.column width="50%"}
 ```{r}
 #| label: theme-hrbrthemes
 #| echo: true
@@ -362,7 +364,9 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
   theme_ipsum() +
   scale_color_ipsum()
 ```
+:::
 
+::: {.column width="50%"}
 ::: {.callout-note}
 ## hrbrthemes Package
 
@@ -373,6 +377,8 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
 - `theme_ipsum_rc()` - Roboto Condensed font
 - Excellent for presentations and reports
 - May require: `extrafont::font_import()`
+:::
+:::
 :::
 
 ## Setting Global Theme
