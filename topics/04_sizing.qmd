@@ -13,6 +13,7 @@ library(glue)
 
 # Output directory
 fig_dir <- "plots/04_sizing"
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
 
 # Create the base plot used throughout
 p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +

@@ -13,6 +13,7 @@ library(glue)
 
 # Output directory
 fig_dir <- "plots/03_formats"
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
 ```
 
 ## What is a Raster Image?
