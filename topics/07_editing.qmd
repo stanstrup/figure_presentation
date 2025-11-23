@@ -1,0 +1,604 @@
+# Post-Export Editing {background-color="#16a085"}
+
+## Why Edit After Export?
+
+**Legitimate uses:**
+
+::: {.incremental}
+- Combine multiple plots into multi-panel figures (A, B, C labels)
+- Fine-tune alignment and spacing
+- Add annotations, arrows, or highlights
+- Adjust layout without re-running analysis
+:::
+
+## Vector Editing Tools
+
+::: {.columns}
+::: {.column width="50%"}
+**Adobe Illustrator**
+
+- Industry standard
+- Commercial ($$$)
+- Best PDF/EPS import
+- Precise typography
+:::
+
+::: {.column width="50%"}
+**Inkscape**
+
+- Free & open source
+- Excellent alternative
+- Native SVG format
+- Cross-platform
+:::
+:::
+
+## Export for Editability
+
+```{r}
+#| label: editing-export
+#| echo: true
+#| eval: false
+
+# For Inkscape: use SVG
+ggsave("plot.svg", p, width = 7, height = 5)
+
+# For Illustrator: use PDF with embedded fonts
+ggsave("plot.pdf", p, width = 7, height = 5,
+       device = cairo_pdf)
+
+# Both preserve vector graphics
+# Text remains editable
+```
+
+## Common Editing Tasks
+
+### Adding Panel Labels
+
+::: {.fragment}
+**Typical style:**
+
+- Position: Top-left of each panel
+- Font: Arial or Helvetica, **Bold**
+- Size: 14-16 pt
+- Label: **A**, **B**, **C**, etc.
+:::
+
+## Aligning Multiple Plots
+
+**In Illustrator/Inkscape:**
+
+1. Import all plots
+2. Select all panels
+3. Use alignment tools:
+   - Align left edges
+   - Distribute vertically with equal spacing
+4. Ensure axis widths match for stacked plots
+
+## What NOT to Edit
+
+::: {.callout-warning}
+## Keep These in R!
+
+**Never manually edit:**
+
+- Data points themselves
+- Axis scales or ranges
+- Statistical elements (error bars, fit lines, p-values)
+- Color mappings
+
+**Why?** Breaks reproducibility! Always regenerate from R.
+:::
+
+## The Golden Rule
+
+::: {.r-fit-text}
+R scripts = Source of Truth
+:::
+
+::: {.fragment}
+Illustrator/Inkscape = Final polish only
+:::
+
+## Workflow Example
+
+```{r}
+#| label: editing-workflow
+#| echo: true
+#| eval: false
+
+# 1_analysis.R - Data analysis and initial plots
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
+
+# 2_export_figures.R - Standardized export
+ggsave("figures/panel_a.pdf", p1, width = 3.5, height = 3)
+ggsave("figures/panel_b.pdf", p2, width = 3.5, height = 3)
+
+# 3_combine_in_illustrator.ai - Manual combining
+# - Add panel labels (A, B)
+# - Align panels
+# - Add title/caption
+
+# 4_README.txt - Document manual edits
+# "Added bold panel labels (A, B) in Arial 16pt"
+```
+
+## Maintaining Reproducibility
+
+**Document your workflow:**
+
+```
+project/
+├── data/
+├── scripts/
+│   ├── 01_analysis.R
+│   ├── 02_generate_figures.R
+├── figures/
+│   ├── raw/           # Direct from R
+│   ├── panel_a.pdf
+│   ├── panel_b.pdf
+│   └── final/         # After Illustrator
+│       └── figure1_combined.pdf
+└── README.md          # Documents manual edits
+```
+
+## Inkscape Basics
+
+**Opening PDFs:**
+
+1. File → Open → Select PDF
+2. Choose "Import via Poppler" for best results
+3. Each plot element is now editable
+
+**Useful tools:**
+
+- Selection tool (F1): Move and resize
+- Text tool (F8): Edit or add text
+- Align and Distribute (Ctrl+Shift+A)
+
+## Illustrator Basics
+
+**Opening PDFs:**
+
+1. File → Open → Select PDF
+2. Plots import as grouped objects
+3. Use Direct Selection Tool (A) to edit individual elements
+
+**Useful features:**
+
+- Artboards: Multiple figures in one file
+- Symbols: Reuse panel labels
+- Guides: Align elements precisely
+
+## Combining Plots: R vs. Post-Processing
+
+::: {.columns}
+::: {.column width="50%"}
+**In R (patchwork)**
+
+```{r}
+#| label: editing-patchwork
+#| echo: true
+#| eval: false
+
+library(patchwork)
+p1 + p2 +
+  plot_annotation(
+    tag_levels = 'A'
+  )
+```
+
+Fully reproducible!
+:::
+
+::: {.column width="50%"}
+**In Illustrator**
+
+- More layout control
+- Easier fine-tuning
+- Less reproducible
+- Good for final polish
+:::
+:::
+
+## When to Use Each Approach
+
+**Use R (patchwork/cowplot):**
+
+- Simple multi-panel layouts
+- Need to regenerate frequently
+- Sharing code with collaborators
+
+**Use Illustrator/Inkscape:**
+
+- Complex layouts with mixed content
+- Final publication figure
+- Need pixel-perfect alignment
+- Adding non-data elements (photos, diagrams)
+
+## Avoiding Common Pitfalls
+
+::: {.callout-warning}
+## Watch Out!
+
+1. **Don't convert to raster**: Keep as vector
+2. **Don't edit data**: Only layout/labels
+3. **Save source files**: Keep .ai or .svg
+4. **Export final as PDF**: For submission
+5. **Document changes**: Note what was done manually
+:::
+
+## Example: Multi-Panel Figure
+
+```{r}
+#| label: editing-multi-panel
+#| echo: true
+#| eval: false
+
+# Create 4 plots in R
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
+      theme_classic(base_size = 10)
+p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line() +
+      theme_classic(base_size = 10)
+p3 <- ggplot(faithful, aes(eruptions)) + geom_histogram() +
+      theme_classic(base_size = 10)
+p4 <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot() +
+      theme_classic(base_size = 10)
+
+# Export each
+walk2(list(p1, p2, p3, p4),
+      paste0("panel_", letters[1:4], ".pdf"),
+      ~ggsave(.y, .x, width = 3, height = 3))
+
+# Then combine in Illustrator/Inkscape
+# 2×2 layout with labels A-D
+```
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Keep R scripts** as authoritative source
+2. **Export individual panels** as separate files
+3. **Use vector formats** (PDF, SVG)
+4. **Document manual edits** in README
+5. **Save layered source files** (.ai, .svg)
+6. **Final export as PDF** for submission
+7. **When in doubt, regenerate from R**
+:::
+
+## The patchwork Package
+
+**A better alternative to manual composition!**
+
+```{r}
+#| label: setup-patchwork
+#| echo: false
+#| eval: true
+#| message: false
+
+library(ggplot2)
+library(patchwork)
+
+# Create sample plots
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "steelblue") +
+  labs(title = "Scatter") +
+  theme_classic(base_size = 10)
+
+p2 <- ggplot(mtcars, aes(factor(cyl), mpg)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Boxplot") +
+  theme_classic(base_size = 10)
+
+p3 <- ggplot(mtcars, aes(mpg)) +
+  geom_histogram(bins = 15, fill = "coral") +
+  labs(title = "Histogram") +
+  theme_classic(base_size = 10)
+
+p4 <- ggplot(mtcars, aes(hp, mpg)) +
+  geom_point() + geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "With trend") +
+  theme_classic(base_size = 10)
+```
+
+::: {.callout-tip}
+## Why patchwork?
+
+- **Fully reproducible** - no manual editing needed
+- **Intuitive syntax** - `|` for side-by-side, `/` for stacked
+- **Automatic labeling** - A, B, C, etc.
+- **Flexible layouts** - complex arrangements possible
+:::
+
+## patchwork: Basic Operators
+
+```{r}
+#| label: patchwork-operators
+#| echo: true
+#| eval: false
+
+library(patchwork)
+
+# Side by side (horizontal)
+p1 | p2
+
+# Stacked (vertical)
+p1 / p2
+
+# Combine both
+(p1 | p2) / (p3 | p4)
+
+# Addition also works for side-by-side
+p1 + p2
+```
+
+## patchwork: Side by Side
+
+```{r}
+#| label: patchwork-horizontal
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+p1 | p2 | p3
+```
+
+## patchwork: Stacked Layout
+
+```{r}
+#| label: patchwork-vertical
+#| echo: true
+#| eval: true
+#| fig-width: 6
+#| fig-height: 8
+
+p1 / p2 / p3
+```
+
+## patchwork: Grid Layout
+
+```{r}
+#| label: patchwork-grid
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4)
+```
+
+## Adding Panel Labels (A, B, C...)
+
+```{r}
+#| label: patchwork-labels
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Customizing Panel Labels
+
+```{r}
+#| label: patchwork-labels-custom
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(
+    tag_levels = 'A',
+    tag_prefix = '(',
+    tag_suffix = ')'
+  ) &
+  theme(plot.tag = element_text(face = 'bold', size = 14))
+```
+
+Labels become **(A)**, **(B)**, etc. with bold styling
+
+## Label Style Options
+
+```{r}
+#| label: patchwork-label-options
+#| echo: true
+#| eval: false
+
+# Uppercase letters: 'A' → A, B, C, D
+plot_annotation(tag_levels = 'A')
+
+# Lowercase letters: 'a' → a, b, c, d
+plot_annotation(tag_levels = 'a')
+
+# Numbers: '1' → 1, 2, 3, 4
+plot_annotation(tag_levels = '1')
+
+# Roman numerals: 'I' → I, II, III, IV
+plot_annotation(tag_levels = 'I')
+
+# Custom labels
+plot_annotation(tag_levels = list(c('Panel A', 'Panel B', 'Panel C', 'Panel D')))
+```
+
+## Complex Layouts with wrap_plots()
+
+```{r}
+#| label: patchwork-wrap
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+wrap_plots(p1, p2, p3, p4, ncol = 3) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Unequal Panel Sizes
+
+```{r}
+#| label: patchwork-widths
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# First plot takes 2x width
+p1 + p2 + p3 +
+  plot_layout(widths = c(2, 1, 1)) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Nested Layouts
+
+```{r}
+#| label: patchwork-nested
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Large plot on left, two stacked on right
+p1 | (p2 / p3) +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Adding Overall Title and Caption
+
+```{r}
+#| label: patchwork-annotation
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 8
+
+(p1 | p2) / (p3 | p4) +
+  plot_annotation(
+    title = 'Figure 1: mtcars Dataset Analysis',
+    subtitle = 'Exploring relationships between vehicle characteristics',
+    caption = 'Data source: R datasets package',
+    tag_levels = 'A'
+  ) &
+  theme(plot.tag = element_text(face = 'bold'))
+```
+
+## Shared Legends with plot_layout()
+
+```{r}
+#| label: patchwork-legend
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Create plots with same color mapping
+pa <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point() + theme_classic(base_size = 10)
+pb <- ggplot(mtcars, aes(hp, mpg, color = factor(cyl))) +
+  geom_point() + theme_classic(base_size = 10)
+
+pa + pb +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A')
+```
+
+## Saving patchwork Figures
+
+```{r}
+#| label: patchwork-save
+#| echo: true
+#| eval: false
+
+# Create combined figure
+combined <- (p1 | p2) / (p3 | p4) +
+  plot_annotation(tag_levels = 'A')
+
+# Save as vector (recommended)
+ggsave("figure1.svg", combined, width = 10, height = 8)
+ggsave("figure1.pdf", combined, width = 10, height = 8)
+
+# Save as high-res raster if needed
+ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
+```
+
+## patchwork vs Manual Editing
+
+::: {.columns}
+::: {.column width="50%"}
+**patchwork (in R)**
+
+✅ Fully reproducible
+
+✅ Easy to update
+
+✅ Automatic alignment
+
+✅ Consistent styling
+
+✅ Version controlled
+
+⚠️ Less layout flexibility
+:::
+
+::: {.column width="50%"}
+**Illustrator/Inkscape**
+
+✅ Pixel-perfect control
+
+✅ Mix with non-R content
+
+✅ Complex annotations
+
+❌ Not reproducible
+
+❌ Manual re-editing
+
+❌ Easy to break
+:::
+:::
+
+## When to Use patchwork
+
+**Use patchwork when:**
+
+- All panels are ggplot2 objects
+- Need reproducible figures
+- Simple to moderately complex layouts
+- Sharing code with collaborators
+- Figures may need updates
+
+**Use Illustrator/Inkscape when:**
+
+- Need pixel-perfect alignment
+- Adding photos, diagrams, or non-R content
+- Very complex custom layouts
+- Final publication polish only
+
+## Other R Alternatives
+
+```{r}
+#| label: editing-combining-tools
+#| echo: true
+#| eval: false
+
+# cowplot - also good for multi-panel
+library(cowplot)
+plot_grid(p1, p2, p3, p4, labels = "AUTO", ncol = 2)
+
+# gridExtra - basic functionality
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+```
+
+**Recommendation:** Use patchwork for most cases - most intuitive syntax!
+
+## Powerpoint
+
+* use SVG
+

@@ -1,0 +1,346 @@
+# PowerPoint Import {background-color="#8e44ad"}
+
+## The Copy-Paste Problem
+
+**What happens when you copy from RStudio:**
+
+::: {.incremental}
+- Pastes as low-resolution bitmap
+- Looks OK on screen (72 DPI)
+- **Terrible when projected**
+- Pixelated and blurry
+- Doesn't scale well
+:::
+
+## The Solution: Save First, Insert Second
+
+**Never copy-paste!**
+
+::: {.fragment}
+Instead:
+
+1. Save plot as file
+2. Insert file into PowerPoint
+3. Maintain quality
+:::
+
+## Vector Formats for PowerPoint
+
+**Three options:**
+
+1. **EMF** (Windows only) - best
+2. **PDF** (cross-platform) - good
+3. **SVG** (modern PowerPoint) - good
+
+## Option 1: EMF (Windows)
+
+**Enhanced Metafile - native PowerPoint vector format**
+
+```{r}
+#| label: ppt-emf
+#| echo: true
+#| eval: false
+
+# Save as EMF (Windows only)
+library(devEMF)
+emf("plot.emf", width = 8, height = 6)
+  print(my_plot)
+dev.off()
+
+# Or with ggsave (if supported)
+ggsave("plot.emf", width = 8, height = 6, device = "emf")
+```
+
+**Advantages:**
+
+- Fully editable in PowerPoint
+- Can ungroup and change colors
+- Perfect quality
+
+## Option 2: PDF (All Platforms)
+
+```{r}
+#| label: ppt-pdf
+#| echo: true
+#| eval: false
+
+# Save as PDF
+ggsave("plot.pdf", my_plot, width = 8, height = 6, device = cairo_pdf)
+```
+
+**Insert into PowerPoint:**
+
+1. Insert → Object → Create from File
+2. Browse to PDF
+3. Check "Display as icon" = OFF
+
+**Or:** Insert → Pictures → select PDF (PowerPoint 2016+)
+
+## Option 3: SVG (Modern)
+
+```{r}
+#| label: ppt-svg
+#| echo: true
+#| eval: false
+
+# Save as SVG
+ggsave("plot.svg", my_plot, width = 8, height = 6)
+```
+
+**Insert into PowerPoint:**
+
+- PowerPoint 2016+ supports SVG
+- Insert → Pictures → select .svg
+- Maintains vector quality
+- Cross-platform
+
+## High-Res PNG Alternative
+
+**If vector doesn't work:**
+
+```{r}
+#| label: ppt-png
+#| echo: true
+#| eval: false
+
+# Save at 2-3× presentation size with high DPI
+ggsave("plot.png",
+       width = 10,
+       height = 7,
+       dpi = 300,
+       type = "cairo")
+```
+
+**Critical:** Don't resize in PowerPoint!
+
+## Inserting into PowerPoint
+
+**For vector formats (PDF/EMF/SVG):**
+
+1. Insert → Pictures (or Objects for PDF)
+2. Select file
+3. **Check**: Zoom to 200-400%
+4. Edges should be crisp, not pixelated
+
+## Testing Your Import
+
+::: {.columns}
+::: {.column width="50%"}
+**Vector (correct):**
+
+- Zoom 400%: still crisp
+- Text is selectable
+- Small file size
+- Professional quality
+:::
+
+::: {.column width="50%"}
+**Raster (wrong):**
+
+- Zoom 400%: pixelated
+- Text not selectable
+- Larger file size
+- Unprofessional
+:::
+:::
+
+## Sizing in PowerPoint
+
+**Right-click image → Format Picture → Size**
+
+::: {.callout-warning}
+Critical settings:
+
+- ✅ "Lock aspect ratio" checked
+- ✅ "Relative to original size" checked
+- ❌ Don't enter arbitrary dimensions
+:::
+
+## Slide Dimensions Matter
+
+**PowerPoint default:**
+
+- Standard: 10" × 7.5" (4:3)
+- Widescreen: 13.33" × 7.5" (16:9)
+
+**Design plots for final size:**
+
+```{r}
+#| label: ppt-slide-size
+#| echo: true
+#| eval: false
+
+# For widescreen, plot might be ~8" wide
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 4) +  # Larger for projection
+  theme_classic(base_size = 18)  # Readable from back
+
+ggsave("slide_plot.pdf", p, width = 8, height = 6)
+```
+
+## Presentation vs. Publication
+
+::: {.columns}
+::: {.column width="50%"}
+**Publication (paper)**
+
+- Small: 3.5-7"
+- Fine details
+- Small text (8-12 pt)
+- High DPI
+:::
+
+::: {.column width="50%"}
+**Presentation (slides)**
+
+- Large: 8-10"
+- Bold/simple
+- Large text (16-24 pt)
+- Lower DPI OK (150)
+:::
+:::
+
+## Creating Presentation-Ready Plots
+
+```{r}
+#| label: ppt-presentation-ready
+#| echo: true
+#| eval: false
+
+# Presentation version: large text, bold elements
+p_present <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 5) +  # Larger points
+  geom_smooth(linewidth = 1.5, se = FALSE) +
+  scale_color_brewer(palette = "Set1") +
+  theme_minimal(base_size = 20) +  # Large text
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 18),
+    axis.title = element_text(size = 22, face = "bold"),
+    plot.title = element_text(size = 24, face = "bold")
+  ) +
+  labs(title = "Fuel Efficiency", color = "Cylinders")
+
+ggsave("presentation.pdf", p_present, width = 10, height = 7)
+```
+
+## Animations and Builds
+
+**Tip:** Save separate plots for each "step"
+
+```{r}
+#| label: ppt-animations
+#| echo: true
+#| eval: false
+
+# Step 1: Just data
+p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+ggsave("step1.pdf", p1, width = 8, height = 6)
+
+# Step 2: Add regression line
+p2 <- p1 + geom_smooth(method = "lm")
+ggsave("step2.pdf", p2, width = 8, height = 6)
+
+# Step 3: Add annotation
+p3 <- p2 + annotate("text", x = 3.5, y = 25, label = "Key finding!")
+ggsave("step3.pdf", p3, width = 8, height = 6)
+
+# Import all, stack on one slide, use animations
+```
+
+## Background Transparency
+
+**For plots on colored slide backgrounds:**
+
+```{r}
+#| label: ppt-transparency
+#| echo: true
+#| eval: false
+
+# Make plot background transparent
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA)
+  )
+
+ggsave("transparent.png", p,
+       width = 8, height = 6,
+       dpi = 300,
+       bg = "transparent")  # Key!
+```
+
+## File Format Recommendations
+
+| Platform | Best Format | Alternative |
+|----------|-------------|-------------|
+| Windows PowerPoint | EMF | PDF, high-res PNG |
+| Mac PowerPoint | PDF | SVG, high-res PNG |
+| Cross-platform | PDF or SVG | High-res PNG |
+| Online (Google Slides) | High-res PNG | SVG |
+
+## Avoiding Common Issues
+
+::: {.callout-warning}
+## Watch Out!
+
+1. **Fonts**: Stick to Arial, Calibri, Helvetica
+2. **Line width**: Thicker for projection (≥0.5 pt)
+3. **Colors**: High contrast for projection
+4. **File size**: Vector keeps file small
+5. **Compression**: PowerPoint auto-compresses images!
+:::
+
+## PowerPoint Compression Settings
+
+**Turn off auto-compression:**
+
+1. File → Options → Advanced
+2. Image Size and Quality section
+3. ✅ Check "Do not compress images in file"
+4. Set default to "High fidelity"
+
+## Complete Workflow Example
+
+```{r}
+#| label: ppt-complete-example
+#| echo: true
+#| eval: false
+
+# 1. Create presentation-optimized plot
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 5) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1.5) +
+  scale_color_brewer(palette = "Set1", name = "Cylinders") +
+  theme_minimal(base_size = 22) +
+  theme(
+    legend.position = "top",
+    plot.background = element_rect(fill = "transparent", color = NA)
+  ) +
+  labs(x = "Weight", y = "MPG", title = "Fuel Efficiency")
+
+# 2. Save as vector (PDF) for best quality
+ggsave("slides/plot.pdf", p, width = 9, height = 6.5, device = cairo_pdf)
+
+# 3. Also save as high-res PNG as backup
+ggsave("slides/plot.png", p, width = 9, height = 6.5, dpi = 300, bg = "transparent")
+
+# 4. Insert PDF into PowerPoint
+# 5. Test by zooming in presentation mode
+```
+
+## Key Takeaways
+
+::: {.callout-tip}
+## Remember
+
+- **Never copy-paste** from RStudio
+- **Use vector formats** when possible (PDF, EMF, SVG)
+- **Design for projection**: large text, bold elements
+- **Test quality**: zoom to 400% in PowerPoint
+- **Turn off** auto-compression in PowerPoint settings
+:::

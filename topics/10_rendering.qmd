@@ -1,0 +1,344 @@
+# Rendering Issues {background-color="#c0392b"}
+
+## What You See Isn't Always What You Get
+
+**Common scenario:**
+
+::: {.incremental}
+- Create plot in R
+- Save as PDF
+- Open in viewer
+- **Looks broken!** 😱
+- Lines missing, weird artifacts
+:::
+
+::: {.fragment}
+But when you print or open in Illustrator... **it's perfect!**
+:::
+
+## Why This Happens
+
+**Rendering vs. Content:**
+
+::: {.columns}
+::: {.column width="50%"}
+**PDF contains:**
+
+- Exact mathematical instructions
+- Perfect vector data
+- Precise coordinates
+:::
+
+::: {.column width="50%"}
+**Viewer displays:**
+
+- Approximation for screen
+- Simplified for speed
+- Varies by software
+:::
+:::
+
+## The Thin Line Problem
+
+```{r}
+#| label: render-thin-lines
+#| echo: true
+#| eval: false
+
+# Very thin lines may not render on screen
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_line(linewidth = 0.1)  # Too thin!
+
+# Looks broken in preview
+# Prints fine
+# Solution: use linewidth ≥ 0.5
+```
+
+## Transparency Rendering
+
+```{r}
+#| label: render-transparency
+#| echo: true
+#| eval: false
+
+# Many semi-transparent points
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(alpha = 0.1, size = 1)
+
+# 10,000 points at 10% transparency
+# May appear as solid blob in some viewers
+# May render slowly
+# But prints correctly!
+```
+
+## Font Substitution
+
+**Problem:**
+
+::: {.incremental}
+- You use specific font (e.g., "Roboto")
+- Viewer doesn't have that font
+- Substitutes different font
+- Spacing/alignment looks wrong
+:::
+
+**Solution:**
+
+```{r}
+#| label: render-font-embed
+#| echo: true
+#| eval: false
+
+# Use cairo_pdf to embed fonts
+ggsave("plot.pdf", p, width = 7, height = 5, device = cairo_pdf)
+```
+
+## Viewer Differences
+
+**Same PDF, different appearance:**
+
+| Viewer | Rendering Quality |
+|--------|-------------------|
+| Adobe Acrobat Reader | ⭐⭐⭐⭐⭐ Excellent |
+| Preview (Mac) | ⭐⭐⭐⭐ Good |
+| Chrome/Firefox | ⭐⭐⭐ Variable |
+| Edge | ⭐⭐⭐ Variable |
+| RStudio Viewer | ⭐⭐ Basic |
+
+## Real-World Example
+
+```{r}
+#| label: render-real-world
+#| echo: true
+#| eval: false
+
+# Create plot with many elements
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_density2d(linewidth = 0.3) +
+  theme_classic(base_size = 9) +
+  theme(panel.border = element_rect(linewidth = 0.25, fill = NA))
+
+ggsave("complex.pdf", p, width = 3.5, height = 3)
+
+# In RStudio viewer: may look messy
+# In Preview: looks OK
+# In Acrobat: looks perfect
+# When printed: looks perfect
+```
+
+## The Border Artifact Issue
+
+**Some viewers show:**
+
+- Jagged borders
+- Gaps between shapes
+- White lines between tiles
+
+```{r}
+#| label: render-tiles
+#| echo: true
+#| eval: false
+
+# Heatmap with tiles
+ggplot(mtcars, aes(wt, mpg, fill = hp)) +
+  geom_tile()
+
+# May show white lines between tiles in viewer
+# These disappear when printed!
+```
+
+## Anti-Aliasing Differences
+
+::: {.columns}
+::: {.column width="50%"}
+**Screen rendering:**
+
+- Uses anti-aliasing
+- Smooths edges
+- Can create "fuzzy" appearance
+- Varies by viewer settings
+:::
+
+::: {.column width="50%"}
+**Print rendering:**
+
+- Higher resolution (300+ DPI)
+- Less/no anti-aliasing needed
+- Crisp edges
+- True to vector instructions
+:::
+:::
+
+## Testing Your Figures
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Always check in Adobe Acrobat** (most accurate)
+2. **Use print preview** (Command/Ctrl + P)
+3. **Test actual printing** on paper
+4. **Check journal's submission system** viewer
+5. **When in doubt, trust print preview**
+:::
+
+## Avoiding Rendering Problems
+
+```{r}
+#| label: render-avoid-problems
+#| echo: true
+#| eval: false
+
+# 1. Use reasonable line widths
+geom_line(linewidth = 0.5)  # Not 0.1
+
+# 2. Use cairo_pdf for better compatibility
+ggsave("plot.pdf", device = cairo_pdf)
+
+# 3. Avoid excessive transparency layering
+# Instead of 10,000 points at alpha=0.1:
+geom_density_2d_filled()  # Computed density
+
+# 4. Use standard fonts
+theme_classic(base_family = "Arial")
+
+# 5. Avoid too-small text
+theme_classic(base_size = 10)  # Not 6
+```
+
+## Communication with Collaborators
+
+**When sharing drafts:**
+
+> "Please open in Adobe Acrobat Reader or check print preview. Some viewers may display rendering artifacts that aren't in the actual PDF."
+
+## The "Looks Wrong" Checklist
+
+**Before panicking:**
+
+::: {.incremental}
+1. ✅ Open in Adobe Acrobat Reader
+2. ✅ Check print preview
+3. ✅ View at 100% zoom (not zoomed way in)
+4. ✅ Try printing one copy
+5. ✅ Check on different device
+:::
+
+::: {.fragment}
+**If it looks good in 3+ of these: it's fine!**
+:::
+
+## Specific Issues and Solutions
+
+### Issue: Thin lines disappear
+
+```{r}
+#| label: render-issue-thin
+#| echo: true
+#| eval: false
+
+# ❌ Bad
+geom_line(linewidth = 0.1)
+
+# ✅ Good
+geom_line(linewidth = 0.5)  # Minimum for reliable rendering
+```
+
+### Issue: Fonts look wrong
+
+```{r}
+#| label: render-issue-fonts
+#| echo: true
+#| eval: false
+
+# ❌ Bad
+ggsave("plot.pdf", device = "pdf")  # Doesn't embed fonts
+
+# ✅ Good
+ggsave("plot.pdf", device = cairo_pdf)  # Embeds fonts
+```
+
+## Advanced: Controlling PDF Version
+
+```{r}
+#| label: render-pdf-version
+#| echo: true
+#| eval: false
+
+# Some journals require specific PDF version
+cairo_pdf("plot.pdf",
+          width = 7, height = 5,
+          version = "1.4")  # PDF 1.4 (Acrobat 5.0)
+
+print(my_plot)
+dev.off()
+```
+
+Check journal requirements!
+
+## Debugging Rendering Issues
+
+```{r}
+#| label: render-debugging
+#| echo: true
+#| eval: false
+
+# Create simplified version to test
+p_simple <- ggplot(head(mtcars, 20), aes(wt, mpg)) +
+  geom_point(size = 3) +
+  theme_classic(base_size = 12)
+
+ggsave("test.pdf", p_simple, device = cairo_pdf)
+
+# If simple version renders correctly:
+# Problem is complexity (too many elements, transparency, etc.)
+
+# If simple version still broken:
+# Problem is likely viewer or device settings
+```
+
+## When to Worry (and When Not To)
+
+::: {.columns}
+::: {.column width="50%"}
+**Don't Worry:**
+
+- Thin lines look broken in RStudio
+- Colors slightly different in browser
+- Slight fuzziness on screen
+- Minor spacing differences
+:::
+
+::: {.column width="50%"}
+**Do Worry:**
+
+- Missing data in Acrobat
+- Can't read text when printed
+- Actual graphical errors
+- Elements overlapping incorrectly
+:::
+:::
+
+## Summary
+
+::: {.callout-important}
+## Key Points
+
+1. **Screen rendering ≠ print output**
+2. **Different viewers = different rendering**
+3. **Adobe Acrobat = most accurate** screen preview
+4. **Print preview = ground truth**
+5. **Use cairo_pdf** for best compatibility
+6. **Avoid very thin lines** (< 0.5 pt)
+7. **When in doubt, print it out!**
+:::
+
+## Trust the Print
+
+::: {.r-fit-text}
+If it prints well, it **is** well.
+:::
+
+::: {.fragment}
+Don't obsess over screen artifacts!
+:::

@@ -1,0 +1,891 @@
+# Color Gradients {background-color="#e74c3c"}
+
+## What is the Rainbow Scale?
+
+```{r}
+#| label: setup-libraries
+#| echo: false
+#| eval: true
+
+library(ggplot2)
+library(patchwork)
+library(mixOmics)
+library(viridis)
+library(scales)
+library(colorspace)
+library(dichromat)
+
+n <- 100      # number of final colors in the gradient
+k <- 10       # number of anchor colors to sample from rainbow()
+
+# Rainbow end point: 5/6 gives red to magenta (full spectrum without wrap-around)
+rainbow_end <- 5/6
+
+# -------------------------------------------------------------------------
+# Helper: Find nearest R named color to a given hex
+# -------------------------------------------------------------------------
+nearest_named_color <- function(hex) {
+  target <- grDevices::col2rgb(hex)[, 1]  # numeric vector length 3
+
+  all_cols <- grDevices::colors()
+  rgb_all <- grDevices::col2rgb(all_cols)  # 3 × N matrix
+
+  # Euclidean RGB distance (broadcast target across columns)
+  dist <- colSums((rgb_all - target)^2)
+
+  all_cols[which.min(dist)]
+}
+
+# -------------------------------------------------------------------------
+# Generate rainbow anchor colors
+# -------------------------------------------------------------------------
+# Use start=0 (red) and end=5/6 (magenta) to get full spectrum without wrap
+anchors_true <- rainbow(k, start = 0, end = rainbow_end)
+
+# Replace each with nearest named color
+anchors_named <- sapply(anchors_true, nearest_named_color)
+
+# Create manual rainbow using colorRampPalette
+manual_crp <- colorRampPalette(anchors_named)
+manual_colors <- manual_crp(n)
+```
+
+**Interactive Challenge: Can you order these colors?**
+
+```{r}
+#| label: rainbow-challenge
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 2
+
+# Randomize the order for the challenge
+set.seed(42)  # for reproducibility
+shuffled_idx <- sample(1:k)
+shuffled_colors <- anchors_named[shuffled_idx]
+
+# Create data for colored circles in random order
+circle_data <- data.frame(
+  x = 1:k,
+  y = 1,
+  color = shuffled_colors,
+  label = paste0(1:k)
+)
+
+ggplot(circle_data, aes(x = x, y = y)) +
+  geom_point(aes(fill = color), shape = 21, size = 25, stroke = 2, color = "white") +
+  geom_text(aes(label = label), size = 8, fontface = "bold", color = "white") +
+  scale_fill_identity() +
+  #scale_x_continuous(breaks = 1:k, labels = 1:k) +
+  theme_void() +
+  coord_fixed(ratio = 8) +
+  theme(
+    plot.margin = margin(0, 0, 0, 10)
+  ) +
+  labs(title = "Put these colors in the correct rainbow order",
+       subtitle = "Write down the correct number order!")
+```
+
+::: {.notes}
+Ask the audience to mentally arrange these numbered colors in rainbow order before revealing the answer.
+:::
+
+## The Correct Rainbow Order
+
+```{r}
+#| label: rainbow-answer
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 2.5
+
+# Show the correct order (reversed to match gradient direction)
+# Use the original shuffled numbers so participants can verify their answers
+anchors_reversed <- rev(anchors_named)
+correct_data <- data.frame(
+  x = rev(1:k),
+  y = 1,
+  color = anchors_reversed,
+  label = paste0(rev(order(shuffled_idx)))
+)
+
+ggplot(correct_data, aes(x = x, y = y)) +
+  geom_point(aes(fill = color), shape = 21, size = 25, stroke = 2, color = "white") +
+  geom_text(aes(label = label), size = 8, fontface = "bold", color = "white") +
+  scale_fill_identity() +
+  scale_x_continuous(breaks = 1:k, labels = rev(correct_data$color), position = "bottom") +
+  theme_void() +
+  coord_fixed(ratio = 8) +
+  theme(
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1, margin = margin(t = 10)),
+    plot.margin = margin(0, 0, 0, 10)
+  ) +
+  labs(title = "Correct Rainbow Order")
+```
+
+**Colors in order:** Red → Orange → Yellow → Green → Cyan → Blue → Purple/Magenta
+
+
+::: {.fragment}
+![](sources/1-s2.0-S0924271622002659-gr1_lrg.jpg)
+:::
+
+::: {.notes}
+Gołębiowska, I., & Çöltekin, A. (2022). What’s wrong with the rainbow? An interdisciplinary review of empirical evidence for and against the rainbow color scheme in visualizations. ISPRS Journal of Photogrammetry and Remote Sensing, 194, 195–208. https://doi.org/10.1016/j.isprsjprs.2022.10.002
+:::
+
+
+## Comparing Rainbow Implementations
+
+
+
+:::: {.columns}
+::: {.column width="50%"}
+
+
+```{r}
+#| label: rainbow-implementations
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+# -------------------------------------------------------------------------
+# Build data frames for ggplot (reversed to match the dot visualization)
+# -------------------------------------------------------------------------
+native <- data.frame(x = n:1, y = 1, color = rev(rainbow(n, end = rainbow_end)))
+manual <- data.frame(x = n:1, y = 1, color = rev(manual_colors))
+jet    <- data.frame(x = n:1, y = 1, color = mixOmics::color.jet(n))
+
+# -------------------------------------------------------------------------
+# Helper plot function
+# -------------------------------------------------------------------------
+make_plot <- function(df, title_text) {
+  ggplot(df, aes(x = x, y = y, fill = color)) +
+    geom_tile() +
+    scale_fill_identity() +
+    theme_void() +
+    labs(title = title_text) +
+    theme(plot.title = element_text(size = 14, hjust = 0.5))
+}
+
+p1 <- make_plot(native, "rainbow()")
+p2 <- make_plot(manual, "Manual colorRampPalette() using nearest R named colors")
+p3 <- make_plot(jet,    "Jet (mixOmics::color.jet)")
+
+# -------------------------------------------------------------------------
+# Combine with patchwork
+# -------------------------------------------------------------------------
+p1 / p2 / p3 +
+  plot_annotation(
+    title = "Comparison of rainbow(), Manual RGB Interpolation, and Jet",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+
+
+
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+
+
+
+
+```{r}
+#| label: rainbow-implementations-desaturated
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+library(colorspace)
+
+# -------------------------------------------------------------------------
+# Build data frames for ggplot (reversed to match the dot visualization)
+# -------------------------------------------------------------------------
+native <- data.frame(x = n:1, y = 1, color = desaturate(rev(rainbow(n, end = rainbow_end))))
+manual <- data.frame(x = n:1, y = 1, color = desaturate(rev(manual_colors)))
+jet    <- data.frame(x = n:1, y = 1, color = desaturate(mixOmics::color.jet(n)))
+
+# -------------------------------------------------------------------------
+# Helper plot function
+# -------------------------------------------------------------------------
+make_plot <- function(df, title_text) {
+  ggplot(df, aes(x = x, y = y, fill = color)) +
+    geom_tile() +
+    scale_fill_identity() +
+    theme_void() +
+    labs(title = title_text) +
+    theme(plot.title = element_text(size = 14, hjust = 0.5))
+}
+
+p1 <- make_plot(native, "rainbow()")
+p2 <- make_plot(manual, "Manual colorRampPalette() using nearest R named colors")
+p3 <- make_plot(jet,    "Jet (mixOmics::color.jet)")
+
+# -------------------------------------------------------------------------
+# Combine with patchwork
+# -------------------------------------------------------------------------
+p1 / p2 / p3 +
+  plot_annotation(
+    title = "Comparison of rainbow(), Manual RGB Interpolation, and Jet",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+
+
+
+:::
+:::
+::::
+
+
+
+
+
+
+
+
+
+
+::: {.callout-note}
+## Why This Order?
+
+This follows the visible light spectrum by **wavelength**:
+
+- Red: ~700 nm (longest)
+- Violet: ~400 nm (shortest)
+
+But wavelength order ≠ perceptual order!
+:::
+
+
+
+## A Tale of Two Colormaps
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: tale-of-two-colormaps-rainbow
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+library(ggplot2)
+library(patchwork)
+
+# Create sample data with smooth gradient
+faithful_plot <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+p1 <- faithful_plot +
+  scale_fill_gradientn(colors = rainbow(256, end = rainbow_end)) +
+  labs(title = "Colormap A: Do you see sharp edges?", subtitle = "Rainbow scale")
+
+p2 <- faithful_plot +
+  scale_fill_viridis_c() +
+  labs(title = "Colormap B: Smooth transitions", subtitle = "Viridis scale")
+
+p1
+```
+
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+```{r}
+#| label: tale-of-two-colormaps-viridis
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p2
+```
+:::
+:::
+:::
+
+
+::: {.fragment}
+**Which one shows the data more accurately?**
+
+The data is **smooth**, yet Colormap A creates false boundaries!
+:::
+
+
+
+## Perceptual Non-Uniformity: Demonstrated
+
+```{r}
+#| label: perceptual-non-uniformity
+#| echo: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
+
+library(ggplot2)
+library(patchwork)
+
+# Create smooth gradient data
+gradient_data <- expand.grid(x = 1:100, y = 1:100)
+gradient_data$z <- with(gradient_data, sin(x/10) * cos(y/10))
+
+base_plot <- ggplot(gradient_data, aes(x, y, fill = z)) +
+  geom_raster() +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold"))
+
+p1 <- base_plot +
+  scale_fill_gradientn(colors = rainbow(7, end = rainbow_end)) +
+  labs(title = "Rainbow: False boundaries appear!",
+       subtitle = "Yellow-green and cyan-blue transitions 'pop'")
+
+p2 <- base_plot +
+  scale_fill_viridis_c() +
+  labs(title = "Viridis: Perceptually uniform",
+       subtitle = "Smooth data looks smooth")
+
+p3 <- base_plot +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(title = "Diverging: Clear zero point",
+       subtitle = "For data with meaningful center")
+
+(p1 | p2 | p3)
+```
+
+**The data is perfectly smooth, yet rainbow creates artificial edges!**
+
+
+## Real world consequences
+
+![](sources/file-20211005-30173-hog6m.avif)
+
+
+::: {.notes}
+https://theconversation.com/how-rainbow-colour-maps-can-distort-data-and-be-misleading-167159
+:::
+
+
+
+
+
+
+
+
+
+
+## Not just spatial data
+
+<div class="image-container" style="--max-width: 1200px; --img-scale: 0.7; position: relative;">
+<div class="cropped fragment fade-out" data-fragment-index="1" style="--crop-width: 62%; position: absolute;">
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+</div>
+</div>
+
+::: {.notes}
+Haseneyer, G., Schmutzer, T., Seidel, M. et al. From RNA-seq to large-scale genotyping - genomics resources for rye (Secale cereale L.). BMC Plant Biol 11, 131 (2011). https://doi.org/10.1186/1471-2229-11-131
+:::
+
+
+## Medical Consequences
+
+
+:::: {.columns}
+:::: {.column width="50%"}
+
+::: {.callout-important}
+## Lives at Stake
+
+**Borkin et al. (2011)** - *IEEE Visualization*
+
+Studied **physicians diagnosing heart disease** using medical imaging:
+
+- Physicians using **jet colormap**: More errors, slower diagnosis
+- Physicians using **perceptually uniform colormaps**: Fewer errors, faster
+
+**Why?**
+
+- Bright yellow appears more "intense" than dark red
+- But dark red represents **higher values** (more critical condition)
+- Perceptual bias leads to misdiagnosis
+
+**Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
+
+:::
+
+::::
+
+:::: {.column width="50%"}
+
+
+![](sources/borkin.png)
+
+::::
+
+
+::::
+
+
+
+
+
+
+## Comparison: Rainbow vs Better Alternatives
+
+```{r}
+#| label: rainbow-vs-alternatives
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+# Helper function to display color scales
+img <- function(obj, nam) {
+  image(1:length(obj), 1, as.matrix(1:length(obj)), col=obj,
+        main = nam, ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+}
+
+n_col <- 128
+
+par(mfrow=c(9, 1), mar=rep(1, 4))
+img(rev(rainbow(n_col, end = rainbow_end)), "rainbow")
+img(rev(mixOmics::color.jet(n_col)), "jet")
+img(rev(turbo(n_col)), "turbo")
+img(rev(heat.colors(n_col)), "heat")
+img(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "ggplot default")
+img(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "brewer blues")
+img(rev(viridis(n_col)), "viridis")
+img(rev(magma(n_col)), "magma")
+img(rev(cividis(n_col)), "cividis")
+```
+
+**Notice how rainbow and heat have sharp transitions while viridis/magma are smooth!**
+
+
+## Desaturated
+
+```{r}
+#| label: rainbow-vs-alternatives-desaturated
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+n_col <- 128
+
+par(mfrow=c(9, 1), mar=rep(1, 4))
+img(desaturate(rev(rainbow(n_col, end = rainbow_end))), "rainbow")
+img(desaturate(rev(mixOmics::color.jet(n_col))), "jet")
+img(desaturate(rev(turbo(n_col))), "turbo")
+img(desaturate(rev(heat.colors(n_col))), "heat")
+img(desaturate(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col)))), "ggplot default")
+img(desaturate(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col))), "brewer blues")
+img(desaturate(rev(viridis(n_col))), "viridis")
+img(desaturate(rev(magma(n_col))), "magma")
+img(desaturate(rev(cividis(n_col))), "cividis")
+```
+
+**Rainbow loses all information when desaturated! Viridis/magma remain readable.**
+
+
+
+
+## The Viridis Color Scales
+
+```{r}
+#| label: viridis-scales
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 9
+
+n_col <- 128
+
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(rev(viridis(n_col)), "viridis")
+img(rev(magma(n_col)), "magma")
+img(rev(plasma(n_col)), "plasma")
+img(rev(inferno(n_col)), "inferno")
+img(rev(cividis(n_col)), "cividis")
+img(rev(mako(n_col)), "mako")
+img(rev(rocket(n_col)), "rocket")
+img(rev(turbo(n_col)), "turbo")
+```
+
+**All viridis scales are perceptually uniform**
+
+## The Viridis Color Scales, desaturated
+
+```{r}
+#| label: viridis-scales-desaturated
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 9
+
+n_col <- 128
+
+par(mfrow=c(8, 1), mar=rep(1, 4))
+img(desaturate(rev(viridis(n_col))), "viridis")
+img(desaturate(rev(magma(n_col))), "magma")
+img(desaturate(rev(plasma(n_col))), "plasma")
+img(desaturate(rev(inferno(n_col))), "inferno")
+img(desaturate(rev(cividis(n_col))), "cividis")
+img(desaturate(rev(mako(n_col))), "mako")
+img(desaturate(rev(rocket(n_col))), "rocket")
+img(desaturate(rev(turbo(n_col))), "turbo")
+```
+
+
+## Green-Blind Vision (Deuteranopia)
+
+```{r}
+#| label: green-blind-vision
+#| echo: false
+#| eval: true
+#| fig-width: 12
+#| fig-height: 8
+
+par(mfrow=c(9, 1), mar=rep(1, 4))
+img(dichromat(rev(rainbow(n_col, end = rainbow_end)), "deutan"), "rainbow")
+img(dichromat(rev(mixOmics::color.jet(n_col)), "deutan"), "jet")
+img(dichromat(rev(turbo(n_col)), "deutan"), "turbo")
+img(dichromat(rev(heat.colors(n_col)), "deutan"), "heat")
+img(dichromat(rev(seq_gradient_pal(low = "#132B43", high = "#56B1F7", space = "Lab")(seq(0, 1, length=n_col))), "deutan"), "ggplot default")
+img(dichromat(gradient_n_pal(brewer_pal(type="seq")(9))(seq(0, 1, length=n_col)), "deutan"), "brewer blues")
+img(dichromat(rev(viridis(n_col)), "deutan"), "viridis")
+img(dichromat(rev(magma(n_col)), "deutan"), "magma")
+img(dichromat(rev(cividis(n_col)), "deutan"), "cividis")
+```
+
+**For ~8% of men, rainbow is nearly useless! Viridis/magma stay distinct.**
+
+
+## Color Scale Comparison: Pros and Cons
+
+<table class="rotated-headers">
+<thead>
+<tr>
+<th></th>
+<th class="rotate"><div><span>Rainbow</span></div></th>
+<th class="rotate"><div><span>Jet</span></div></th>
+<th class="rotate"><div><span>Turbo</span></div></th>
+<th class="rotate"><div><span>Heat</span></div></th>
+<th class="rotate"><div><span>ggplot default</span></div></th>
+<th class="rotate"><div><span>Brewer Blues</span></div></th>
+<th class="rotate"><div><span>Viridis</span></div></th>
+<th class="rotate"><div><span>Magma</span></div></th>
+<th class="rotate"><div><span>Cividis</span></div></th>
+</tr>
+</thead>
+<tbody>
+<tr><th class="row-header">Perceptually uniform</th><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><th class="row-header">Colorblind safe</th><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><th class="row-header">B&W/grayscale safe</th><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><th class="row-header">Good on projectors</th><td>⚠️</td><td>⚠️</td><td>✅</td><td>⚠️</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><th class="row-header">Print friendly</th><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><th class="row-header">Engaging colors</th><td>✅</td><td>✅</td><td>✅</td><td>⚠️</td><td>⚠️</td><td>⚠️</td><td>✅</td><td>✅</td><td>⚠️</td></tr>
+<tr><th class="row-header">Wide color range</th><td>✅</td><td>✅</td><td>✅</td><td>⚠️</td><td>⚠️</td><td>⚠️</td><td>✅</td><td>✅</td><td>⚠️</td></tr>
+<tr><th class="row-header">Recommendation</th><td>❌ AVOID</td><td>❌ AVOID</td><td>⚠️ Careful</td><td>❌ AVOID</td><td>OK</td><td>Good</td><td>✅ DEFAULT</td><td>✅ Great</td><td>✅ Great</td></tr>
+</tbody>
+</table>
+
+
+
+## Viridis Family: Show All Options
+
+```{r}
+#| label: viridis-family-demo
+#| echo: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 10
+
+library(ggplot2)
+library(patchwork)
+
+# Use volcano data for demonstration
+volcano_df <- data.frame(
+  x = rep(1:ncol(volcano), each = nrow(volcano)),
+  y = rep(1:nrow(volcano), ncol(volcano)),
+  z = as.vector(volcano)
+)
+
+base_plot <- ggplot(volcano_df, aes(x, y, fill = z)) +
+  geom_raster() +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5))
+
+p1 <- base_plot + scale_fill_viridis_c(option = "viridis") +
+  labs(title = "viridis (default): Blue → Green → Yellow")
+
+p2 <- base_plot + scale_fill_viridis_c(option = "magma") +
+  labs(title = "magma: Black → Purple → Yellow")
+
+p3 <- base_plot + scale_fill_viridis_c(option = "plasma") +
+  labs(title = "plasma: Purple → Orange → Yellow")
+
+p4 <- base_plot + scale_fill_viridis_c(option = "inferno") +
+  labs(title = "inferno: Black → Red → Yellow")
+
+p5 <- base_plot + scale_fill_viridis_c(option = "cividis") +
+  labs(title = "cividis: Blue → Yellow (colorblind optimized)")
+
+p6 <- base_plot + scale_fill_viridis_c(option = "rocket") +
+  labs(title = "rocket: Black → Purple → Pink")
+
+(p1 | p2) / (p3 | p4) / (p5 | p6)
+```
+
+**All are perceptually uniform and colorblind-friendly!**
+
+## Recommendation for continous scales
+
+**For most use cases:** Use **Viridis** (or Magma/Plasma variants)
+
+**When to use something else:**
+
+- Diverging data (has meaningful center): ColorBrewer diverging (RdBu, RdYlBu)
+- High colorblind audience: Cividis
+- Print-only publication: Brewer Blues or Greens
+
+**Never use:** Rainbow or Jet
+
+
+
+# Colors for qualitative data {background-color="#e74c3c"}
+
+## ColorBrewer: All Palettes
+
+```{r}
+#| label: colorbrewer-palettes
+#| echo: false
+#| eval: true
+#| fig-width: 14
+#| fig-height: 12
+
+library(ggplot2)
+library(RColorBrewer)
+library(patchwork)
+
+# Get ALL ColorBrewer palettes organized by type
+# Sequential palettes
+seq_palettes <- list(
+  "Blues" = brewer.pal(9, "Blues"),
+  "Greens" = brewer.pal(9, "Greens"),
+  "Oranges" = brewer.pal(9, "Oranges"),
+  "Reds" = brewer.pal(9, "Reds"),
+  "Purples" = brewer.pal(9, "Purples"),
+  "Greys" = brewer.pal(9, "Greys"),
+  "YlOrRd" = brewer.pal(9, "YlOrRd"),
+  "YlOrBr" = brewer.pal(9, "YlOrBr"),
+  "YlGnBu" = brewer.pal(9, "YlGnBu"),
+  "YlGn" = brewer.pal(9, "YlGn"),
+  "RdPu" = brewer.pal(9, "RdPu"),
+  "PuRd" = brewer.pal(9, "PuRd"),
+  "PuBuGn" = brewer.pal(9, "PuBuGn"),
+  "PuBu" = brewer.pal(9, "PuBu"),
+  "OrRd" = brewer.pal(9, "OrRd"),
+  "GnBu" = brewer.pal(9, "GnBu"),
+  "BuPu" = brewer.pal(9, "BuPu"),
+  "BuGn" = brewer.pal(9, "BuGn")
+)
+
+# Diverging palettes
+div_palettes <- list(
+  "RdBu" = brewer.pal(11, "RdBu"),
+  "RdYlBu" = brewer.pal(11, "RdYlBu"),
+  "RdYlGn" = brewer.pal(11, "RdYlGn"),
+  "RdGy" = brewer.pal(11, "RdGy"),
+  "PuOr" = brewer.pal(11, "PuOr"),
+  "PRGn" = brewer.pal(11, "PRGn"),
+  "PiYG" = brewer.pal(11, "PiYG"),
+  "BrBG" = brewer.pal(11, "BrBG"),
+  "Spectral" = brewer.pal(11, "Spectral")
+)
+
+# Qualitative palettes (max colors each)
+qual_palettes <- list(
+  "Set1" = brewer.pal(9, "Set1"),
+  "Set2" = brewer.pal(8, "Set2"),
+  "Set3" = brewer.pal(12, "Set3"),
+  "Paired" = brewer.pal(12, "Paired"),
+  "Dark2" = brewer.pal(8, "Dark2"),
+  "Accent" = brewer.pal(8, "Accent"),
+  "Pastel1" = brewer.pal(9, "Pastel1"),
+  "Pastel2" = brewer.pal(8, "Pastel2")
+)
+
+# Create visualization for each palette
+plot_palette <- function(pal_name, colors) {
+  df <- data.frame(
+    x = 1:length(colors),
+    y = 1,
+    color = colors
+  )
+
+  ggplot(df, aes(x = x, y = y, fill = color)) +
+    geom_tile(color = "white", linewidth = 0.5) +
+    scale_fill_identity() +
+    theme_void() +
+    labs(title = pal_name) +
+    theme(plot.title = element_text(size = 8, hjust = 0, face = "bold"))
+}
+
+# Create all plots by type
+seq_plots <- mapply(plot_palette, names(seq_palettes), seq_palettes, SIMPLIFY = FALSE)
+div_plots <- mapply(plot_palette, names(div_palettes), div_palettes, SIMPLIFY = FALSE)
+qual_plots <- mapply(plot_palette, names(qual_palettes), qual_palettes, SIMPLIFY = FALSE)
+
+# Arrange with labels
+library(grid)
+
+seq_wrap <- wrap_plots(seq_plots, ncol = 3) +
+  plot_annotation(subtitle = "Sequential")
+div_wrap <- wrap_plots(div_plots, ncol = 3) +
+  plot_annotation(subtitle = "Diverging")
+qual_wrap <- wrap_plots(qual_plots, ncol = 3) +
+  plot_annotation(subtitle = "Qualitative")
+
+seq_wrap / div_wrap / qual_wrap +
+  plot_annotation(
+    title = "All ColorBrewer Palettes",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"))
+  )
+```
+
+**Explore all palettes at:** [colorbrewer2.org](https://colorbrewer2.org)
+
+## ColorBrewer Website
+
+
+![](sources/colorbrewer.png)
+
+
+## Yellow Color Warning
+
+::: {.callout-warning}
+## The Yellow Problem
+
+Even though ColorBrewer includes yellow in some palettes (e.g., "YlOrRd", "RdYlBu", "Set1"):
+
+**Yellow has serious issues:**
+
+1. **Poor printing**: Yellow can be nearly invisible on white paper
+2. **Projection problems**: On projected slides, yellow often washes out
+3. **Low contrast**: Yellow text on white background is unreadable
+4. **Photocopying**: Disappears when photocopied in B&W
+
+**Recommendation:**
+
+- For presentations: Avoid yellow-heavy palettes
+- For print: Use darker yellows or oranges instead
+- For text: **NEVER** use yellow text on light backgrounds
+:::
+
+**Removing yellow from Set1:**
+
+```{r}
+#| label: remove-yellow-set1
+#| echo: true
+#| eval: false
+
+library(RColorBrewer)
+
+# Set1 has yellow as the 6th color
+set1_colors <- brewer.pal(9, "Set1")
+set1_colors
+# [1] "#E41A1C" "#377EB8" "#4DAF4A" "#984EA3" "#FF7F00" "#FFFF33" "#A65628" "#F781BF" "#999999"
+
+# Remove yellow (position 6)
+set1_no_yellow <- set1_colors[-6]
+
+# Use in ggplot2
+scale_color_manual(values = set1_no_yellow)
+```
+
+
+## Recommendations Summary
+
+::: {.callout-tip}
+## Best Practices for Color
+
+1. **Continuous data**: Viridis family
+   - `scale_fill_viridis_c()` or `scale_color_viridis_c()`
+   - Options: "viridis", "magma", "plasma", "inferno", "cividis"
+
+2. **Diverging data** (meaningful center): ColorBrewer
+   - `scale_fill_distiller(palette = "RdBu")` for continuous
+   - `scale_fill_gradient2()` for custom diverging
+
+3. **Categorical/qualitative data**:
+   - **Viridis**: `scale_fill_viridis_d()` or `scale_color_viridis_d()`
+   - **ColorBrewer**: `scale_fill_brewer(palette = "Set2")` (up to 8-12 categories)
+
+4. **AVOID**:
+   - ❌ Rainbow/jet colormaps
+   - ❌ Red-green combinations (colorblind issue)
+   - ❌ Yellow text or yellow-heavy palettes (visibility issue)
+
+5. **ALWAYS TEST**:
+   - ✅ Grayscale conversion
+   - ✅ Colorblind simulation
+   - ✅ Print preview
+:::
+
+## Quick Reference: Code Examples
+
+```{r}
+#| label: code-examples
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+
+# --- CONTINUOUS DATA ---
+
+# Viridis continuous (best default)
+ggplot(data, aes(x, y, fill = continuous_var)) +
+  geom_raster() +
+  scale_fill_viridis_c(option = "viridis")  # or "magma", "plasma", "cividis"
+
+# ColorBrewer sequential continuous
+ggplot(data, aes(x, y, fill = continuous_var)) +
+  geom_raster() +
+  scale_fill_distiller(palette = "Blues")  # or "YlOrRd", "Greens", etc.
+
+# --- DIVERGING DATA (meaningful center) ---
+
+# ColorBrewer diverging
+ggplot(data, aes(x, y, fill = fold_change)) +
+  geom_raster() +
+  scale_fill_distiller(palette = "RdBu", direction = 1)
+
+# Custom diverging
+ggplot(data, aes(x, y, fill = fold_change)) +
+  geom_raster() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
+
+# --- CATEGORICAL/QUALITATIVE DATA ---
+
+# Viridis discrete
+ggplot(data, aes(x, y, color = category)) +
+  geom_point() +
+  scale_color_viridis_d(option = "viridis")
+
+# ColorBrewer qualitative
+ggplot(data, aes(x, y, color = category)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set2")  # or "Dark2", "Paired", etc.
+```

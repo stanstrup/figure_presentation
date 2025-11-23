@@ -1,0 +1,334 @@
+# Saving Plots in R {background-color="#34495e"}
+
+```{r}
+#| label: setup-saving
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(glue)
+library(tidyverse)
+library(ggpubr)
+library(conflicted)
+conflicts_prefer(dplyr::filter)
+
+# Output directory
+fig_dir <- "plots/06_saving"
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+## The Graphics Device System
+
+**Every plot needs a "device"**
+
+::: {.fragment}
+Device = where R sends the graphics output (device = "the printer")
+
+- Screen (RStudio viewer)
+- PDF file
+- SVG file
+- PNG file
+- JPEG file
+- etc.
+:::
+
+## Old Way: Manual Device Management
+
+```{r}
+#| label: saving-old-way
+#| echo: true
+#| eval: false
+
+pdf("myplot.pdf", width = 7, height = 5)
+  plot(x, y)
+dev.off()  # CRITICAL! Must close device
+```
+
+::: {.callout-note}
+## dev.off() Works with ALL R Plots
+
+The `dev.off()` approach works for:
+
+- Base R plots (`plot()`, `hist()`, `barplot()`, etc.)
+- ggplot2 plots
+- Any R graphics output
+
+**It's universal** - not limited to any specific plotting system!
+:::
+
+::: {.fragment}
+**Problems with manual device management:**
+
+- Easy to forget `dev.off()`
+- Verbose
+- Not intuitive
+- Must manage device lifecycle manually
+:::
+
+## Modern Way: ggsave()
+
+**For ggplot2 objects** (recommended!)
+
+```{r}
+#| label: saving-ggsave-basic
+#| echo: true
+#| eval: false
+
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+# Saves last plot by default
+ggsave("myplot.pdf")
+
+# Better: explicit plot object
+ggsave("myplot.pdf", plot = p, width = 6, height = 4)
+```
+
+No `dev.off()` needed! ✨
+
+### Full Control
+
+```{r}
+#| label: saving-ggsave-full
+#| echo: true
+#| eval: false
+
+ggsave(
+  filename = "figure1.pdf",
+  plot = my_plot,
+  width = 7,
+  height = 5,
+  units = "in",     # or "cm", "mm"
+  dpi = 300,        # for raster formats
+  device = "pdf"    # or "png", "svg", "tiff"
+)
+```
+
+
+
+## Batch Saving: Result
+
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-show-data
+#| echo: true
+#| eval: false
+
+# View the resulting tibble
+plot_data
+```
+
+```
+# A tibble: 3 × 3
+  Species    data               plot
+  <fct>      <list>             <list>
+1 setosa     <tibble [50 × 4]>  <gg>
+2 versicolor <tibble [50 × 4]>  <gg>
+3 virginica  <tibble [50 × 4]>  <gg>
+```
+
+**Each row contains:**
+
+- Species name
+- Nested data for that species
+- A ggplot object with regression
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-example-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 4.5
+#| message: false
+#| warning: false
+
+library(ggpubr)
+
+# Example for setosa
+iris_setosa <- iris %>% filter(Species == "setosa")
+
+ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(size = 2, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred",
+              formula = y ~ x) +
+  stat_regline_equation(
+    aes(label = after_stat(eq.label)),
+    formula = y ~ x,
+    label.x.npc = 0.98,
+    label.y.npc = 0.95,
+    hjust = 1
+  ) +
+  stat_cor(
+    aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
+    label.x.npc = 0.98,
+    label.y.npc = 0.88,
+    hjust = 1
+  ) +
+  labs(title = "Iris setosa",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)") +
+  theme_classic(base_size = 11)
+```
+
+**Example:** Setosa species plot
+:::
+:::
+
+## File Organization
+
+```{r}
+#| label: saving-organization
+#| echo: true
+#| eval: false
+
+library(glue)
+
+# Good practice: separate directory
+fig_dir <- "figures"
+dir.create(fig_dir, showWarnings = FALSE)
+
+ggsave(glue("{fig_dir}/figure1.pdf"), p1, width = 7, height = 5)
+ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
+
+# Save both vector and raster versions!
+```
+
+
+
+## Using magick for Conversion
+
+```{r}
+#| label: saving-magick-convert
+#| echo: true
+#| eval: false
+
+library(magick)
+
+# Convert PDF to 300 DPI PNG
+img <- image_read_pdf("plot.pdf", density = 300)
+image_write(img, "plot.png", format = "png", quality = 100)
+
+# With better antialiasing (remove alpha channel)
+img <- image_read_pdf("plot.pdf", density = 300)
+img <- image_background(img, "white")  # Remove alpha
+image_write(img, "plot.png", format = "png", quality = 100)
+
+# Batch convert all PDFs in directory
+pdf_files <- list.files(pattern = "\\.pdf$")
+for (file in pdf_files) {
+  img <- image_read_pdf(file, density = 300)
+  img <- image_background(img, "white")
+  out_file <- sub("\\.pdf$", ".png", file)
+  image_write(img, out_file, format = "png", quality = 100)
+}
+```
+
+## Batch Saving Multiple Plots
+
+::: {.columns}
+::: {.column width="60%"}
+
+
+**Make a plotting function**
+```{r}
+#| label: saving-batch-fun
+#| echo: true
+#| eval: true
+
+make_species_plot <- function(data, species) {
+  ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
+    geom_point(size = 2, color = "steelblue") +
+    geom_smooth(method = "lm", se = TRUE, color = "darkred", formula = y ~ x) +
+    labs(title = glue("Iris {species}"), x = "Sepal Length (cm)", y = "Sepal Width (cm)") +
+    theme_classic(base_size = 12)
+}
+```
+
+\
+
+**Nest data per Species**
+```{r}
+#| label: saving-batch
+#| echo: true
+#| eval: true
+
+# Nest data by Species and apply plotting function
+plot_data <- iris %>%
+  nest(data = -Species) %>%
+  mutate(plot = map2(data, Species, make_species_plot))
+```
+
+\
+
+**Write out to separate file per Species**
+
+```{r}
+#| label: saving-batch-save
+#| echo: true
+#| eval: false
+
+# Save all plots using walk2
+walk2(plot_data$plot, plot_data$Species, ~ggsave(
+  filename = glue("{fig_dir}/iris_{..2}.pdf"),
+  plot = ..1,
+  width = 6, height = 5
+))
+```
+
+:::
+
+::: {.column width="40%"}
+
+```{r}
+#| label: saving-batch-tbl
+#| echo: false
+#| eval: true
+
+plot_data
+```
+
+```{r}
+#| label: saving-batch-tbl-sep
+#| echo: true
+#| eval: true
+head(plot_data$data[[1]])
+```
+
+
+
+\
+
+```{r}
+#| label: saving-batch-show
+#| echo: true
+#| eval: true
+#| fig-width: 5
+#| fig-height: 3
+
+plot_data$plot[[1]]
+```
+
+
+:::
+:::
+
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Always use ggsave()** for ggplot2 (not manual devices)
+2. **Always specify width, height, units and DPI (for raster output)**
+3. **Increase DPI from the default** for all raster formats set ≥300
+4. **Use cairo_pdf** for PDF output
+5. **Save both PDF and PNG** versions
+6. **Organize** figures in dedicated directory
+:::

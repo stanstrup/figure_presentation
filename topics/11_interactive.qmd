@@ -1,0 +1,513 @@
+# Interactive Plots {background-color="#27ae60"}
+
+## The Appeal of Interactivity
+
+**Why use interactive plots?**
+
+::: {.incremental}
+- 🖱️ Hover to see exact values
+- 🔍 Zoom and pan
+- 👁️ Toggle traces on/off
+- 📊 Great for exploration
+- 🎯 Excellent for presentations
+:::
+
+## plotly and ggplotly
+
+**Two approaches:**
+
+::: {.columns}
+::: {.column width="50%"}
+**ggplotly()**
+
+```{r}
+#| label: interactive-ggplotly-basic
+#| echo: true
+#| eval: false
+
+library(plotly)
+
+p <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point()
+
+ggplotly(p)
+```
+
+Convert ggplot2 to interactive!
+:::
+
+::: {.column width="50%"}
+**plot_ly()**
+
+```{r}
+#| label: interactive-plotly-basic
+#| echo: true
+#| eval: false
+
+library(plotly)
+
+plot_ly(data,
+  x = ~x, y = ~y,
+  type = 'scatter',
+  mode = 'markers')
+```
+
+Build interactively from scratch
+:::
+:::
+
+## Basic ggplotly Example
+
+```{r}
+#| label: interactive-example
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+library(plotly)
+
+# Create ggplot
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_brewer(palette = "Set1") +
+  theme_minimal() +
+  labs(title = "Fuel Efficiency by Weight",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon",
+       color = "Cylinders")
+
+# Make interactive
+ggplotly(p)
+```
+
+Try hovering over points!
+
+## Customizing Tooltips
+
+```{r}
+#| label: interactive-tooltips
+#| echo: true
+#| eval: false
+
+# Control what appears on hover
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl),
+                        text = paste("Car:", rownames(mtcars),
+                                   "<br>HP:", hp))) +
+  geom_point(size = 3)
+
+ggplotly(p, tooltip = c("text", "x", "y"))
+
+# Now hover shows car name and horsepower!
+```
+
+## The Saving Problem
+
+::: {.callout-warning}
+## Challenge
+
+Interactive plots are **HTML widgets**, not static images!
+
+Can't just save as PDF or PNG traditionally.
+:::
+
+## Solution 1: Save as HTML (Keep Interactivity)
+
+```{r}
+#| label: interactive-save-html
+#| echo: true
+#| eval: false
+
+library(htmlwidgets)
+
+# Create a plot and make it interactive
+p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  theme_minimal()
+
+p_interactive <- ggplotly(p)
+
+# Save as self-contained HTML
+saveWidget(p_interactive,
+           "interactive_plot.html",
+           selfcontained = TRUE)
+
+# Can email this file or put on website!
+# Opens in any web browser
+```
+
+## Solution 2: Static Snapshot
+
+**Requires kaleido (Python)**
+
+First, install kaleido:
+
+```bash
+# In terminal
+pip install kaleido
+```
+
+Then in R:
+
+```{r}
+#| label: interactive-save-static
+#| echo: true
+#| eval: false
+
+library(plotly)
+
+# Save static image
+save_image(p_interactive,
+           "plot.png",
+           width = 800,
+           height = 600)
+
+# Can also save as PDF, SVG, etc.
+save_image(p_interactive, "plot.pdf")
+```
+
+## Solution 3: Screenshot (Quick & Dirty)
+
+**In plotly viewer:**
+
+1. Hover over plot
+2. Click camera icon 📷 (top-right)
+3. Downloads PNG
+
+**Pros:** Quick
+
+**Cons:** Not reproducible, fixed resolution
+
+## When to Use Interactive vs. Static
+
+::: {.columns}
+::: {.column width="50%"}
+**Use Interactive:**
+
+- HTML reports (R Markdown)
+- Quarto documents
+- Lab presentations
+- Exploratory analysis
+- Supplementary materials
+- Websites
+:::
+
+::: {.column width="50%"}
+**Use Static:**
+
+- Journal publications
+- Print posters
+- PowerPoint (sometimes)
+- PDF reports
+- When file size matters
+:::
+:::
+
+## R Markdown Integration
+
+````markdown
+```{r, echo=FALSE, message=FALSE}
+library(plotly)
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+ggplotly(p)
+```
+````
+
+When you knit to HTML, plot is interactive!
+
+When you knit to PDF, automatically becomes static.
+
+## Quarto Integration
+
+````markdown
+---
+title: "My Report"
+format: html
+---
+
+```{r}
+#| label: interactive-plot
+#| fig-cap: "Interactive scatter plot"
+
+library(plotly)
+library(ggplot2)
+
+# Create plot
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
+
+# Make it interactive
+ggplotly(p)
+```
+````
+
+Perfect for modern scientific reports!
+
+## Advanced plotly Features
+
+```{r}
+#| label: interactive-advanced
+#| echo: true
+#| eval: false
+
+# Add buttons for different views
+p <- plot_ly(mtcars, x = ~wt, y = ~mpg, type = 'scatter', mode = 'markers')
+
+p %>% layout(
+  updatemenus = list(
+    list(
+      buttons = list(
+        list(method = "restyle", args = list("type", "scatter"),
+             label = "Scatter"),
+        list(method = "restyle", args = list("type", "box"),
+             label = "Box")
+      )
+    )
+  )
+)
+```
+
+## 3D Plots
+
+```{r}
+#| label: interactive-3d
+#| echo: true
+#| eval: false
+
+# 3D scatter plot
+plot_ly(mtcars,
+        x = ~wt, y = ~hp, z = ~mpg,
+        color = ~factor(cyl),
+        type = "scatter3d",
+        mode = "markers")
+
+# Rotate by clicking and dragging!
+```
+
+Great for exploring multivariate data
+
+## Linked Plots (crosstalk)
+
+```{r}
+#| label: interactive-crosstalk
+#| echo: true
+#| eval: false
+
+library(crosstalk)
+
+# Create shared data
+shared_data <- SharedData$new(mtcars)
+
+# Two linked plots
+p1 <- plot_ly(shared_data, x = ~wt, y = ~mpg, type = 'scatter')
+p2 <- plot_ly(shared_data, x = ~hp, y = ~mpg, type = 'scatter')
+
+# Display side-by-side
+subplot(p1, p2)
+
+# Selecting points in one highlights in both!
+```
+
+## Time Series with Range Slider
+
+```{r}
+#| label: interactive-timeseries
+#| echo: true
+#| eval: false
+
+# Stock price example (using built-in data)
+ts_data <- data.frame(date = seq(as.Date("2023-01-01"), length.out = 252, by = "day"), price = cumsum(rnorm(252)))
+plot_ly(ts_data, x = ~date, y = ~price, type = 'scatter', mode = 'lines') %>%
+  layout(
+    xaxis = list(
+      rangeselector = list(
+        buttons = list(
+          list(count = 1, label = "1m", step = "month", stepmode = "backward"),
+          list(count = 6, label = "6m", step = "month", stepmode = "backward"),
+          list(count = 1, label = "1y", step = "year", stepmode = "backward"),
+          list(step = "all", label = "All")
+        )
+      ),
+      rangeslider = list(visible = TRUE)
+    )
+  )
+```
+
+## Animations
+
+```{r}
+#| label: interactive-animations
+#| echo: true
+#| eval: false
+
+# Animated scatter plot (e.g., by year)
+plot_ly(gapminder,
+        x = ~gdpPercap, y = ~lifeExp,
+        size = ~pop, color = ~continent,
+        frame = ~year,  # Animate over years
+        text = ~country,
+        type = 'scatter', mode = 'markers') %>%
+  layout(xaxis = list(type = "log"))
+
+# Play button appears automatically!
+```
+
+## File Size Considerations
+
+**Interactive HTML can be large:**
+
+```{r}
+#| label: interactive-filesize
+#| echo: true
+#| eval: false
+
+# For large datasets, sample for interactive version
+library(dplyr)
+mtcars_sample <- mtcars %>% slice_sample(n = nrow(mtcars))  # mtcars is small, so no real sampling needed
+
+p <- ggplot(mtcars_sample, aes(wt, mpg)) + geom_point()
+ggplotly(p)
+
+# Keep full dataset for static publication figure
+```
+
+## Hybrid Approach: Both Versions
+
+```{r}
+#| label: interactive-hybrid
+#| echo: true
+#| eval: false
+
+# Create base plot
+p_static <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  theme_classic(base_size = 12)
+
+# Static version for publication
+ggsave("figure1.pdf", p_static, width = 7, height = 5)
+
+# Interactive version for supplement/website
+p_interactive <- ggplotly(p_static)
+saveWidget(p_interactive, "figure1_interactive.html")
+
+# Best of both worlds!
+```
+
+## Sharing Interactive Plots
+
+**Options:**
+
+1. **Email HTML file** (if selfcontained = TRUE)
+2. **Upload to web server**
+3. **GitHub Pages** (free hosting)
+4. **RPubs** (publish directly from RStudio)
+5. **Shiny app** (for more complex interactions)
+
+## Publishing to RPubs
+
+```{r}
+#| label: interactive-rpubs
+#| echo: true
+#| eval: false
+
+# In R Markdown document with interactive plots
+
+# Click "Knit" button
+# Then click "Publish" button
+# Select RPubs
+# Get public URL to share!
+```
+
+## Limitations of ggplotly
+
+**Not all ggplot2 features convert:**
+
+- Some geoms don't translate well
+- Complex annotations may be lost
+- Custom themes partially supported
+- Facets work but can be slow
+
+**Test your conversion!**
+
+## Alternative: ggiraph
+
+```{r}
+#| label: interactive-ggiraph
+#| echo: true
+#| eval: false
+
+library(ggiraph)
+
+# Create plot with interactive elements
+mtcars$car_name <- rownames(mtcars)
+p <- ggplot(mtcars, aes(wt, mpg,
+                        tooltip = car_name,
+                        data_id = car_name)) +
+  geom_point_interactive(size = 3)
+
+girafe(ggobj = p)
+
+# Hover to see tooltips
+# Click to select
+```
+
+Better ggplot2 compatibility than plotly!
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Interactive for exploration** and presentations
+2. **Static for publications** and print
+3. **Save HTML** to preserve interactivity
+4. **Sample large datasets** to keep HTML file manageable
+5. **Create both versions** when possible
+6. **Test thoroughly** - not all features convert
+7. **Consider audience** - do they have web browser?
+:::
+
+## Complete Example
+
+```{r}
+#| label: interactive-complete-example
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+
+# 1. Create publication-quality static plot
+p_static <- ggplot(iris, aes(Sepal.Length, Sepal.Width,
+                             color = Species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_brewer(palette = "Set1") +
+  theme_classic(base_size = 11) +
+  labs(title = "Iris Measurements",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)")
+
+# 2. Save static version (for paper)
+ggsave("iris_static.pdf", p_static, width = 5, height = 4)
+
+# 3. Create interactive version (for supplement)
+p_interactive <- ggplotly(p_static) %>%
+  layout(hovermode = "closest")
+
+# 4. Save interactive version
+saveWidget(p_interactive, "iris_interactive.html", selfcontained = TRUE)
+
+# Now you have both!
+```
+
+## Key Takeaways
+
+::: {.callout-important}
+## Remember
+
+- Interactive plots are **HTML widgets**, not images
+- Use `saveWidget()` to save with interactivity
+- Use `save_image()` for static snapshot (requires kaleido)
+- **Both formats have their place** - create both!
+- Interactive excellent for **exploration**, static for **publication**
+:::

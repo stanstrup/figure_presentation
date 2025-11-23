@@ -1,0 +1,345 @@
+# Heatmap Scaling {background-color="#e67e22"}
+
+## The Outlier Problem
+
+**Scenario**: Gene expression data
+
+- 99% of values: -2 to +2
+- 1 outlier gene: +20
+
+::: {.fragment}
+**What happens with default scaling?**
+
+Color scale: -20 to +20
+
+Result: Everything looks the same color! 😱
+:::
+
+## Visual Example: The Outlier Effect
+
+```{r}
+#| label: setup-heatmaps
+#| echo: false
+#| eval: true
+
+library(ggplot2)
+library(pheatmap)
+library(RColorBrewer)
+library(patchwork)
+```
+
+```{r}
+#| label: heatmap-outlier-example
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Simulate data with outlier
+set.seed(123)
+expr_matrix <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
+rownames(expr_matrix) <- paste0("Gene", 1:10)
+colnames(expr_matrix) <- paste0("Sample", 1:10)
+expr_matrix[5, 5] <- 20  # One extreme outlier
+
+# Default heatmap - terrible!
+pheatmap(expr_matrix, main = "With outlier: All data compressed!")
+```
+
+::: {.fragment}
+99% of your data is invisible due to 1 outlier!
+:::
+
+## The Problem Illustrated
+
+::: {.columns}
+::: {.column width="50%"}
+**Without Outlier Handling**
+
+- Scale: -20 to +20
+- Most data: -2 to +2
+- Uses only 20% of color range
+- Real patterns invisible
+:::
+
+::: {.column width="50%"}
+**With Proper Scaling**
+
+- Scale: -3 to +3 (capped)
+- Most data: -2 to +2
+- Uses 100% of color range
+- Patterns visible!
+:::
+:::
+
+## The Dendrogram Scaling Trap
+
+::: {.callout-warning}
+## Hidden Technical Issue
+
+**Critical R bug**: Functions like `heatmap()`, `heatmap.2()`, and `heatplot()` have a dangerous inconsistency:
+
+- The `scale` parameter affects **color visualization**
+- But **NOT** dendrogram calculation!
+
+**Result**: Dendrograms cluster on unscaled data while colors show scaled data!
+:::
+
+## Why Scaling Matters for Clustering
+
+```{r}
+#| label: scaling-demo
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# Create data where scaling matters
+set.seed(42)
+# Variable 1: mean 0, sd 1
+# Variable 2: mean 100, sd 10 (different scale!)
+demo_data <- data.frame(
+  var1 = rnorm(50, mean = 0, sd = 1),
+  var2 = rnorm(50, mean = 100, sd = 10)
+)
+
+# Without scaling: var2 dominates distance calculations
+# With scaling: both variables contribute equally
+
+p1 <- ggplot(demo_data, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Unscaled: var2 dominates",
+       subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
+  theme_classic()
+
+demo_scaled <- as.data.frame(scale(demo_data))
+p2 <- ggplot(demo_scaled, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Scaled: Equal contribution",
+       subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
+  theme_classic()
+
+p1 + p2
+```
+
+## Solution 1: Standard Deviation Cutoffs
+
+```{r}
+#| label: sd-cutoff
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Cap at ±2 SD
+mean_val <- mean(expr_matrix, na.rm = TRUE)
+sd_val <- sd(expr_matrix, na.rm = TRUE)
+
+expr_capped <- pmin(pmax(expr_matrix, mean_val - 2*sd_val),
+                    mean_val + 2*sd_val)
+
+pheatmap(expr_capped,
+         main = "Values capped at ±2 SD")
+```
+
+Most common: ±2 or ±3 SD cutoff
+
+## Solution 2: Quantile-Based
+
+```{r}
+#| label: quantile-cutoff
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Cap at 5th and 95th percentiles
+lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
+upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
+
+expr_quantile <- pmin(pmax(expr_matrix, lower), upper)
+
+pheatmap(expr_quantile,
+         main = "Values capped at 5-95 percentiles")
+```
+
+Robust to extreme outliers
+
+## Solution 3: Manual Breaks
+
+```{r}
+#| label: manual-breaks
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Define your own color breaks
+breaks <- seq(-3, 3, length.out = 100)
+
+pheatmap(expr_matrix,
+         breaks = breaks,
+         main = "Custom breaks: -3 to +3")
+
+# Values outside range automatically assigned to extremes
+```
+
+Full control over color mapping
+
+## Solution 4: Log Transformation
+
+**For positive values only** (e.g., counts, intensities)
+
+```{r}
+#| label: log-transform
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Create positive data (e.g., count data)
+set.seed(123)
+count_matrix <- matrix(rpois(100, lambda = 50), nrow = 10)
+count_matrix[5, 5] <- 5000  # Extreme count
+rownames(count_matrix) <- paste0("Gene", 1:10)
+colnames(count_matrix) <- paste0("Sample", 1:10)
+
+# Log transform BEFORE plotting
+count_log <- log10(count_matrix + 1)  # +1 to handle zeros
+
+pheatmap(count_log,
+         main = "Log10 transformed counts")
+```
+
+## Proper Heatmap Workflow
+
+::: {.callout-important}
+## The Right Approach
+
+1. **Scale your data FIRST** (before creating heatmap)
+2. **Calculate dendrograms on scaled data**
+3. **Pass pre-calculated dendrograms to heatmap function**
+4. **Set `scale = "none"`** in heatmap call
+
+```r
+# Proper workflow
+data_scaled <- t(scale(t(expr_matrix)))  # Scale by row
+data_capped <- pmin(pmax(data_scaled, -3), 3)  # Cap extremes
+
+# Calculate dendrograms on scaled data
+row_dend <- hclust(dist(data_capped))
+col_dend <- hclust(dist(t(data_capped)))
+
+# Plot with pre-computed dendrograms
+pheatmap(data_capped,
+         cluster_rows = row_dend,
+         cluster_cols = col_dend,
+         scale = "none")  # Already scaled!
+```
+:::
+
+## Complete Example: Proper Scaling
+
+```{r}
+#| label: proper-scaling-example
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Step 1: Scale by row (gene)
+data_scaled <- t(scale(t(expr_matrix)))
+
+# Step 2: Cap extremes at ±2.5
+data_capped <- pmin(pmax(data_scaled, -2.5), 2.5)
+
+# Step 3: Calculate dendrograms on scaled data
+row_dend <- hclust(dist(data_capped))
+col_dend <- hclust(dist(t(data_capped)))
+
+# Step 4: Plot with consistent scaling
+pheatmap(data_capped,
+         cluster_rows = row_dend,
+         cluster_cols = col_dend,
+         scale = "none",
+         color = colorRampPalette(brewer.pal(11, "RdBu"))(100),
+         main = "Properly scaled: dendrograms match colors!")
+```
+
+## Diverging Scales for Centered Data
+
+```{r}
+#| label: diverging-scale
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# When zero is meaningful (fold-change, z-scores, etc.)
+pheatmap(data_capped,
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-2.5, 2.5, length.out = 101),
+         main = "Diverging scale: zero = white")
+
+# Zero = white, negative = blue, positive = red
+```
+
+## When NOT to Cap
+
+::: {.callout-warning}
+## Don't cap blindly!
+
+- If outliers are **biologically meaningful** (rare events)
+- Small datasets where each value matters
+- When you want to highlight extreme values
+
+**Alternative**: Use asterisks or separate panel for outliers
+:::
+
+## Comparison: Before and After
+
+```{r}
+#| label: heatmap-comparison
+#| echo: true
+#| eval: true
+#| fig-width: 14
+#| fig-height: 6
+
+# Side-by-side comparison
+library(gridExtra)
+
+# Before: with outlier
+p1 <- pheatmap(expr_matrix, main = "Uncapped: Pattern lost", silent = TRUE)
+
+# After: outlier capped
+p2 <- pheatmap(data_capped, main = "Capped at ±2.5 SD: Patterns visible", silent = TRUE)
+
+grid.arrange(p1[[4]], p2[[4]], ncol = 2)
+```
+
+## Color Scale Considerations
+
+::: {.callout-important}
+## Critical Elements
+
+1. **Always include color scale bar** with numeric labels
+2. **Center at meaningful value** (often zero for diverging data)
+3. **Label extremes if capped**: "<-2.5" or ">+2.5"
+4. **Use appropriate palette**:
+   - Diverging for data with meaningful zero (red-white-blue)
+   - Sequential for one-directional (viridis)
+:::
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Inspect data distribution** before making heatmap
+2. **Cap at 2-3 SD** for large datasets with outliers
+3. **Use quantiles** (5-95%) for robustness
+4. **Always annotate** what you did: "Values capped at ±2 SD"
+5. **Include color scale** with actual values
+6. **Scale data BEFORE** passing to heatmap function
+7. **Calculate dendrograms** on the same scaled data
+:::

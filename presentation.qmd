@@ -1,0 +1,137 @@
+---
+format:
+  revealjs:
+    theme: dark
+    css: custom.css
+    slide-number: true
+    chalkboard: true
+    preview-links: auto
+    footer: "Academic Figure Pitfalls"
+    code-fold: false
+    code-overflow: wrap
+    fig-width: 8
+    fig-height: 5
+keep-md: true
+keep-source: true
+---
+
+# Academic Figures: Common Pitfalls and Best Practices {.title-slide}
+
+::: {.fragment}
+*Things that annoy me - An opinionated guide*
+:::
+
+**Jan Stanstrup**
+
+# Introduction {background-color="#2c3e50"}
+
+## Why This Matters
+
+::: {.incremental}
+- Figures are often the first (and sometimes only) thing readers look at
+
+- Poor quality figures look unprofessional
+- Low resolution images look bad when scaled up (e.g. posters)
+
+- Bad visualizations can be misleading
+:::
+
+## What We'll Cover
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Do it right**
+
+1. Color Gradients
+2. Heatmap Scaling
+3. File Formats
+
+:::
+
+::: {.column width="50%"}
+
+**Do it easily**
+
+4. Text Sizing
+5. Themes & Styling
+6. Saving Plots
+7. Factor Ordering
+
+8. Post-Processing
+9. PowerPoint Import
+10. Rendering Issues
+
+11. Interactive Plots
+
+:::
+::::
+
+
+
+{{< include topics/01_colors.qmd >}}
+
+
+
+{{< include topics/02_heatmaps.qmd >}}
+
+
+
+{{< include topics/03_formats.qmd >}}
+
+
+
+{{< include topics/04_sizing.qmd >}}
+
+
+
+{{< include topics/05_themes.qmd >}}
+
+
+
+{{< include topics/06_saving.qmd >}}
+
+
+
+{{< include topics/07_editing.qmd >}}
+
+
+
+{{< include topics/08_factors.qmd >}}
+
+
+
+{{< include topics/09_powerpoint.qmd >}}
+
+
+
+{{< include topics/10_rendering.qmd >}}
+
+
+
+{{< include topics/11_interactive.qmd >}}
+
+
+
+# Summary {background-color="#2c3e50"}
+
+## Key Takeaways
+
+::: {.incremental}
+- **Format**: Vector for plots (PDF/SVG), high-res raster for photos (PNG/TIFF)
+- **Colors**: Avoid rainbow, use viridis/ColorBrewer, test for colorblindness
+- **Sizing**: Set text sizes explicitly for final dimensions
+- **Saving**: Use `ggsave()` with proper DPI and dimensions
+- **Reproducibility**: Keep R scripts as source of truth
+:::
+
+## Resources
+
+- ColorBrewer: [colorbrewer2.org](https://colorbrewer2.org)
+- Colorblind simulator: [coblis.org](https://www.coblis.com)
+- "Fundamentals of Data Visualization" by Claus Wilke
+- ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
+- https://clauswilke.com/dataviz
+- https://www.nature.com/articles/s41467-020-19160-7?utm_source=chatgpt.com
+
+Slides: github.com/yourrepo

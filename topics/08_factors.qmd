@@ -1,0 +1,520 @@
+# Factor Ordering {background-color="#2980b9"}
+
+## The Alphabetical Problem
+
+**R's default behavior:**
+
+```{r}
+#| label: factors-default-behavior
+#| echo: true
+#| eval: false
+
+categories <- c("High", "Medium", "Low", "Very High")
+factor(categories)
+# Levels: High Low Medium Very High
+
+# Alphabetical! Not logical! 😞
+```
+
+## Visual Impact
+
+::: {.columns}
+::: {.column width="50%"}
+**Alphabetical (bad):**
+
+```
+High
+Low
+Medium
+Very High
+```
+
+Nonsensical!
+:::
+
+::: {.column width="50%"}
+**Logical (good):**
+
+```
+Low
+Medium
+High
+Very High
+```
+
+Makes sense!
+:::
+:::
+
+## Why This Matters
+
+::: {.incremental}
+- **Bar charts**: Random bar order confuses readers
+- **Legends**: Illogical color assignment
+- **Line plots**: Colors don't match expectations
+- **Facets**: Panels in wrong sequence
+- **Boxplots**: Treatments in random order
+:::
+
+## Solution 1: Manual Ordering
+
+```{r}
+#| label: factors-manual-ordering
+#| echo: true
+#| eval: true
+
+library(ggplot2)
+
+# Specify levels explicitly
+category_df <- data.frame(
+  category = c("Low", "Medium", "High", "Very High", "Low", "High"),
+  value = c(10, 20, 15, 30, 12, 25)
+)
+
+category_df$category <- factor(category_df$category,
+                       levels = c("Low", "Medium", "High", "Very High"))
+
+# Now plots will use this order!
+ggplot(category_df, aes(x = category, y = value)) +
+  geom_col()
+```
+
+Full control over order
+
+## Solution 2: forcats Package
+
+**Part of tidyverse, designed for factor manipulation**
+
+```{r}
+#| label: factors-forcats-intro
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+# Reorder by another variable (e.g., median)
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg, .fun = median)) %>%
+  ggplot(aes(cyl_group, mpg)) +
+  geom_boxplot()
+
+# Boxplots now ordered by median value!
+```
+
+## fct_reorder(): Order by Another Variable
+
+```{r}
+#| label: factors-fct-reorder
+#| echo: true
+#| eval: false
+
+# Order categories by mean of values
+mtcars %>%
+  mutate(cyl_group = factor(cyl)) %>%
+  group_by(cyl_group) %>%
+  summarise(mean_mpg = mean(mpg)) %>%
+  ungroup() %>%
+  mutate(cyl_group = fct_reorder(cyl_group, mean_mpg, mean)) %>%
+  ggplot(aes(x = cyl_group, y = mean_mpg, fill = cyl_group)) +
+  geom_col() +
+  coord_flip()  # Horizontal bars easier to read
+```
+
+Bars ordered by height!
+
+## fct_infreq(): Order by Frequency
+
+```{r}
+#| label: factors-fct-infreq
+#| echo: true
+#| eval: false
+
+# Order by how common each level is
+ggplot(mtcars, aes(x = fct_infreq(factor(cyl)))) +
+  geom_bar() +
+  labs(x = "Cylinders") +
+  coord_flip()
+
+# Most common category first!
+```
+
+Great for survey data
+
+## fct_rev(): Reverse Order
+
+```{r}
+#| label: factors-fct-rev
+#| echo: true
+#| eval: false
+
+# Sometimes you want reverse order
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg) %>% fct_rev()) %>%
+  ggplot(aes(x = cyl_group, y = mpg)) +
+  geom_col()
+
+# Now highest values first instead of last
+```
+
+## fct_relevel(): Move Specific Levels
+
+```{r}
+#| label: factors-fct-relevel
+#| echo: true
+#| eval: false
+
+# Move "4" to front for cylinders
+mtcars %>%
+  mutate(cyl_group = fct_relevel(factor(cyl), "4")) %>%
+  ggplot(aes(cyl_group, mpg)) +
+  geom_boxplot()
+
+# 4-cylinder always shown first
+```
+
+Common in experimental data!
+
+## Common Use Case: Ordered Bar Chart
+
+```{r}
+#| label: factors-ordered-bar
+#| echo: true
+#| eval: false
+
+# Calculate summary statistics
+summary_data <- mtcars %>%
+  mutate(cyl_group = factor(cyl)) %>%
+  group_by(cyl_group) %>%
+  summarise(mean_mpg = mean(mpg), .groups = "drop")
+
+# Plot with bars ordered by height
+ggplot(summary_data,
+       aes(x = fct_reorder(cyl_group, mean_mpg), y = mean_mpg)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Horizontal bars
+  labs(x = "Cylinders", y = "Mean MPG") +
+  theme_minimal()
+```
+
+Much easier to read than alphabetical!
+
+## Time-Based Ordering
+
+```{r}
+#| label: factors-time-ordering
+#| echo: true
+#| eval: false
+
+# Create data with months
+month_data <- data.frame(
+  month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+  value = c(10, 15, 12, 18, 20, 17)
+)
+
+# Months in calendar order (not alphabetical!)
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+month_data$month <- factor(month_data$month, levels = months)
+
+# Now plots show Jan, Feb, Mar... not alphabetical!
+ggplot(month_data, aes(month, value)) +
+  geom_line(group = 1)
+```
+
+## Legend Ordering
+
+```{r}
+#| label: factors-legend-ordering
+#| echo: true
+#| eval: false
+
+# Order legend by maximum mpg of each cylinder group
+mtcars$cyl_group <- factor(mtcars$cyl)
+ggplot(mtcars, aes(x = wt,
+                 y = mpg,
+                 color = fct_reorder(cyl_group, mpg, max, .desc = TRUE))) +
+  geom_point(size = 2) +
+  labs(color = "Cylinders") +
+  theme_minimal()
+
+# Legend now shows groups in order of importance!
+```
+
+## Facet Ordering
+
+```{r}
+#| label: factors-facet-ordering
+#| echo: true
+#| eval: false
+
+# Order facets by median mpg for each cylinder
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), mpg, median)) %>%
+  ggplot(aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot() +
+  facet_wrap(~cyl_group) +
+  theme_minimal()
+
+# Facet panels in meaningful order!
+```
+
+## forcats Cheat Sheet
+
+```{r}
+#| label: factors-cheatsheet
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+fct_reorder(f, x, fun)   # Order by another variable
+fct_infreq(f)            # Order by frequency
+fct_rev(f)               # Reverse current order
+fct_relevel(f, "A", "B") # Move specific levels to front
+fct_recode(f, new = "old") # Rename levels
+fct_lump_n(f, n = 5)     # Keep top n, lump others as "Other"
+fct_explicit_na(f)       # Make NA a visible level
+```
+
+## Real-World Example: Survey Data
+
+```{r}
+#| label: factors-survey-example
+#| echo: true
+#| eval: false
+
+# Likert scale survey responses
+set.seed(42)
+survey <- data.frame(
+  response = sample(c("Strongly Disagree", "Disagree", "Neutral",
+                     "Agree", "Strongly Agree"), 100, replace = TRUE)
+)
+
+# Set logical order
+survey$response <- factor(survey$response,
+  levels = c("Strongly Disagree", "Disagree", "Neutral",
+             "Agree", "Strongly Agree"))
+
+# Plot with correct order
+ggplot(survey, aes(x = response)) +
+  geom_bar(fill = "steelblue") +
+  coord_flip() +
+  theme_minimal()
+```
+
+## Real-World Example: Treatment Groups
+
+```{r}
+#| label: factors-treatment-example
+#| echo: true
+#| eval: false
+
+library(forcats)
+
+# Clinical trial data simulation
+set.seed(123)
+clinical <- data.frame(
+  treatment = rep(c("Placebo", "Low Dose", "Medium Dose", "High Dose"), each = 25),
+  response = rnorm(100, mean = rep(c(10, 12, 15, 18), each = 25), sd = 3)
+)
+
+# Ensure logical ordering
+clinical$treatment <- factor(clinical$treatment,
+  levels = c("Placebo", "Low Dose", "Medium Dose", "High Dose"))
+
+# Boxplots in dose order
+ggplot(clinical, aes(treatment, response)) +
+  geom_boxplot(fill = "lightblue") +
+  theme_classic()
+```
+
+## Combining Operations
+
+```{r}
+#| label: factors-combining
+#| echo: true
+#| eval: false
+
+# Combine multiple forcats functions
+mtcars %>%
+  mutate(
+    # 1. Convert to factor
+    cyl_group = factor(cyl),
+    # 2. Order by frequency
+    cyl_group = fct_infreq(cyl_group),
+    # 3. Reverse so most common at top
+    cyl_group = fct_rev(cyl_group)
+  ) %>%
+  ggplot(aes(cyl_group)) +
+  geom_bar()
+```
+
+## Before and After
+
+::: {.columns}
+::: {.column width="50%"}
+**Before (alphabetical):**
+
+```{r}
+#| label: factors-before
+#| echo: true
+#| eval: false
+
+ggplot(msleep,
+  aes(x = vore,
+      y = sleep_total)) +
+  geom_boxplot()
+
+# Order: carni, herbi,
+#        insecti, omni
+# Meaningless!
+```
+:::
+
+::: {.column width="50%"}
+**After (by median):**
+
+```{r}
+#| label: factors-after
+#| echo: true
+#| eval: false
+
+library(forcats)
+ggplot(msleep,
+  aes(x = fct_reorder(
+           vore,
+           sleep_total,
+           median,
+           na.rm = TRUE),
+      y = sleep_total)) +
+  geom_boxplot()
+
+# Ordered by sleep time!
+```
+:::
+:::
+
+## Common Patterns
+
+### Pattern 1: Sorted bar chart
+
+```{r}
+#| label: factors-pattern-sorted-bar
+#| echo: true
+#| eval: false
+
+mtcars %>%
+  count(cyl) %>%
+  ggplot(aes(x = fct_reorder(as.character(cyl), n), y = n)) +
+  geom_col() +
+  coord_flip()
+```
+
+### Pattern 2: Control group first
+
+```{r}
+#| label: factors-pattern-control
+#| echo: true
+#| eval: false
+
+mtcars %>%
+  mutate(group = fct_relevel(factor(cyl), "4")) %>%
+  ggplot(aes(group, mpg)) +
+  geom_boxplot()
+```
+
+### Pattern 3: Chronological grouping
+
+```{r}
+#| label: factors-pattern-chrono
+#| echo: true
+#| eval: false
+
+mtcars %>%
+  mutate(cyl_group = fct_reorder(factor(cyl), cyl)) %>%
+  ggplot(aes(wt, mpg)) +
+  geom_point() +
+  facet_wrap(~cyl_group)
+```
+
+## Debugging Factor Issues
+
+```{r}
+#| label: factors-debugging
+#| echo: true
+#| eval: false
+
+# Check current levels
+levels(mtcars$cyl)
+
+# Check level order
+factor(mtcars$cyl) %>% levels()
+
+# See factor structure
+str(factor(mtcars$cyl))
+
+# Convert to character if needed
+mtcars$cyl_char <- as.character(mtcars$cyl)
+```
+
+## Recommendations
+
+::: {.callout-tip}
+## Best Practices
+
+1. **Always check factor order** before plotting
+2. **Use `fct_reorder()`** for data-driven ordering
+3. **Use manual levels** for logical ordering (Low/Med/High)
+4. **Use `fct_relevel()`** to put control/baseline first
+5. **Use `fct_infreq()`** for categorical data
+6. **Think about your reader** - what order makes sense?
+:::
+
+## Complete Example
+
+```{r}
+#| label: factors-complete-example
+#| echo: true
+#| eval: false
+
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+# Create simulated gene expression data by tissue type
+set.seed(123)
+expr_data <- data.frame(
+  tissue = rep(c("Brain", "Heart", "Liver", "Lung", "Kidney"), each = 50),
+  expression = c(rnorm(50, 100, 15), rnorm(50, 50, 10),
+                 rnorm(50, 200, 30), rnorm(50, 75, 12),
+                 rnorm(50, 150, 20))
+)
+
+# Plot with tissues ordered by median expression
+expr_data %>%
+  mutate(tissue = fct_reorder(tissue, expression, median)) %>%
+  ggplot(aes(x = tissue, y = expression, fill = tissue)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_fill_brewer(palette = "Set2") +
+  theme_classic(base_size = 14) +
+  labs(x = "Tissue Type",
+       y = "Expression Level",
+       title = "Gene Expression by Tissue")
+
+# Tissues ordered by median expression level!
+```
+
+## Key Takeaways
+
+::: {.callout-important}
+## Remember
+
+- **R defaults to alphabetical** factor ordering
+- **forcats package** provides powerful ordering tools
+- **`fct_reorder()`** orders by another variable
+- **`fct_infreq()`** orders by frequency
+- **Manual levels** for logical ordering (Low/Med/High)
+- **Always think about the reader** - what order makes sense?
+- **Check factor levels** before creating final plots
+:::
