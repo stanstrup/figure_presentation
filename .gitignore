@@ -24,3 +24,5 @@ plots/*
 topics/plots/*
 public/
 .claude
+
+/.quarto/
