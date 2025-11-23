@@ -364,7 +364,7 @@ p <- ggboxplot(ToothGrowth,
   stat_compare_means(
     comparisons = my_comparisons,
     method = "t.test",
-    p.adjust.method = "BH"  # Benjamini-Hochberg correction
+    p.adjust.method = "holm"  # Holm correction
   ) +
   stat_compare_means(
     method = "anova",
@@ -373,6 +373,9 @@ p <- ggboxplot(ToothGrowth,
   labs(title = "Pairwise Comparisons with Multiple Testing Correction",
        x = "Dose (mg/day)",
        y = "Tooth Length")
+
+# Alternative: Use Tukey's HSD for all pairwise comparisons
+# p + stat_compare_means(method = "tukey_hsd")
 ```
 :::
 
@@ -391,11 +394,13 @@ p
 
 - Define specific pairwise comparisons
 - `method = "t.test"` for pairwise tests
-- `p.adjust.method = "BH"` for multiple testing correction
+- `p.adjust.method = "holm"` for multiple testing correction
 - `method = "anova"` for overall test
 - Automatic significance brackets
 
-**Other correction methods:** "holm", "hochberg", "bonferroni", "BY", "fdr"
+**Correction methods:** "holm", "BH", "bonferroni", "hochberg", "BY", "fdr"
+
+**Alternative:** `method = "tukey_hsd"` for Tukey's HSD (all pairwise)
 :::
 :::
 
