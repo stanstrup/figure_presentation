@@ -295,7 +295,7 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
 ```{r}
 #| label: ggpubr-regression-code
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(ggpubr)
 
@@ -303,13 +303,19 @@ p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(size = 3, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE,
               color = "darkred", formula = y ~ x) +
-  stat_regline_equation(
-    aes(label = paste(after_stat(eq.label),
-                      after_stat(rr.label),
-                      sep = "~~~")),
-    label.x = 3, label.y = 30,
-    formula = y ~ x
-  ) +
+
+      stat_regline_equation(
+      aes(label = after_stat(eq.label)),
+      formula = y ~ x,
+      label.x.npc = 0.95,  # 95% to the right (relative)
+      label.y.npc = 0.95,  # 95% to the top (relative)
+      hjust = 1            # right-align text
+    ) +
+    stat_cor(
+      aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
+      label.x.npc = 0.95, label.y.npc = 0.88, hjust = 1
+    ) +
+  
   labs(title = "Linear Regression with Equation",
        x = "Weight (1000 lbs)",
        y = "Miles Per Gallon") +
@@ -368,19 +374,6 @@ p <- ggboxplot(ToothGrowth,
 ```
 
 
-**Key features:**
-
-- `combn(levels, 2)` generates all pairs automatically
-- `method = "t.test"` for pairwise tests
-- `p.adjust.method = "BH"` for multiple testing correction
-- `method = "anova"` for overall test
-- Automatic significance brackets
-
-**Other methods:** "holm", "bonferroni", "hochberg", "BY", "fdr"
-
-**Alternative:** `method = "tukey_hsd"` for Tukey's HSD
-
-
 :::
 
 ::: {.column width="40%"}
@@ -395,15 +388,18 @@ p
 ```
 
 
-**Correction methods:** "holm", "BH", "bonferroni", "hochberg", "BY", "fdr"
-
-**Alternative:** `method = "tukey_hsd"` for Tukey's HSD (all pairwise)
 
 
 :::
 :::
 
 
+- `combn(levels, 2)` generates all pairs automatically
+- `method = "t.test"` for pairwise tests (or `method = "tukey_hsd"` for Tukey's HSD)
+- `p.adjust.method = "BH"` for multiple testing correction ("holm", "bonferroni", "hochberg", "BY", "fdr")
+- `method = "anova"` for overall test
+- Automatic significance brackets
+ 
 
 
 ## Modern Typography: hrbrthemes

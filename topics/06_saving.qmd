@@ -236,37 +236,24 @@ for (file in pdf_files) {
 ::: {.column width="60%"}
 
 
+**Make a plotting function**
 ```{r}
 #| label: saving-batch-fun
 #| echo: true
 #| eval: true
 
-# Define plotting function
 make_species_plot <- function(data, species) {
   ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
     geom_point(size = 2, color = "steelblue") +
     geom_smooth(method = "lm", se = TRUE, color = "darkred", formula = y ~ x) +
-    
-    stat_regline_equation(
-      aes(label = after_stat(eq.label)),
-      formula = y ~ x,
-      label.x.npc = 0.98,  # 98% to the right (relative)
-      label.y.npc = 0.95,  # 95% to the top (relative)
-      hjust = 1            # right-align text
-    ) +
-    stat_cor(
-      aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-      label.x.npc = 0.98,
-      label.y.npc = 0.88,
-      hjust = 1
-    ) +
-    
     labs(title = glue("Iris {species}"), x = "Sepal Length (cm)", y = "Sepal Width (cm)") +
     theme_classic(base_size = 12)
 }
 ```
 
+\
 
+**Nest data per Species**
 ```{r}
 #| label: saving-batch
 #| echo: true
@@ -277,6 +264,10 @@ plot_data <- iris %>%
   nest(data = -Species) %>%
   mutate(plot = map2(data, Species, make_species_plot))
 ```
+
+\
+
+**Write out to separate file per Species**
 
 ```{r}
 #| label: saving-batch-save
@@ -297,11 +288,22 @@ walk2(plot_data$plot, plot_data$Species, ~ggsave(
 
 ```{r}
 #| label: saving-batch-tbl
-#| echo: true
+#| echo: false
 #| eval: true
 
 plot_data
 ```
+
+```{r}
+#| label: saving-batch-tbl-sep
+#| echo: true
+#| eval: true
+head(plot_data$data[[1]])
+```
+
+
+
+\
 
 ```{r}
 #| label: saving-batch-show
@@ -313,12 +315,6 @@ plot_data
 plot_data$plot[[1]]
 ```
 
-**Workflow:**
-
-1. Nest iris data by Species
-2. Define plotting function with regression
-3. Use `map2()` to apply function
-4. Save with `walk2()` using plot and Species columns to save one plot per species
 
 :::
 :::
