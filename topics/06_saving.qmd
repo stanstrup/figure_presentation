@@ -12,6 +12,7 @@ library(glue)
 
 # Output directory
 fig_dir <- "plots/06_saving"
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
 ```
 
 ## The Graphics Device System
@@ -247,12 +248,12 @@ make_species_plot <- function(data, species) {
     stat_regline_equation(
       aes(label = after_stat(eq.label)),
       formula = y ~ x,
-      label.y = 1.0
+      label.y = 1.1
     ) +
 
     stat_cor(
       aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-      label.y = 0.92
+      label.y = 0.9
     ) +
     
     labs(title = glue("Iris {species}"),
@@ -285,7 +286,7 @@ walk2(plot_data$plot, plot_data$Species, ~ggsave(
 ::: {.column width="50%"}
 
 ```{r}
-#| label: saving-batch-save
+#| label: saving-batch-show
 #| echo: true
 #| eval: true
 
