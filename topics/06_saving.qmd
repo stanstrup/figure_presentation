@@ -9,6 +9,10 @@
 
 library(ggplot2)
 library(glue)
+library(tidyverse)
+library(ggpubr)
+library(conflicted)
+conflicts_prefer(dplyr::filter)
 
 # Output directory
 fig_dir <- "plots/06_saving"
@@ -157,11 +161,15 @@ ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
   stat_regline_equation(
     aes(label = after_stat(eq.label)),
     formula = y ~ x,
-    label.y = 1.0
+    label.x.npc = 0.98,
+    label.y.npc = 0.95,
+    hjust = 1
   ) +
   stat_cor(
     aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-    label.y = 0.92
+    label.x.npc = 0.98,
+    label.y.npc = 0.88,
+    hjust = 1
   ) +
   labs(title = "Iris setosa",
        x = "Sepal Length (cm)",
@@ -225,47 +233,49 @@ for (file in pdf_files) {
 ## Batch Saving Multiple Plots
 
 ::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
+
+
+```{r}
+#| label: saving-batch-fun
+#| echo: true
+#| eval: true
+
+# Define plotting function
+make_species_plot <- function(data, species) {
+  ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
+    geom_point(size = 2, color = "steelblue") +
+    geom_smooth(method = "lm", se = TRUE, color = "darkred", formula = y ~ x) +
+    
+    stat_regline_equation(
+      aes(label = after_stat(eq.label)),
+      formula = y ~ x,
+      label.x.npc = 0.98,  # 98% to the right (relative)
+      label.y.npc = 0.95,  # 95% to the top (relative)
+      hjust = 1            # right-align text
+    ) +
+    stat_cor(
+      aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
+      label.x.npc = 0.98,
+      label.y.npc = 0.88,
+      hjust = 1
+    ) +
+    
+    labs(title = glue("Iris {species}"), x = "Sepal Length (cm)", y = "Sepal Width (cm)") +
+    theme_classic(base_size = 12)
+}
+```
+
 
 ```{r}
 #| label: saving-batch
 #| echo: true
 #| eval: true
 
-library(tidyverse)
-library(ggpubr)
-
-# Define plotting function
-make_species_plot <- function(data, species) {
-  ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
-    geom_point(size = 2, color = "steelblue") +
-    
-    geom_smooth(method = "lm", 
-                se = TRUE,
-                color = "darkred",
-                formula = y ~ x) +
-    
-    stat_regline_equation(
-      aes(label = after_stat(eq.label)),
-      formula = y ~ x,
-      label.y = 1.1
-    ) +
-
-    stat_cor(
-      aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
-      label.y = 0.9
-    ) +
-    
-    labs(title = glue("Iris {species}"),
-         x = "Sepal Length (cm)",
-         y = "Sepal Width (cm)") +
-    theme_classic(base_size = 12)
-}
-
-# Nest data by Species and apply plotting
+# Nest data by Species and apply plotting function
 plot_data <- iris %>%
   nest(data = -Species) %>%
-  mutate(plot = map2(data, as.character(Species), make_species_plot))
+  mutate(plot = map2(data, Species, make_species_plot))
 ```
 
 ```{r}
@@ -283,12 +293,22 @@ walk2(plot_data$plot, plot_data$Species, ~ggsave(
 
 :::
 
-::: {.column width="50%"}
+::: {.column width="40%"}
+
+```{r}
+#| label: saving-batch-tbl
+#| echo: true
+#| eval: true
+
+plot_data
+```
 
 ```{r}
 #| label: saving-batch-show
 #| echo: true
 #| eval: true
+#| fig-width: 5
+#| fig-height: 3
 
 plot_data$plot[[1]]
 ```
@@ -298,9 +318,8 @@ plot_data$plot[[1]]
 1. Nest iris data by Species
 2. Define plotting function with regression
 3. Use `map2()` to apply function
-4. Save with `walk2()` using plot and Species columns
+4. Save with `walk2()` using plot and Species columns to save one plot per species
 
-**Result:** One plot per species with regression line and stats
 :::
 :::
 
