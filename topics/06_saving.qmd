@@ -1,5 +1,19 @@
 # Saving Plots in R {background-color="#34495e"}
 
+```{r}
+#| label: setup-saving
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(glue)
+
+# Output directory
+fig_dir <- "plots/06_saving"
+```
+
 ## The Graphics Device System
 
 **Every plot needs a "device"**
@@ -173,7 +187,7 @@ plot_data <- tibble(
 
 # Save all plots using iwalk
 iwalk(plot_data$plot, ~ggsave(
-  filename = glue("figure_{plot_data$title[.y]}.pdf"),
+  filename = glue("{fig_dir}/figure_{plot_data$title[.y]}.pdf"),
   plot = .x,
   width = 7, height = 5
 ))
@@ -275,32 +289,3 @@ ggsave(glue("{fig_dir}/figure1.png"), p1, width = 7, height = 5, dpi = 300)
 5. **Save both PDF and PNG** versions
 6. **Organize** figures in dedicated directory
 :::
-
-## Complete Example
-
-```{r}
-#| label: saving-complete-example
-#| echo: true
-#| eval: false
-
-# Create publication-quality plot
-library(ggplot2)
-
-p <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl))) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = FALSE) +
-  scale_color_brewer(palette = "Set1", name = "Cylinders") +
-  theme_classic(base_size = 11) +
-  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
-       title = "Fuel Efficiency by Weight")
-
-# Save for journal (vector)
-ggsave("figures/mpg_analysis.pdf", p,
-       width = 3.5, height = 3, units = "in",
-       device = cairo_pdf)
-
-# Save for presentation (raster)
-ggsave("figures/mpg_analysis.png", p,
-       width = 8, height = 6, units = "in",
-       dpi = 300, type = "cairo")
-```
