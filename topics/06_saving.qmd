@@ -154,10 +154,13 @@ ggplot(iris_setosa, aes(x = Sepal.Length, y = Sepal.Width)) +
   geom_smooth(method = "lm", se = TRUE, color = "darkred",
               formula = y ~ x) +
   stat_regline_equation(
-    aes(label = after_stat(eq.label)),
+    aes(label = paste(after_stat(eq.label), after_stat(p.label), sep = "~~~~")),
     formula = y ~ x
   ) +
-  stat_cor(aes(label = after_stat(rr.label))) +
+  stat_cor(
+    aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
+    label.y = 0.95
+  ) +
   labs(title = "Iris setosa",
        x = "Sepal Length (cm)",
        y = "Sepal Width (cm)") +
@@ -225,7 +228,7 @@ for (file in pdf_files) {
 ```{r}
 #| label: saving-batch
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(tidyverse)
 library(ggpubr)
@@ -234,13 +237,22 @@ library(ggpubr)
 make_species_plot <- function(data, species) {
   ggplot(data, aes(x = Sepal.Length, y = Sepal.Width)) +
     geom_point(size = 2, color = "steelblue") +
-    geom_smooth(method = "lm", se = TRUE, color = "darkred",
+    
+    geom_smooth(method = "lm", 
+                se = TRUE,
+                color = "darkred",
                 formula = y ~ x) +
+    
     stat_regline_equation(
-      aes(label = after_stat(eq.label)),
+      aes(label = paste(after_stat(eq.label), after_stat(p.label), sep = "~~~~")),
       formula = y ~ x
     ) +
-    stat_cor(aes(label = after_stat(rr.label))) +
+
+    stat_cor(
+      aes(label = paste(after_stat(rr.label), after_stat(p.label), sep = "~~~~")),
+      label.y = 0.95
+    ) +
+    
     labs(title = glue("Iris {species}"),
          x = "Sepal Length (cm)",
          y = "Sepal Width (cm)") +
@@ -251,11 +263,17 @@ make_species_plot <- function(data, species) {
 plot_data <- iris %>%
   nest(data = -Species) %>%
   mutate(plot = map2(data, as.character(Species), make_species_plot))
+```
+
+```{r}
+#| label: saving-batch-save
+#| echo: true
+#| eval: false
 
 # Save all plots using walk2
 walk2(plot_data$plot, plot_data$Species, ~ggsave(
-  filename = glue("{fig_dir}/iris_{.y}.pdf"),
-  plot = .x,
+  filename = glue("{fig_dir}/iris_{..2}.pdf"),
+  plot = ..1,
   width = 6, height = 5
 ))
 ```
@@ -263,6 +281,15 @@ walk2(plot_data$plot, plot_data$Species, ~ggsave(
 :::
 
 ::: {.column width="50%"}
+
+```{r}
+#| label: saving-batch-save
+#| echo: true
+#| eval: true
+
+plot_data$plot[[1]]
+```
+
 **Workflow:**
 
 1. Nest iris data by Species
