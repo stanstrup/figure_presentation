@@ -126,6 +126,34 @@ ggplot(mtcars, aes(x = fct_infreq(factor(cyl)))) +
 
 Great for survey data
 
+## fct_inorder(): Order by Appearance
+
+```{r}
+#| label: factors-fct-inorder
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Create data with specific order
+treatment_data <- data.frame(
+  treatment = c("Control", "Low Dose", "Medium Dose", "High Dose",
+                "Control", "Low Dose", "Medium Dose", "High Dose"),
+  response = c(10, 12, 15, 18, 11, 13, 16, 19)
+)
+
+# Keep order as they appear in data (not alphabetical!)
+ggplot(treatment_data,
+       aes(x = fct_inorder(treatment), y = response)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(x = "Treatment", y = "Response") +
+  theme_classic()
+
+# Order: Control, Low Dose, Medium Dose, High Dose
+```
+
+Preserves the order from your data!
+
 ## fct_rev(): Reverse Order
 
 ```{r}
