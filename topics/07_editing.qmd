@@ -81,6 +81,45 @@
 - Lock layers to prevent accidental edits
 - Use layers for complex figures
 
+## Handling Missing Fonts
+
+When opening files in Inkscape, you may see a font warning:
+
+![](../sources/keep_font_names.png){width=70%}
+
+**Important: Keep the font names!**
+
+::: {.callout-tip}
+## Why keep missing font names?
+
+- Preserves original font information
+- If you substitute fonts, you can't revert later
+- Fonts may be available on other systems (e.g., when submitting to journals)
+- You can always change fonts manually later if needed
+- Prevents unexpected text reflow or sizing issues
+:::
+
+## Example: Before and After Editing
+
+::: {.columns}
+::: {.column width="50%"}
+**Original R output (pre-edit.svg)**
+
+![](../sources/pre-edit.svg){width=100%}
+:::
+
+::: {.column width="50%"}
+**After editing in Inkscape (post-edit.svg)**
+
+![](../sources/post-edit.svg){width=100%}
+
+**Changes made:**
+
+- Cropped whitespace
+- Added annotations
+- Made legend more compact
+:::
+:::
 
 ## Avoiding Common Pitfalls
 
