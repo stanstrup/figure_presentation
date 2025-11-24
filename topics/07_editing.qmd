@@ -65,8 +65,7 @@
 **Opening PDFs/SVGs:**
 
 1. File → Open → Select PDF or SVG
-2. For PDFs: Choose "Import via Poppler" for best results
-3. Each plot element is now editable
+2. Each plot element is now editable
 
 **Useful tools:**
 
@@ -80,6 +79,14 @@
 - Group related elements (Ctrl+G)
 - Lock layers to prevent accidental edits
 - Use layers for complex figures
+
+**Handling Missing Fonts:**
+
+When opening files, you may see a font warning:
+
+![](../sources/keep_font_names.png){width=50%}
+
+**Keep the font names!** Don't substitute - preserves original font info and prevents text reflow issues
 
 ## Cropping Canvas to Remove Whitespace
 
@@ -109,24 +116,6 @@ R exports often contain many **invisible/empty objects** that prevent proper cro
 - Object → Clip → Set can destroy your plot elements
 - May convert gradients/fills to colored rectangles
 - **Don't use clipping** - just delete empty objects instead
-:::
-
-## Handling Missing Fonts
-
-When opening files in Inkscape, you may see a font warning:
-
-![](../sources/keep_font_names.png){width=70%}
-
-**Important: Keep the font names!**
-
-::: {.callout-tip}
-## Why keep missing font names?
-
-- Preserves original font information
-- If you substitute fonts, you can't revert later
-- Fonts may be available on other systems (e.g., when submitting to journals)
-- You can always change fonts manually later if needed
-- Prevents unexpected text reflow or sizing issues
 :::
 
 ## Example: Before and After Editing
