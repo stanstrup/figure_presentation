@@ -319,22 +319,21 @@ pa + pb +
 ```{r}
 #| label: patchwork-axes-demo
 #| echo: true
-#| eval: false
+#| eval: true
 
-# Default - separate axes
-p1 / p2 / p3
+# Share y-axes for side-by-side plots
+(p1 | p2) + plot_layout(axes = "collect_y")
 
-# Share x-axes (for stacked plots)
-p1 / p2 / p3 +
-  plot_layout(axes = "collect_x")
+# Share x-axes for stacked plots
+(p1 / p2) + plot_layout(axes = "collect_x")
 
-# Share y-axes (for side-by-side)
-p1 | p2 | p3 +
-  plot_layout(axes = "collect_y")
+# Complex: collect within groups first
+((p1 | p2) + plot_layout(axes = "collect_y")) /
+((p3 | p4) + plot_layout(axes = "collect_y"))
 
-# Share both
-(p1 | p2) / (p3 | p4) +
-  plot_layout(axes = "collect")
+# Or more simply:
+((p1 | p2) + plot_layout(axes = "collect")) /
+ (p3 | p4)
 ```
 
 :::
