@@ -49,7 +49,7 @@
 
 
 
-## editing in Inkscape
+## Editing in Inkscape
 
 1. Import
 2. Ungroup
@@ -90,33 +90,41 @@ When opening files, you may see a font warning:
 
 ## Cropping Canvas to Remove Whitespace
 
+::: {.columns}
+::: {.column width="50%"}
+
 **The Page Tool approach:**
 
-1. Select the objects you want to keep (or Select All)
+1. Select the objects you want to keep (or Select All (Ctrl+A))
 2. Use **Edit → Resize Page to Selection** (or **Ctrl+Shift+R**)
 3. This resizes the canvas to fit your selection
 
+:::
+
+::: {.column width="50%"}
+
 ::: {.callout-warning}
-## Hidden Objects from R Plots
+## Hidden Objects from R Plots!
 
-R exports often contain many **invisible/empty objects** that prevent proper cropping!
+R exports contain many **invisible/empty objects** that prevent proper cropping!
 
-![](../sources/hidden_objects.png){width=80%}
-
-**The frustrating whack-a-mole problem:**
+**The frustrating whack-a-mole:**
 
 - Press **Ctrl+A** (Select All) to reveal hidden objects
-- You'll see many white/empty rectangles and objects
+- You'll see many white/empty rectangles
 - **Delete these empty objects first** before resizing page
-- Otherwise, your canvas will include this invisible whitespace
-- This is tedious but necessary for clean cropping
+- Otherwise canvas includes invisible whitespace
 
 **Why clipping doesn't work:**
 
-- Object → Clip → Set can destroy your plot elements
-- May convert gradients/fills to colored rectangles
-- **Don't use clipping** - just delete empty objects instead
+- Object → Clip → Set can destroy plot elements
+- **Don't use clipping** - delete empty objects instead
 :::
+
+:::
+:::
+
+![](../sources/hidden_objects.png){width=70%}
 
 ## Example: Before and After Editing
 
@@ -138,18 +146,6 @@ R exports often contain many **invisible/empty objects** that prevent proper cro
 - Added annotations
 - Made legend more compact
 :::
-:::
-
-## Avoiding Common Pitfalls
-
-::: {.callout-warning}
-## Watch Out!
-
-1. **Don't convert to raster**: Keep as vector
-2. **Don't edit data**: Only layout/labels
-3. **Save source files**: Keep .ai or .svg
-4. **Export final as PDF**: For submission
-5. **Document changes**: Note what was done manually
 :::
 
 
