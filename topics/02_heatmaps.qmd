@@ -61,7 +61,7 @@ for (i in 1:5) {  # First 5 metabolites get outliers
 
   for (s in outlier_samples) {
     # Make it high (1.2-2x normal range)
-    expr_data[s, metab_col] <- normal_range * runif(1, 1.2, 2)
+    expr_data[s, metab_col] <- normal_range * runif(1, 2, 8)
   }
 }
 
@@ -102,7 +102,7 @@ p
 
 
 
-## Solution 1: Unit-variance Sscaling and Standard Deviation Cutoffs
+## Solution 1: Robust MAD Scaling and Cutoffs
 
 
 ::: {.columns}
@@ -114,14 +114,16 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale variables to unit variance (mean=0, sd=1)
-expr_scaled <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
+# Step 1: Robust scaling using MAD (Median Absolute Deviation)
+# MAD is not affected by outliers, unlike SD
+expr_scaled <- expr_data %>%
+  mutate(across(-Sample, ~ (.x - median(.x)) / mad(.x)))
 
 # Step 2: Identify which values will be capped
 expr_mat_scaled <- expr_scaled %>% column_to_rownames("Sample") %>% as.matrix()
 capped_cells <- (expr_mat_scaled < -3) | (expr_mat_scaled > 3)
 
-# Step 3: Cap at ±3 (only meaningful after scaling!)
+# Step 3: Cap at ±3 (meaningful after MAD scaling!)
 expr_capped <- expr_scaled %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 
 # Step 4: Create symmetric breaks centered at 0
@@ -133,7 +135,7 @@ border_color <- matrix(NA, nrow = nrow(capped_cells), ncol = ncol(capped_cells))
 border_color[capped_cells] <- "black"
 
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
-              main = "Scaled + capped at ±3 (black borders = capped)",
+              main = "MAD-scaled + capped at ±3 (black borders = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks, scale = "none",
               border_color = border_color, silent = TRUE)
@@ -154,13 +156,13 @@ p
 
 ::: {.column width="35%"}
 
-**Most common approach**
+**Robust scaling approach**
 
-- **Scale FIRST** to unit variance
-- Then cap at ±2 or ±3
-- ±2 captures ~95.4% of data
-- ±3 captures ~99.7% of data
-- Uses full color range
+- **Use MAD instead of SD** - not affected by outliers
+- Center by median (robust)
+- Scale by MAD (Median Absolute Deviation)
+- Then cap at ±3 MAD
+- Outliers now exceed threshold!
 - Set `scale = "none"` (already scaled!)
 
 :::
@@ -393,6 +395,10 @@ The `massageR` package provides `heat.clust()` which handles scaling and dendrog
 
 ## heat.clust with pheatmap
 
+::: {.columns}
+::: {.column width="60%"}
+
+
 ```{r}
 #| label: heat-clust-pheatmap
 #| echo: true
@@ -401,31 +407,35 @@ The `massageR` package provides `heat.clust()` which handles scaling and dendrog
 library(massageR)
 
 # Convert tibble to matrix for heat.clust
-expr_matrix <- expr_data %>%
-  column_to_rownames("Sample") %>%
-  as.matrix()
+expr_matrix <- expr_data %>% column_to_rownames("Sample") %>% as.matrix()
 
 # Use heat.clust to scale and cluster
 z <- heat.clust(expr_matrix,
                 scaledim = "column",           # Scale by column
                 zlim = c(-3, 3),            # Cap at ±3
                 zlim_select = c("dend", "outdata"),  # Apply to both
-                reorder = c(),        # Reorder dendrograms
-                distfun = function(x) dist(x),
-                hclustfun = function(x) hclust(x, method = "complete"),
-                scalefun = scale)
+                reorder = c(),        # Reorder dendrograms off for consistency
+                distfun = function(x) dist(x))
 
 max_abs <- max(abs(range(z$data)))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
+```
 
-# Extract dendrograms and convert to hclust objects
-row_dend <- as.hclust(z$Rowv)
-col_dend <- as.hclust(z$Colv)
+
+:::
+
+::: {.column width="40%"}
+
+
+```{r}
+#| label: heat-clust-pheatmap-make
+#| echo: true
+#| eval: true
 
 # Use with pheatmap
 p <- pheatmap(z$data,
-              cluster_rows = row_dend,
-              cluster_cols = col_dend,
+              cluster_rows = as.hclust(z$Rowv),
+              cluster_cols = as.hclust(z$Colv),
               scale = "none",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks,
@@ -433,19 +443,30 @@ p <- pheatmap(z$data,
               silent = TRUE)
 ```
 
+:::
+:::
+
+
+
+
+
 ::: {.columns}
 ::: {.column width="60%"}
+
 ```{r}
 #| label: heat-clust-plot
 #| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 6
+#| fig-width: 6
+#| fig-height: 3.5
+
 p
 ```
-:::
 
+:::
 ::: {.column width="40%"}
+
+
 **One-step workflow**
 
 - Scales data automatically
@@ -453,6 +474,7 @@ p
 - Caps at specified zlim
 - Returns everything needed for pheatmap
 - Ensures consistency throughout
+
 :::
 :::
 
@@ -478,8 +500,9 @@ p1 <- pheatmap(expr_mat_outlier_comp,
                color = rev(viridis::magma(100)),
                silent = TRUE)
 
-# After: scaled + capped (from "Solution 1: Standard Deviation Cutoffs")
-expr_scaled_comp <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
+# After: MAD-scaled + capped (from "Solution 1: Robust MAD Scaling")
+expr_scaled_comp <- expr_data %>%
+  mutate(across(-Sample, ~ (.x - median(.x)) / mad(.x)))
 expr_mat_scaled_comp <- expr_scaled_comp %>% column_to_rownames("Sample") %>% as.matrix()
 capped_cells_comp <- (expr_mat_scaled_comp < -3) | (expr_mat_scaled_comp > 3)
 expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
@@ -490,7 +513,7 @@ border_color_comp <- matrix(NA, nrow = nrow(capped_cells_comp), ncol = ncol(capp
 border_color_comp[capped_cells_comp] <- "black"
 
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
-               main = "Scaled + capped at ±3 (black borders = capped)",
+               main = "MAD-scaled + capped at ±3 (black borders = capped)",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                breaks = breaks_comp,
                border_color = border_color_comp,
@@ -508,8 +531,10 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 1. **Inspect data distribution** before making heatmap
 2. **Consider log transformation**
 3. **Scale data BEFORE** passing to heatmap function
+   - **Use MAD (robust)** if data has outliers: `(x - median(x)) / mad(x)`
+   - Use SD if data is clean: `scale(x)`
 4. Cap extremes
-   - **Cap at 2-3 SD** for large datasets with outliers, if using unit variance scaling
+   - **Cap at ±3 MAD** for robust scaling with outliers
    - **Cap using quantiles** (5-95%) if using range scaling
 5. **Calculate dendrograms** on the same scaled and capped data
 6. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
