@@ -13,13 +13,33 @@ The presentation is automatically built and deployed to GitHub Pages on every co
 ### Prerequisites
 
 - [Quarto](https://quarto.org/) (v1.4 or later)
-- R (v4.0 or later)
-- Required R packages:
-  - ggplot2
-  - patchwork
-  - magick
-  - glue
-  - viridis
+- R (v4.5 or later)
+- Required R packages (see installation below)
+
+### Installation
+
+Install all required R packages:
+
+```bash
+# Install all dependencies
+Rscript .github/workflows/install_packages.R
+```
+
+Or install manually using R:
+
+```r
+# Core packages
+install.packages(c("ggplot2", "dplyr", "tidyr", "forcats", "patchwork",
+                   "viridis", "RColorBrewer", "colorspace", "scales",
+                   "pheatmap", "plotly", "gtools", "magick"))
+
+# Bioconductor packages
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install("mixOmics")
+
+# GitLab packages
+remotes::install_gitlab("stanstrup_R_packages/massageR")
+```
 
 ### Rendering Locally
 
@@ -29,6 +49,27 @@ quarto render presentation.qmd
 
 # Preview while developing
 quarto preview presentation.qmd
+
+# Or use the helper script
+Rscript render.R
+```
+
+### Development Workflow
+
+The `render.R` script provides helpful utilities:
+
+```r
+# Load functions
+source("render.R")
+
+# Test all topics in parallel (fast!)
+results <- test_all_topics_parallel()
+
+# Test a specific topic
+render_topic(9)  # Test topic 09
+
+# Render full presentation
+render_presentation()
 ```
 
 ## Structure

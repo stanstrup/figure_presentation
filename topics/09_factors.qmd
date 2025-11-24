@@ -23,8 +23,6 @@ theme_set(theme_bw())
 #| label: factors-problem-alphabetical
 #| echo: true
 #| eval: true
-#| fig-width: 5
-#| fig-height: 3.5
 
 # Create data with logical categories
 category_df <- data.frame(
@@ -33,7 +31,7 @@ category_df <- data.frame(
 )
 
 # R defaults to alphabetical!
-ggplot(category_df, aes(x = category, y = value)) +
+p1 <- ggplot(category_df, aes(x = category, y = value)) +
   geom_col(fill = "coral") +
   theme_classic(base_size = 12) +
   labs(title = "Alphabetical (Wrong!)")
@@ -47,15 +45,13 @@ ggplot(category_df, aes(x = category, y = value)) +
 #| label: factors-solution-ordered
 #| echo: true
 #| eval: true
-#| fig-width: 5
-#| fig-height: 3.5
 
 # Specify levels explicitly
 category_df$category <- factor(category_df$category,
                        levels = c("Low", "Medium", "High", "Very High"))
 
 # Now plots use logical order!
-ggplot(category_df, aes(x = category, y = value)) +
+p2 <- ggplot(category_df, aes(x = category, y = value)) +
   geom_col(fill = "steelblue") +
   theme_classic(base_size = 12) +
   labs(title = "Logical Order (Correct!)")
@@ -67,11 +63,31 @@ ggplot(category_df, aes(x = category, y = value)) +
 ::: {.columns}
 ::: {.column width="50%"}
 
+```{r}
+#| label: factors-problem-plot
+#| echo: false
+#| eval: true
+#| fig-width: 5
+#| fig-height: 3.5
+
+p1
+```
+
 Random order makes no sense!
 
 :::
 
 ::: {.column width="50%"}
+
+```{r}
+#| label: factors-solution-plot
+#| echo: false
+#| eval: true
+#| fig-width: 5
+#| fig-height: 3.5
+
+p2
+```
 
 Much better - order makes sense!
 
@@ -82,37 +98,58 @@ Much better - order makes sense!
 
 **Part of tidyverse, designed for factor manipulation**
 
+::: {.columns}
+::: {.column width="45%"}
+
 ```{r}
 #| label: factors-forcats-intro
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 library(forcats)
 
 # Reorder car classes by median highway mpg
-mpg %>%
-  ggplot(aes(x = fct_reorder(class, hwy, median), y = hwy)) +
+p <- mpg %>%
+  ggplot(aes(x = fct_reorder(class, hwy, median),
+             y = hwy)) +
   geom_boxplot(fill = "lightblue") +
   coord_flip() +
-  labs(x = "Vehicle Class", y = "Highway MPG",
+  labs(x = "Vehicle Class",
+       y = "Highway MPG",
        title = "Ordered by median MPG")
-
-# Boxplots now ordered by median value!
 ```
 
+Boxplots now ordered by median value!
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-forcats-intro-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
 ## fct_reorder(): Order by Another Variable
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-fct-reorder
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Order diamond cuts by mean price
-diamonds %>%
+p <- diamonds %>%
   group_by(cut) %>%
   summarise(mean_price = mean(price)) %>%
   ggplot(aes(x = fct_reorder(cut, mean_price),
@@ -120,71 +157,129 @@ diamonds %>%
              fill = cut)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
-  labs(x = "Diamond Cut", y = "Mean Price ($)",
+  labs(x = "Diamond Cut",
+       y = "Mean Price ($)",
        title = "Cuts ordered by average price")
 ```
 
-Bars ordered by height!
+Bars ordered by length!
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-fct-reorder-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
 
 ## fct_infreq(): Order by Frequency
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-fct-infreq
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Order by how common each vehicle class is
-ggplot(mpg, aes(x = fct_infreq(class))) +
+p <- ggplot(mpg,
+            aes(x = fct_infreq(class))) +
   geom_bar(fill = "steelblue") +
   coord_flip() +
-  labs(x = "Vehicle Class", y = "Count",
+  labs(x = "Vehicle Class",
+       y = "Count",
        title = "Most common classes first")
-
-# Most common category first!
 ```
+
+Most common category first!
 
 Great for survey data
 
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-fct-infreq-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
 ## fct_inorder(): Order by Appearance
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-fct-inorder
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Create data with specific order
 treatment_data <- data.frame(
-  treatment = c("Control", "Low Dose", "Medium Dose", "High Dose",
-                "Control", "Low Dose", "Medium Dose", "High Dose"),
-  response = c(10, 12, 15, 18, 11, 13, 16, 19)
+  treatment = c("Control", "Low Dose",
+                "Medium Dose", "High Dose",
+                "Control", "Low Dose",
+                "Medium Dose", "High Dose"),
+  response = c(10, 12, 15, 18,
+               11, 13, 16, 19)
 )
 
-# Keep order as they appear in data (not alphabetical!)
-ggplot(treatment_data,
-       aes(x = fct_inorder(treatment), y = response)) +
+# Keep order as they appear in data
+p <- ggplot(treatment_data,
+       aes(x = fct_inorder(treatment),
+           y = response)) +
   geom_boxplot(fill = "lightblue") +
-  labs(x = "Treatment", y = "Response") +
-  theme_classic()
-
-# Order: Control, Low Dose, Medium Dose, High Dose
+  labs(x = "Treatment", y = "Response")
 ```
 
 Preserves the order from your data!
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-fct-inorder-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
 
 ## Natural Sorting: var1, var2, ..., var10
 
 **The problem with alphabetical sorting:**
 
+::: {.columns}
+::: {.column width="45%"}
+
 ```{r}
 #| label: factors-natural-sort-problem
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Create data with numbered variables
 var_data <- data.frame(
@@ -193,20 +288,37 @@ var_data <- data.frame(
 )
 
 # Alphabetical order: var1, var10, var2, var20 (wrong!)
-ggplot(var_data, aes(x = variable, y = value)) +
+p <- ggplot(var_data, aes(x = variable, y = value)) +
   geom_boxplot(fill = "coral") +
-  theme_classic() +
   labs(title = "Alphabetical: var1, var10, var2, var20")
 ```
 
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-natural-sort-problem-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
 ## Natural Sorting: The Solution
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-natural-sort-solution
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Use gtools::mixedsort() for natural/alphanumeric sorting
 library(gtools)
@@ -215,135 +327,559 @@ var_data$variable <- factor(var_data$variable,
                             levels = mixedsort(unique(var_data$variable)))
 
 # Natural order: var1, var2, var10, var20 (correct!)
-ggplot(var_data, aes(x = variable, y = value)) +
+p <- ggplot(var_data, aes(x = variable, y = value)) +
   geom_boxplot(fill = "steelblue") +
-  theme_classic() +
   labs(title = "Natural sort: var1, var2, var10, var20")
 ```
 
 **Note:** `forcats::fct_inseq()` only works if entire level is numeric
 
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-natural-sort-solution-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
 ## fct_rev(): Reverse Order
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-fct-rev
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
 # Reverse the frequency order
-ggplot(mpg, aes(x = fct_rev(fct_infreq(class)))) +
+p <- ggplot(mpg, aes(x = fct_rev(fct_infreq(class)))) +
   geom_bar(fill = "coral") +
   coord_flip() +
   labs(x = "Vehicle Class", y = "Count",
        title = "Least common classes first (reversed)")
-
-# Now least common first instead of most common!
 ```
 
+Now least common first instead of most common!
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-fct-rev-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
 ## fct_relevel(): Move Specific Levels
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-fct-relevel
 #| echo: true
 #| eval: true
 
-# Move "4" to front for cylinders
-mtcars %>%
-  mutate(cyl_group = fct_relevel(factor(cyl), "4")) %>%
-  ggplot(aes(cyl_group, mpg)) +
-  geom_boxplot()
+# Move "Control" to front for treatment groups
+treatment_data <- data.frame(
+  treatment = c("Low Dose", "High Dose", "Control",
+                "Medium Dose", "Low Dose", "Control"),
+  response = c(12, 18, 10, 15, 13, 11)
+)
 
-# 4-cylinder always shown first
+p <- treatment_data %>%
+  mutate(treatment = fct_relevel(treatment, "Control")) %>%
+  ggplot(aes(treatment, response)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(x = "Treatment", y = "Response")
 ```
+
+Control always shown first
 
 Common in experimental data!
 
-## Common Use Case: Ordered Bar Chart
+:::
+
+::: {.column width="55%"}
 
 ```{r}
-#| label: factors-ordered-bar
-#| echo: true
+#| label: factors-fct-relevel-plot
+#| echo: false
 #| eval: true
+#| fig-width: 6
+#| fig-height: 5
 
-# Calculate summary statistics
-summary_data <- mtcars %>%
-  mutate(cyl_group = factor(cyl)) %>%
-  group_by(cyl_group) %>%
-  summarise(mean_mpg = mean(mpg), .groups = "drop")
-
-# Plot with bars ordered by height
-ggplot(summary_data,
-       aes(x = fct_reorder(cyl_group, mean_mpg), y = mean_mpg)) +
-  geom_col(fill = "steelblue") +
-  coord_flip() +  # Horizontal bars
-  labs(x = "Cylinders", y = "Mean MPG") +
-  theme_minimal()
+p
 ```
 
-Much easier to read than alphabetical!
-
-## Time-Based Ordering
-
-```{r}
-#| label: factors-time-ordering
-#| echo: true
-#| eval: true
-
-# Create data with months
-month_data <- data.frame(
-  month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
-  value = c(10, 15, 12, 18, 20, 17)
-)
-
-# Months in calendar order (not alphabetical!)
-months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
-month_data$month <- factor(month_data$month, levels = months)
-
-# Now plots show Jan, Feb, Mar... not alphabetical!
-ggplot(month_data, aes(month, value)) +
-  geom_line(group = 1)
-```
-
-## Legend Ordering
-
-```{r}
-#| label: factors-legend-ordering
-#| echo: true
-#| eval: true
-
-# Order legend by maximum mpg of each cylinder group
-mtcars$cyl_group <- factor(mtcars$cyl)
-ggplot(mtcars, aes(x = wt,
-                 y = mpg,
-                 color = fct_reorder(cyl_group, mpg, max, .desc = TRUE))) +
-  geom_point(size = 2) +
-  labs(color = "Cylinders") +
-  theme_minimal()
-
-# Legend now shows groups in order of importance!
-```
+:::
+:::
 
 ## Facet Ordering
+
+::: {.columns}
+::: {.column width="45%"}
 
 ```{r}
 #| label: factors-facet-ordering
 #| echo: true
 #| eval: true
 
-# Order facets by median mpg for each cylinder
-mtcars %>%
-  mutate(cyl_group = fct_reorder(factor(cyl), mpg, median)) %>%
-  ggplot(aes(x = factor(cyl), y = mpg)) +
-  geom_boxplot() +
-  facet_wrap(~cyl_group) +
-  theme_minimal()
-
-# Facet panels in meaningful order!
+# Order facets by median highway mpg for each vehicle class
+p <- mpg %>%
+  filter(class %in% c("compact", "midsize", "suv")) %>%
+  mutate(class = fct_reorder(class, hwy, median)) %>%
+  ggplot(aes(x = displ, y = hwy)) +
+  geom_point(color = "steelblue", alpha = 0.6) +
+  facet_wrap(~class) +
+  labs(x = "Engine Displacement (L)", y = "Highway MPG")
 ```
+
+Facet panels in meaningful order!
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-facet-ordering-plot
+#| echo: false
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+p
+```
+
+:::
+:::
+
+## ⚠️ The Danger of Numeric Factors
+
+**Converting between factor and numeric can destroy your data!**
+
+\
+
+::: {.fragment}
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-numeric-danger-1
+#| echo: true
+#| eval: true
+
+# Original numeric data
+doses <- c(10, 20, 50, 100, 200)
+print(doses)
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-numeric-danger-1b
+#| echo: true
+#| eval: true
+
+# Convert to factor (common in data import!)
+dose_factor <- factor(doses)
+print(dose_factor)
+```
+
+:::
+:::
+:::
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-numeric-danger-1c
+#| echo: true
+#| eval: true
+
+# Looks fine, right? But look at the internal structure:
+str(dose_factor)
+# Levels: "10" "100" "20" "200" "50" (alphabetical!)
+```
+:::
+
+\
+
+::: {.fragment}
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-numeric-danger-2
+#| echo: true
+#| eval: true
+
+# Try to convert back to numeric - WRONG!
+as.numeric(dose_factor)
+# Returns: 1 3 5 4 2 (NOT original!)
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-numeric-danger-2b
+#| echo: true
+#| eval: true
+
+# Correct way: convert via character
+as.numeric(as.character(dose_factor))
+# Returns: 10 20 50 100 200 (correct!)
+```
+
+:::
+:::
+:::
+
+\
+
+::: {.fragment}
+**The danger:** Many functions silently convert factors to integers!
+:::
+
+## ⚠️ Missing Levels: The Silent Data Corruption
+
+**Even worse: missing levels get renumbered!**
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-missing-levels-1
+#| echo: true
+#| eval: true
+
+# Groups 1, 2, 4, 5 (group 3 doesn't exist in your data)
+groups <- c(1, 2, 4, 5, 1, 2, 4, 5)
+response <- c(10, 15, 25, 30, 11, 16, 24, 29)
+
+data.frame(group = groups, response = response)
+```
+:::
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-missing-levels-2
+#| echo: true
+#| eval: true
+
+# Convert to factor (happens during data import!)
+groups_factor <- factor(groups)
+str(groups_factor)
+# Levels: "1" "2" "4" "5" - looks OK so far
+```
+:::
+
+\
+
+::: {.fragment}
+::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-missing-levels-3
+#| echo: true
+#| eval: true
+
+# Try to convert back - DATA CORRUPTION!
+as.numeric(groups_factor)
+# Returns: 1 2 3 4 1 2 3 4
+# Your group 4 became 3!
+# Your group 5 became 4!
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-missing-levels-4
+#| echo: true
+#| eval: true
+
+# Correct conversion
+as.numeric(as.character(groups_factor))
+# Returns: 1 2 4 5 1 2 4 5 (correct!)
+```
+
+:::
+:::
+:::
+
+\
+
+::: {.fragment}
+::: {.callout-warning}
+## This is catastrophic for analysis!
+
+Your statistical models will use the wrong group numbers. **Always use as.numeric(as.character(factor))** not as.numeric(factor)
+:::
+:::
+
+## ⚠️ Numeric Factors After Reordering
+
+**It gets worse when you've reordered the factor:**
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-numeric-danger-reordered-setup
+#| echo: true
+#| eval: true
+
+library(patchwork)
+
+# Create data with doses as factors, reordered
+dose_data <- data.frame(
+  dose = factor(c(10, 20, 50, 100, 200)),
+  response = c(5, 10, 25, 45, 80)
+)
+
+# Reorder by response (common operation!)
+dose_data$dose_ordered <- fct_reorder(dose_data$dose, dose_data$response)
+```
+:::
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-numeric-danger-reordered-convert
+#| echo: true
+#| eval: true
+
+# Now try to use it numerically - DISASTER!
+dose_data$wrong_numeric <- as.numeric(dose_data$dose_ordered)
+dose_data$correct_numeric <- as.numeric(as.character(dose_data$dose_ordered))
+
+print(data.frame(
+  dose_ordered = dose_data$dose_ordered,
+  wrong = dose_data$wrong_numeric,
+  correct = dose_data$correct_numeric
+))
+```
+:::
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-numeric-danger-reordered-plot
+#| echo: false
+#| eval: true
+#| fig-width: 11
+#| fig-height: 4
+
+# Show the disaster
+p1 <- ggplot(dose_data, aes(x = wrong_numeric, y = response)) +
+  geom_point(size = 3, color = "red") +
+  geom_line() +
+  labs(title = "WRONG: as.numeric(factor)",
+       x = "as.numeric(dose_ordered)",
+       y = "Response") +
+  theme(plot.title = element_text(color = "red"))
+
+p2 <- ggplot(dose_data, aes(x = correct_numeric, y = response)) +
+  geom_point(size = 3, color = "darkgreen") +
+  geom_line() +
+  labs(title = "CORRECT: as.numeric(as.character(factor))",
+       x = "Actual dose",
+       y = "Response") +
+  theme(plot.title = element_text(color = "darkgreen"))
+
+p1 | p2
+```
+:::
+
+## ⚠️ Function Ambiguity with Numeric Factors
+
+**You're never sure how a function will treat numeric factors!**
+
+\
+
+::: {.fragment}
+::: {.columns}
+::: {.column width="45%"}
+
+```{r}
+#| label: factors-function-ambiguity
+#| echo: true
+#| eval: true
+
+# Numeric data stored as factor (very common!)
+values <- factor(c("5", "10", "20", "50", "100"))
+
+# Different functions treat it differently:
+mean(values)  # NA! Can't compute mean of factor
+```
+
+:::
+
+::: {.column width="55%"}
+
+```{r}
+#| label: factors-function-ambiguity-1b
+#| echo: true
+#| eval: true
+
+# Some functions use underlying integers:
+as.numeric(values)  # 1 2 3 4 5 (WRONG!)
+
+# Some functions coerce to character first:
+paste("Dose:", values)  # Works as expected
+```
+
+:::
+:::
+:::
+
+\
+
+::: {.fragment}
+**Real danger: statistical functions**
+
+```{r}
+#| label: factors-function-ambiguity-2
+#| echo: true
+#| eval: true
+
+# Statistical models
+dose_factor <- factor(c(10, 20, 50, 100))
+response <- c(5, 10, 25, 45)
+
+# This will use factor integers (1,2,3,4), not doses!
+wrong_model <- lm(response ~ as.numeric(dose_factor))
+coef(wrong_model)
+```
+:::
+
+\
+
+::: {.fragment}
+```{r}
+#| label: factors-function-ambiguity-3
+#| echo: true
+#| eval: true
+
+# Correct approach
+correct_model <- lm(response ~ as.numeric(as.character(dose_factor)))
+coef(correct_model)
+
+# The slope is completely different!
+```
+
+**Always check your data types before analysis!**
+:::
+
+## Recommendations: Avoid Numeric Factors
+
+::: {.callout-warning}
+## Best Practices
+
+1. **Never store numeric values as factors** unless they represent categories
+2. **Prefix categorical numbers**: Use "Group_1", "Group_2" instead of "1", "2"
+3. **Check imported data**: CSV imports often convert numbers to factors
+4. **Use `readr::read_csv()`** instead of `read.csv()` - better type detection
+5. **Always convert via character**: `as.numeric(as.character(factor))` not `as.numeric(factor)`
+6. **Check with `str()`** before analysis to verify data types
+7. **For dose-response data**: Keep doses numeric, only convert to factor for plotting order
+:::
+
+\
+
+::: {.fragment}
+::: {.columns}
+::: {.column width="50%"}
+
+**Bad: Numeric categories**
+
+```{r}
+#| label: factors-numeric-bad-practice
+#| echo: true
+#| eval: true
+
+# DON'T do this - ambiguous!
+groups <- factor(c(1, 2, 4, 5))
+str(groups)
+# Are these numbers or categories?
+```
+
+:::
+
+::: {.column width="50%"}
+
+**Good: Prefixed categories**
+
+```{r}
+#| label: factors-numeric-good-practice
+#| echo: true
+#| eval: true
+
+# DO this - clearly categorical!
+groups <- factor(c("Group_1", "Group_2",
+                   "Group_4", "Group_5"))
+str(groups)
+# Obviously categories, safe!
+```
+
+:::
+:::
+:::
+
+\
+
+::: {.fragment}
+**For dose-response data:**
+
+```{r}
+#| label: factors-numeric-best-practice
+#| echo: true
+#| eval: false
+
+# Keep doses numeric for analysis
+dose_data <- data.frame(
+  dose_numeric = c(10, 20, 50, 100, 200),
+  response = c(5, 10, 25, 45, 80)
+)
+
+# Only convert to factor for plotting order:
+ggplot(dose_data, aes(x = factor(dose_numeric), y = response)) +
+  geom_boxplot()
+
+# But use numeric for analysis:
+model <- lm(response ~ dose_numeric, data = dose_data)
+```
+:::
 
 ## forcats Cheat Sheet
 
@@ -368,176 +904,6 @@ fct_explicit_na(f)       # Make NA a visible level
 factor(x, levels = gtools::mixedsort(unique(x)))
 ```
 
-## Real-World Example: Survey Data
-
-```{r}
-#| label: factors-survey-example
-#| echo: true
-#| eval: true
-
-# Likert scale survey responses
-set.seed(42)
-survey <- data.frame(
-  response = sample(c("Strongly Disagree", "Disagree", "Neutral",
-                     "Agree", "Strongly Agree"), 100, replace = TRUE)
-)
-
-# Set logical order
-survey$response <- factor(survey$response,
-  levels = c("Strongly Disagree", "Disagree", "Neutral",
-             "Agree", "Strongly Agree"))
-
-# Plot with correct order
-ggplot(survey, aes(x = response)) +
-  geom_bar(fill = "steelblue") +
-  coord_flip() +
-  theme_minimal()
-```
-
-## Real-World Example: Treatment Groups
-
-```{r}
-#| label: factors-treatment-example
-#| echo: true
-#| eval: true
-
-library(forcats)
-
-# Clinical trial data simulation
-set.seed(123)
-clinical <- data.frame(
-  treatment = rep(c("Placebo", "Low Dose", "Medium Dose", "High Dose"), each = 25),
-  response = rnorm(100, mean = rep(c(10, 12, 15, 18), each = 25), sd = 3)
-)
-
-# Ensure logical ordering
-clinical$treatment <- factor(clinical$treatment,
-  levels = c("Placebo", "Low Dose", "Medium Dose", "High Dose"))
-
-# Boxplots in dose order
-ggplot(clinical, aes(treatment, response)) +
-  geom_boxplot(fill = "lightblue") +
-  theme_classic()
-```
-
-## Combining Operations
-
-```{r}
-#| label: factors-combining
-#| echo: true
-#| eval: true
-
-# Combine multiple forcats functions
-mtcars %>%
-  mutate(
-    # 1. Convert to factor
-    cyl_group = factor(cyl),
-    # 2. Order by frequency
-    cyl_group = fct_infreq(cyl_group),
-    # 3. Reverse so most common at top
-    cyl_group = fct_rev(cyl_group)
-  ) %>%
-  ggplot(aes(cyl_group)) +
-  geom_bar()
-```
-
-## Before and After: Real Example
-
-::: {.columns}
-::: {.column width="50%"}
-
-```{r}
-#| label: factors-before
-#| echo: true
-#| eval: true
-#| fig-width: 5
-#| fig-height: 4
-
-# Before: alphabetical order
-ggplot(msleep %>% filter(!is.na(vore)),
-  aes(x = vore,
-      y = sleep_total)) +
-  geom_boxplot(fill = "coral") +
-  theme_classic(base_size = 10) +
-  labs(title = "Before: Alphabetical",
-       x = "Diet Type", y = "Sleep (hours)")
-
-# Order: carni, herbi, insecti, omni
-# Meaningless!
-```
-
-:::
-
-::: {.column width="50%"}
-
-```{r}
-#| label: factors-after
-#| echo: true
-#| eval: true
-#| fig-width: 5
-#| fig-height: 4
-
-library(forcats)
-# After: ordered by median sleep
-ggplot(msleep %>% filter(!is.na(vore)),
-  aes(x = fct_reorder(vore,
-           sleep_total,
-           median,
-           na.rm = TRUE),
-      y = sleep_total)) +
-  geom_boxplot(fill = "steelblue") +
-  theme_classic(base_size = 10) +
-  labs(title = "After: Ordered by Median",
-       x = "Diet Type", y = "Sleep (hours)")
-
-# Ordered by sleep time - logical!
-```
-
-:::
-:::
-
-## Common Patterns
-
-### Pattern 1: Sorted bar chart
-
-```{r}
-#| label: factors-pattern-sorted-bar
-#| echo: true
-#| eval: true
-
-mtcars %>%
-  count(cyl) %>%
-  ggplot(aes(x = fct_reorder(as.character(cyl), n), y = n)) +
-  geom_col() +
-  coord_flip()
-```
-
-### Pattern 2: Control group first
-
-```{r}
-#| label: factors-pattern-control
-#| echo: true
-#| eval: true
-
-mtcars %>%
-  mutate(group = fct_relevel(factor(cyl), "4")) %>%
-  ggplot(aes(group, mpg)) +
-  geom_boxplot()
-```
-
-### Pattern 3: Chronological grouping
-
-```{r}
-#| label: factors-pattern-chrono
-#| echo: true
-#| eval: true
-
-mtcars %>%
-  mutate(cyl_group = fct_reorder(factor(cyl), cyl)) %>%
-  ggplot(aes(wt, mpg)) +
-  geom_point() +
-  facet_wrap(~cyl_group)
-```
 
 ## Debugging Factor Issues
 
@@ -559,63 +925,27 @@ str(factor(mtcars$cyl))
 mtcars$cyl_char <- as.character(mtcars$cyl)
 ```
 
-## Recommendations
-
-::: {.callout-tip}
-## Best Practices
-
-1. **Always check factor order** before plotting
-2. **Use `fct_reorder()`** for data-driven ordering
-3. **Use manual levels** for logical ordering (Low/Med/High)
-4. **Use `fct_relevel()`** to put control/baseline first
-5. **Use `fct_infreq()`** for categorical data
-6. **Think about your reader** - what order makes sense?
-:::
-
-## Complete Example
-
-```{r}
-#| label: factors-complete-example
-#| echo: true
-#| eval: true
-
-library(ggplot2)
-library(dplyr)
-library(forcats)
-
-# Create simulated gene expression data by tissue type
-set.seed(123)
-expr_data <- data.frame(
-  tissue = rep(c("Brain", "Heart", "Liver", "Lung", "Kidney"), each = 50),
-  expression = c(rnorm(50, 100, 15), rnorm(50, 50, 10),
-                 rnorm(50, 200, 30), rnorm(50, 75, 12),
-                 rnorm(50, 150, 20))
-)
-
-# Plot with tissues ordered by median expression
-expr_data %>%
-  mutate(tissue = fct_reorder(tissue, expression, median)) %>%
-  ggplot(aes(x = tissue, y = expression, fill = tissue)) +
-  geom_boxplot(show.legend = FALSE) +
-  scale_fill_brewer(palette = "Set2") +
-  theme_classic(base_size = 14) +
-  labs(x = "Tissue Type",
-       y = "Expression Level",
-       title = "Gene Expression by Tissue")
-
-# Tissues ordered by median expression level!
-```
-
-## Key Takeaways
+## Key Takeaways & Best Practices
 
 ::: {.callout-important}
 ## Remember
 
-- **R defaults to alphabetical** factor ordering
-- **forcats package** provides powerful ordering tools
-- **`fct_reorder()`** orders by another variable
-- **`fct_infreq()`** orders by frequency
-- **Manual levels** for logical ordering (Low/Med/High)
-- **Always think about the reader** - what order makes sense?
-- **Check factor levels** before creating final plots
+**The Problem:**
+- **R defaults to alphabetical** factor ordering - usually wrong!
+- **Numeric factors are dangerous** - converting destroys your data
+- **Missing levels get renumbered** - group 4 becomes 3!
+
+**The Solutions:**
+- **forcats package** provides powerful ordering tools:
+  - **`fct_reorder()`** orders by another variable (most useful!)
+  - **`fct_infreq()`** orders by frequency
+  - **`fct_relevel()`** to put control/baseline first
+  - **`fct_rev()`** to reverse order
+- **Manual levels** for logical ordering (Low/Med/High, months, etc.)
+- **Prefix categorical numbers**: "Group_1" not "1"
+
+**Always:**
+- **Check factor order** before plotting with `str()` or `levels()`
+- **Convert via character**: `as.numeric(as.character(f))` not `as.numeric(f)`
+- **Think about your reader** - what order makes sense?
 :::
