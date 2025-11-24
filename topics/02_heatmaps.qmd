@@ -237,6 +237,13 @@ expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(
 ```
 
 
+
+
+:::
+
+::: {.column width="40%"}
+
+
 ```{r}
 #| label: quantile-cutoff-make-plot
 #| echo: true
@@ -257,6 +264,15 @@ p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
 ```
 
 
+:::
+:::
+
+
+
+::: {.columns}
+::: {.column width="60%"}
+
+
 ```{r}
 #| label: quantile-cutoff-plot
 #| echo: false
@@ -267,9 +283,11 @@ p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
 p
 ```
 
-:::
 
+
+:::
 ::: {.column width="40%"}
+
 
 **Quantile capping + range scaling**
 
