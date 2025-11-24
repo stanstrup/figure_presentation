@@ -536,18 +536,6 @@ pheatmap(data_mat,
 # Zero = white, negative = blue, positive = red
 ```
 
-## When NOT to Cap
-
-::: {.callout-warning}
-## Don't cap blindly!
-
-- If outliers are **biologically meaningful** (rare events)
-- Small datasets where each value matters
-- When you want to highlight extreme values
-
-**Alternative**: Use asterisks or separate panel for outliers
-:::
-
 ## Comparison: Before and After
 
 ```{r}
@@ -576,30 +564,36 @@ p2 <- pheatmap(data_mat,
 grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 ```
 
-## Color Scale Considerations
+## Best Practices & Recommendations
+
+::: {.callout-tip}
+## Workflow
+
+1. **Inspect data distribution** before making heatmap
+2. **Cap at 2-3 SD** for large datasets with outliers
+3. **Use quantiles** (5-95%) for robustness
+4. **Scale data BEFORE** passing to heatmap function
+5. **Calculate dendrograms** on the same scaled data
+6. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
+:::
 
 ::: {.callout-important}
-## Critical Elements
+## Color Scales
 
 1. **Always include color scale bar** with numeric labels
 2. **Center at meaningful value** (often zero for diverging data)
 3. **Label extremes if capped**: "<-2.5" or ">+2.5"
 4. **Use appropriate palette**:
-   - Diverging for data with meaningful zero (red-white-blue)
-   - Sequential for one-directional (viridis)
+   - Diverging for data with meaningful center (red-white-blue)
+   - Sequential for one-directional (viridis, magma)
 :::
 
-## Recommendations
+::: {.callout-warning}
+## When NOT to Cap
 
-::: {.callout-tip}
-## Best Practices
+- If outliers are **biologically meaningful** (rare events)
+- Small datasets where each value matters
+- When you want to highlight extreme values
 
-1. **Inspect data distribution** before making heatmap
-2. **Cap at 2-3 SD** for large datasets with outliers
-3. **Use quantiles** (5-95%) for robustness
-4. **Always annotate** what you did: "Values capped at ±3 SD"
-5. **Include color scale** with actual values
-6. **Scale data BEFORE** passing to heatmap function
-7. **Calculate dendrograms** on the same scaled data
-8. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
+**Alternative**: Use asterisks or separate panel for outliers
 :::
