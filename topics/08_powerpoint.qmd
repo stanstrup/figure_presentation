@@ -78,7 +78,7 @@ Modern PowerPoint supports SVG editing:
 
 - Keep a backup copy before ungrouping
 - Test with your specific plots first
-- For complex figures, consider Inkscape instead
+- For complex figures, consider Inkscape instead if editing is needed.
 :::
 
 :::
