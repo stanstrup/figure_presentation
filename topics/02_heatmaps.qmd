@@ -2,15 +2,15 @@
 
 ## The Outlier Problem
 
-**Scenario**: Gene expression data
+**Scenario**: Metabolomics data (log2-transformed)
 
-- 99% of values: -3 to +3
-- 1 outlier gene: +6
+- Most metabolites: 6 to 10 (log2 scale)
+- 1 outlier metabolite: ~10 (2^10 = 1000x higher!)
 
 ::: {.fragment}
 **What happens with default scaling?**
 
-Color scale: -6 to +6
+The extreme outlier compresses the color scale for all other values!
 
 :::
 
@@ -37,20 +37,28 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 
-# Simulate data with outlier as tibble
+# Simulate metabolomics data (positive only, with clustering)
 set.seed(123)
-expr_data <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10, ncol = 10) %>%
-  as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
-  mutate(Gene = paste0("Gene", 1:10), .before = 1)
+# Create two groups of samples with different metabolite patterns
+group1 <- matrix(rlnorm(50, meanlog = 2, sdlog = 0.8), nrow = 10, ncol = 5)
+group2 <- matrix(rlnorm(50, meanlog = 2.5, sdlog = 0.8), nrow = 10, ncol = 5)
 
-expr_data[5, "Sample5"] <- 6  # One extreme outlier
+expr_data <- cbind(group1, group2) %>%
+  as_tibble(.name_repair = ~c(paste0("Control", 1:5), paste0("Treatment", 1:5))) %>%
+  mutate(Metabolite = paste0("Metabolite_", 1:10), .before = 1)
 
-# Use divergent ColorBrewer scale with white at 0
-# RdBu = Red-Blue divergent scale (reversed so blue is positive)
-# Create symmetric breaks centered at 0
-expr_mat_outlier <- expr_data %>% column_to_rownames("Gene")
-max_abs <- max(abs(range(expr_mat_outlier)))
-breaks <- seq(-max_abs, max_abs, length.out = 101)
+expr_data[5, "Treatment3"] <- 1000  # One extreme outlier
+
+# Log-transform for visualization (metabolomics data is often log-transformed)
+expr_log <- expr_data %>%
+  mutate(across(-Metabolite, ~ log2(.x)))
+
+# Use divergent ColorBrewer scale centered at mean
+# RdBu = Red-Blue divergent scale (reversed so blue is high)
+expr_mat_outlier <- expr_log %>% column_to_rownames("Metabolite")
+data_center <- mean(as.matrix(expr_mat_outlier), na.rm = TRUE)
+max_diff <- max(abs(as.matrix(expr_mat_outlier) - data_center))
+breaks <- seq(data_center - max_diff, data_center + max_diff, length.out = 101)
 
 p <- pheatmap(expr_mat_outlier,
               main = "With outlier: All data compressed!",
@@ -64,8 +72,8 @@ p <- pheatmap(expr_mat_outlier,
 ```{r}
 #| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 6
+#| fig-width: 6
+#| fig-height: 4
 p
 ```
 :::
@@ -86,43 +94,46 @@ p
 
 ## Solution 1: Standard Deviation Cutoffs
 
+
+::: {.columns}
+::: {.column width="65%"}
+
+
 ```{r}
 #| label: sd-cutoff
 #| echo: true
 #| eval: true
 
 # Step 1: Scale variables to unit variance (mean=0, sd=1)
-expr_scaled <- expr_data %>%
-                  mutate(across(-Gene, ~ scale(.x)[,1]))
+expr_scaled <- expr_data %>% mutate(across(-Metabolite, ~ scale(.x)[,1]))
 
 # Step 2: Cap at ±3 (only meaningful after scaling!)
-expr_capped <- expr_scaled %>%
-                  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
+expr_capped <- expr_scaled %>% mutate(across(-Metabolite, ~ pmin(pmax(.x, -3), 3)))
 
-# Create symmetric breaks centered at 0
-expr_mat <- expr_capped %>% column_to_rownames("Gene")
-max_abs <- max(abs(range(expr_mat)))
-breaks <- seq(-max_abs, max_abs, length.out = 101)
+# Step 3: Create symmetric breaks centered at 0
+max_abs <- max(abs(range(expr_capped[,-1])))
+breaks  <- seq(-max_abs, max_abs, length.out = 101)
 
-p <- pheatmap(expr_mat,
+p <- pheatmap(expr_capped %>% column_to_rownames("Metabolite"),
               main = "Scaled + capped at ±3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = breaks,
-              scale = "none",  # Already scaled!
-              silent = TRUE)
+              breaks = breaks, scale = "none", silent = TRUE)
 ```
 
-::: {.columns}
-::: {.column width="60%"}
+
 ```{r}
 #| echo: false
 #| eval: true
+#| fig-width: 6
+#| fig-height: 4
 
 p
 ```
+
 :::
 
-::: {.column width="40%"}
+::: {.column width="35%"}
+
 **Most common approach**
 
 - **Scale FIRST** to unit variance
@@ -131,8 +142,12 @@ p
 - ±3 captures ~99.7% of data
 - Uses full color range
 - Set `scale = "none"` (already scaled!)
+
 :::
 :::
+
+
+
 
 ## Solution 2: Quantile-Based
 
@@ -144,13 +159,13 @@ p
 # Cap at 5th and 95th percentiles PER COLUMN (sample)
 # Important: columns may be on different scales!
 expr_quantile <- expr_data %>%
-  mutate(across(-Gene, ~ {
+  mutate(across(-Metabolite, ~ {
     lower <- quantile(.x, 0.05, na.rm = TRUE)
     upper <- quantile(.x, 0.95, na.rm = TRUE)
     pmin(pmax(.x, lower), upper)
   }))
 
-p <- pheatmap(expr_quantile %>% column_to_rownames("Gene"),
+p <- pheatmap(expr_quantile %>% column_to_rownames("Metabolite"),
               main = "Values capped at 5-95 percentiles (per sample)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
@@ -187,12 +202,12 @@ p
 
 # Step 1: Scale to unit variance first by row
 expr_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ scale(.x)[,1]))
+  mutate(across(-Metabolite, ~ scale(.x)[,1]))
 
 # Step 2: Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
 
-p <- pheatmap(expr_scaled %>% column_to_rownames("Gene"),
+p <- pheatmap(expr_scaled %>% column_to_rownames("Metabolite"),
               breaks = breaks,
               main = "Scaled + custom breaks: -3 to +3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
@@ -237,15 +252,15 @@ p
 set.seed(123)
 count_data <- matrix(rpois(100, lambda = 50), nrow = 10, ncol = 10) %>%
   as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
-  mutate(Gene = paste0("Gene", 1:10), .before = 1)
+  mutate(Gene = paste0("Metabolite", 1:10), .before = 1)
 
 count_data[5, "Sample5"] <- 5000  # Extreme count
 
 # Log transform BEFORE plotting
 count_log <- count_data %>%
-  mutate(across(-Gene, ~ log10(.x + 1)))  # +1 to handle zeros
+  mutate(across(-Metabolite, ~ log10(.x + 1)))  # +1 to handle zeros
 
-p <- pheatmap(count_log %>% column_to_rownames("Gene"),
+p <- pheatmap(count_log %>% column_to_rownames("Metabolite"),
               main = "Log10 transformed counts",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
@@ -306,39 +321,39 @@ Without scaling, features with large values dominate sample similarity!
 
 set.seed(42)
 
-# Create sample clustering example (genes × samples)
+# Create sample clustering example (metabolites × samples)
 # Gene 1: small variation (0-1 range)
 # Gene 2: HUGE variation (0-1000 range) - dominates if not scaled!
-gene_data <- data.frame(
+metabolite_data <- data.frame(
   Sample1 = c(0.5, 100),
   Sample2 = c(0.6, 150),
   Sample3 = c(0.55, 900),
   Sample4 = c(0.58, 950),
-  row.names = c("Gene1", "Gene2")
+  row.names = c("Feature1", "Feature2")
 )
 
 # Calculate sample distances WITHOUT scaling
-dist_unscaled <- dist(t(gene_data))
+dist_unscaled <- dist(t(metabolite_data))
 
 # Calculate sample distances WITH scaling
-gene_scaled <- t(scale(t(gene_data)))
-dist_scaled <- dist(t(gene_scaled))
+metabolite_scaled <- t(scale(t(metabolite_data)))
+dist_scaled <- dist(t(metabolite_scaled))
 
 # Visualize
 par(mfrow = c(1, 2))
 
-# Unscaled: Gene2 dominates!
-plot(hclust(dist_unscaled), main = "Unscaled: Gene2 dominates clustering",
+# Unscaled: Feature2 dominates!
+plot(hclust(dist_unscaled), main = "Unscaled: Feature2 dominates clustering",
      xlab = paste("Sample1-2 close, Sample3-4 close\n",
-                  "(only Gene2 matters!)"))
+                  "(only Feature2 matters!)"))
 
-# Scaled: Both genes contribute
-plot(hclust(dist_scaled), main = "Scaled: Both genes contribute equally",
+# Scaled: Both metabolites contribute
+plot(hclust(dist_scaled), main = "Scaled: Both metabolites contribute equally",
      xlab = "Different clustering pattern")
 ```
 
 ::: {.fragment}
-**Key point**: Without scaling, high-variance features (Gene2) completely dominate the distance calculation between samples!
+**Key point**: Without scaling, high-variance features (Feature2) completely dominate the distance calculation between samples!
 
 Scaling by row ensures all features contribute equally to sample clustering.
 :::
@@ -356,13 +371,13 @@ Scaling by row ensures all features contribute equally to sample clustering.
 ```r
 # Proper workflow (using tibbles)
 data_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ scale(.x)[,1]))
+  mutate(across(-Metabolite, ~ scale(.x)[,1]))
 
 data_capped <- data_scaled %>%
-  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
+  mutate(across(-Metabolite, ~ pmin(pmax(.x, -3), 3)))
 
 # Calculate dendrograms on scaled data
-data_mat <- data_capped %>% column_to_rownames("Gene") %>% as.matrix()
+data_mat <- data_capped %>% column_to_rownames("Metabolite") %>% as.matrix()
 row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
@@ -402,7 +417,7 @@ library(massageR)
 
 # Convert tibble to matrix for heat.clust
 expr_matrix <- expr_data %>%
-  column_to_rownames("Gene") %>%
+  column_to_rownames("Metabolite") %>%
   as.matrix()
 
 # Use heat.clust to scale and cluster
@@ -438,16 +453,16 @@ pheatmap(z$data,
 #| fig-width: 10
 #| fig-height: 6
 
-# Step 1: Scale by row (gene)
+# Step 1: Scale by row (metabolite)
 data_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ scale(.x)[,1]))
+  mutate(across(-Metabolite, ~ scale(.x)[,1]))
 
 # Step 2: Cap extremes at ±2.5
 data_capped <- data_scaled %>%
-  mutate(across(-Gene, ~ pmin(pmax(.x, -2.5), 2.5)))
+  mutate(across(-Metabolite, ~ pmin(pmax(.x, -2.5), 2.5)))
 
 # Step 3: Calculate dendrograms on scaled data
-data_mat <- data_capped %>% column_to_rownames("Gene") %>% as.matrix()
+data_mat <- data_capped %>% column_to_rownames("Metabolite") %>% as.matrix()
 row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
@@ -505,7 +520,7 @@ pheatmap(data_mat,
 library(gridExtra)
 
 # Before: with outlier
-p1 <- pheatmap(expr_data %>% column_to_rownames("Gene"),
+p1 <- pheatmap(expr_data %>% column_to_rownames("Metabolite"),
                main = "Uncapped: Pattern lost",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                silent = TRUE)
