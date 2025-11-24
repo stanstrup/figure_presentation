@@ -42,13 +42,33 @@ set.seed(123)
 # Create two groups of samples with different metabolite patterns
 # Samples in rows, metabolites in columns (standard data format)
 group1 <- matrix(rlnorm(50, meanlog = 2, sdlog = 0.8), nrow = 5, ncol = 10)
-group2 <- matrix(rlnorm(50, meanlog = 2.5, sdlog = 0.8), nrow = 5, ncol = 10)
+group2 <- matrix(rlnorm(50, meanlog = 4, sdlog = 0.8), nrow = 5, ncol = 10)
 
 expr_data <- rbind(group1, group2) %>%
   as_tibble(.name_repair = ~paste0("Metabolite_", 1:10)) %>%
   mutate(Sample = c(paste0("Control", 1:5), paste0("Treatment", 1:5)), .before = 1)
 
-expr_data[5, "Metabolite_3"] <- 1000  # One extreme outlier
+# Add outliers to half the metabolites (5 out of 10)
+# Each affected metabolite has 1-3 samples with extreme values
+set.seed(456)
+for (i in 1:5) {  # First 5 metabolites get outliers
+  metab_col <- paste0("Metabolite_", i)
+  normal_range <- range(expr_data[[metab_col]])
+  range_size <- diff(normal_range)
+
+  # Randomly select 1-3 samples for this metabolite
+  n_outliers <- sample(1:3, 1)
+  outlier_samples <- sample(1:10, n_outliers)
+
+  for (s in outlier_samples) {
+    # Randomly make it very high (2-4x) or very low (0.25-0.5x)
+    if (runif(1) > 0.5) {
+      expr_data[s, metab_col] <- normal_range[2] * runif(1, 2, 4)
+    } else {
+      expr_data[s, metab_col] <- normal_range[1] * runif(1, 0.25, 0.5)
+    }
+  }
+}
 
 # Log-transform for visualization (metabolomics data is often log-transformed)
 expr_log <- expr_data %>%
