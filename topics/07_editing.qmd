@@ -25,12 +25,24 @@
 :::
 
 ::: {.column width="50%"}
-**Adobe Illustrator**
+**Other options:**
 
-- Industry standard (commercial)
-- Also an option for vector editing
-- We'll focus on Inkscape examples
+- **Adobe Illustrator**: Industry standard (commercial)
+- **PowerPoint**: Can edit SVG as vector format
 :::
+:::
+
+::: {.callout-warning}
+## ⚠️ Avoid Raster Editors!
+
+**DO NOT use Photoshop, GIMP, or other raster editors** for plots!
+
+- These convert your plots to pixels (rasterization)
+- You lose scalability and editability
+- Text becomes uneditable
+- Quality degrades when resized
+
+**Keep it vector!** Use Inkscape, Illustrator, or PowerPoint with SVG.
 :::
 
 ## Export for Editability
