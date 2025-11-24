@@ -62,32 +62,23 @@ for (i in 1:5) {  # First 5 metabolites get outliers
 
   for (s in outlier_samples) {
     # Randomly make it very high (2-4x) or very low (0.25-0.5x)
-    if (runif(1) > 0.5) {
       expr_data[s, metab_col] <- normal_range[2] * runif(1, 2, 4)
-    } else {
-      expr_data[s, metab_col] <- normal_range[1] * runif(1, 0.25, 0.5)
-    }
   }
 }
+
 
 # Log-transform for visualization (metabolomics data is often log-transformed)
 expr_log <- expr_data %>%
   mutate(across(-Sample, ~ log2(.x)))
 
-# Use divergent ColorBrewer scale centered at mean
-# RdBu = Red-Blue divergent scale (reversed so blue is high)
+# Use viridis scale for positive-only data (no meaningful center)
 expr_mat_outlier <- expr_log %>%
   column_to_rownames("Sample") %>%
   as.matrix()
 
-data_center <- mean(expr_mat_outlier, na.rm = TRUE)
-max_diff <- max(abs(expr_mat_outlier - data_center), na.rm = TRUE)
-breaks <- seq(data_center - max_diff, data_center + max_diff, length.out = 101)
-
 p <- pheatmap(expr_mat_outlier,
-              main = "With outlier: All data compressed!",
-              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = breaks,
+              main = "With outliers: All data compressed!",
+              color = viridis::viridis(100),
               silent = TRUE)
 ```
 
