@@ -248,11 +248,11 @@ p
 #| echo: true
 #| eval: true
 
-# Create positive data (e.g., count data)
+# Create positive data (e.g., count data for metabolites)
 set.seed(123)
 count_data <- matrix(rpois(100, lambda = 50), nrow = 10, ncol = 10) %>%
   as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
-  mutate(Gene = paste0("Metabolite", 1:10), .before = 1)
+  mutate(Metabolite = paste0("Metabolite_", 1:10), .before = 1)
 
 count_data[5, "Sample5"] <- 5000  # Extreme count
 
