@@ -69,17 +69,17 @@ pheatmap(expr_matrix,
 #| echo: true
 #| eval: true
 
-# Cap at ±3 SD
-mean_val <- mean(expr_matrix, na.rm = TRUE)
-sd_val <- sd(expr_matrix, na.rm = TRUE)
+# Step 1: Scale to unit variance (mean=0, sd=1)
+expr_scaled <- t(scale(t(expr_matrix)))
 
-expr_capped <- pmin(pmax(expr_matrix, mean_val - 3*sd_val),
-                    mean_val + 3*sd_val)
+# Step 2: Cap at ±3 (now meaningful after scaling!)
+expr_capped <- pmin(pmax(expr_scaled, -3), 3)
 
 p <- pheatmap(expr_capped,
-              main = "Values capped at ±3 SD",
+              main = "Scaled + capped at ±3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = seq(-3, 3, length.out = 101))
+              breaks = seq(-3, 3, length.out = 101),
+              scale = "none")  # Already scaled!
 ```
 
 ::: {.columns}
@@ -96,10 +96,11 @@ p
 ::: {.column width="40%"}
 **Most common approach**
 
-- Cap at ±2 or ±3 SD
-- ~99.7% of data preserved
+- **Scale FIRST** to unit variance
+- Then cap at ±2 or ±3
+- ±3 captures ~99.7% of data
 - Uses full color range
-- Patterns now visible!
+- Set `scale = "none"` (already scaled!)
 :::
 :::
 
@@ -149,13 +150,17 @@ p
 #| echo: true
 #| eval: true
 
-# Define your own color breaks
+# Step 1: Scale to unit variance first
+expr_scaled <- t(scale(t(expr_matrix)))
+
+# Step 2: Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
 
-p <- pheatmap(expr_matrix,
+p <- pheatmap(expr_scaled,
               breaks = breaks,
-              main = "Custom breaks: -3 to +3",
-              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
+              main = "Scaled + custom breaks: -3 to +3",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+              scale = "none")  # Already scaled!
 
 # Values outside range automatically assigned to extremes
 ```
@@ -174,10 +179,11 @@ p
 ::: {.column width="40%"}
 **Maximum control**
 
-- Define exact color mapping
+- **Scale FIRST** to unit variance
+- Then define exact breaks
 - Values outside range → extremes
 - Good when you know your data
-- Can combine with other methods
+- Can combine with capping
 :::
 :::
 
