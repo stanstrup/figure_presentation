@@ -1,5 +1,16 @@
 # Factor Ordering {background-color="#2980b9"}
 
+```{r}
+#| label: setup-factors
+#| echo: false
+#| eval: true
+#| message: false
+
+library(ggplot2)
+library(dplyr)
+library(forcats)
+```
+
 ## The Alphabetical Problem
 
 **R's default behavior:**
