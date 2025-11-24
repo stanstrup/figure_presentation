@@ -45,23 +45,6 @@
 **Keep it vector!** Use Inkscape, Illustrator, or PowerPoint with SVG.
 :::
 
-## Export for Editability
-
-```{r}
-#| label: editing-export
-#| echo: true
-#| eval: false
-
-# For Inkscape: use SVG (preferred)
-ggsave("plot.svg", p, width = 7, height = 5)
-
-# Or PDF with embedded fonts (also works well)
-ggsave("plot.pdf", p, width = 7, height = 5,
-       device = cairo_pdf)
-
-# Both preserve vector graphics
-# Text remains editable
-```
 
 
 ## Aligning Multiple Plots
@@ -180,19 +163,8 @@ walk2(list(p1, p2, p3, p4),
 # 2×2 layout with labels A-D
 ```
 
-## Recommendations
 
-::: {.callout-tip}
-## Best Practices
-
-1. **Keep R scripts** as authoritative source
-2. **Export individual panels** as separate files
-3. **Use vector formats** (PDF, SVG)
-4. **Document manual edits** in README
-5. **Save layered source files** (.ai, .svg)
-6. **Final export as PDF** for submission
-7. **When in doubt, regenerate from R**
-:::
+# Combine figures directly in R instead {background-color="#16a085"}
 
 ## The patchwork Package
 
@@ -238,27 +210,6 @@ p4 <- ggplot(mtcars, aes(hp, mpg)) +
 - **Flexible layouts** - complex arrangements possible
 :::
 
-## patchwork: Basic Operators
-
-```{r}
-#| label: patchwork-operators
-#| echo: true
-#| eval: false
-
-library(patchwork)
-
-# Side by side (horizontal)
-p1 | p2
-
-# Stacked (vertical)
-p1 / p2
-
-# Combine both
-(p1 | p2) / (p3 | p4)
-
-# Addition also works for side-by-side
-p1 + p2
-```
 
 ## patchwork: Side by Side
 
@@ -268,6 +219,8 @@ p1 + p2
 #| eval: true
 #| fig-width: 10
 #| fig-height: 4
+
+library(patchwork)
 
 p1 | p2 | p3
 ```
@@ -327,7 +280,7 @@ p1 / p2 / p3
   theme(plot.tag = element_text(face = 'bold', size = 14))
 ```
 
-Labels become **(A)**, **(B)**, etc. with bold styling
+
 
 ## Unequal Panel Sizes
 
@@ -399,7 +352,7 @@ ggsave("figure1.pdf", combined, width = 10, height = 8)
 ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 ```
 
-## patchwork vs Manual Editing
+## patchwork vs Manual Editing: Decision Guide
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -416,10 +369,19 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 ✅ Version controlled
 
 ⚠️ Less layout flexibility
+
+\
+
+**Use patchwork when:**
+
+- All panels are ggplot2 objects
+- Need reproducible figures
+- Figures may need updates
+- Sharing code with collaborators
 :::
 
 ::: {.column width="50%"}
-**Inkscape**
+**Inkscape (manual editing)**
 
 ✅ Pixel-perfect control
 
@@ -432,18 +394,8 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 ❌ Manual re-editing
 
 ❌ Easy to break
-:::
-:::
 
-## When to Use patchwork
-
-**Use patchwork when:**
-
-- All panels are ggplot2 objects
-- Need reproducible figures
-- Simple to moderately complex layouts
-- Sharing code with collaborators
-- Figures may need updates
+\
 
 **Use Inkscape when:**
 
@@ -451,4 +403,6 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 - Adding photos, diagrams, or non-R content
 - Very complex custom layouts
 - Final publication polish only
+:::
+:::
 
