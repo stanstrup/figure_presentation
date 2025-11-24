@@ -123,13 +123,18 @@ p
 #| echo: true
 #| eval: true
 
+library(dplyr)
+
 # Cap at 5th and 95th percentiles PER COLUMN (sample)
 # Important: columns may be on different scales!
-expr_quantile <- apply(expr_matrix, 2, function(x) {
-  lower <- quantile(x, 0.05, na.rm = TRUE)
-  upper <- quantile(x, 0.95, na.rm = TRUE)
-  pmin(pmax(x, lower), upper)
-})
+expr_quantile <- expr_matrix %>%
+  as.data.frame() %>%
+  mutate(across(everything(), ~ {
+    lower <- quantile(.x, 0.05, na.rm = TRUE)
+    upper <- quantile(.x, 0.95, na.rm = TRUE)
+    pmin(pmax(.x, lower), upper)
+  })) %>%
+  as.matrix()
 
 p <- pheatmap(expr_quantile,
               main = "Values capped at 5-95 percentiles (per sample)",
