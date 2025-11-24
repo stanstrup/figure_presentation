@@ -31,6 +31,13 @@ library(massageR)
 scale_mad <- function(x) {
   (x - median(x, na.rm = TRUE)) / mad(x, na.rm = TRUE)
 }
+
+# Define quantile capping function (reusable)
+cap_quantiles <- function(x, lower = 0.05, upper = 0.95) {
+  q_lower <- quantile(x, lower, na.rm = TRUE)
+  q_upper <- quantile(x, upper, na.rm = TRUE)
+  pmin(pmax(x, q_lower), q_upper)
+}
 ```
 
 ```{r}
@@ -205,7 +212,7 @@ p
 
 
 ::: {.columns}
-::: {.column width="65%"}
+::: {.column width="60%"}
 
 
 ```{r}
@@ -215,20 +222,15 @@ p
 
 # Step 1: Identify values outside 5-95 percentiles PER COLUMN
 expr_mat_raw <- expr_data %>% column_to_rownames("Sample") %>% as.matrix()
-capped_cells_q <- matrix(FALSE, nrow = nrow(expr_mat_raw), ncol = ncol(expr_mat_raw))
-for (j in 1:ncol(expr_mat_raw)) {
-  lower <- quantile(expr_mat_raw[, j], 0.05, na.rm = TRUE)
-  upper <- quantile(expr_mat_raw[, j], 0.95, na.rm = TRUE)
-  capped_cells_q[, j] <- (expr_mat_raw[, j] < lower) | (expr_mat_raw[, j] > upper)
-}
+capped_cells_q <- apply(expr_mat_raw, 2, function(x) {
+  q_lower <- quantile(x, 0.05, na.rm = TRUE)
+  q_upper <- quantile(x, 0.95, na.rm = TRUE)
+  (x < q_lower) | (x > q_upper)
+})
 
 # Step 2: Cap at 5th and 95th percentiles PER COLUMN (metabolite)
 expr_capped <- expr_data %>%
-  mutate(across(-Sample, ~ {
-    lower <- quantile(.x, 0.05, na.rm = TRUE)
-    upper <- quantile(.x, 0.95, na.rm = TRUE)
-    pmin(pmax(.x, lower), upper)
-  }))
+  mutate(across(-Sample, ~ cap_quantiles(.x, lower = 0.05, upper = 0.95)))
 
 # Step 3: Range scaling (min-max normalization to [0,1])
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
@@ -267,7 +269,7 @@ p
 
 :::
 
-::: {.column width="35%"}
+::: {.column width="40%"}
 
 **Quantile capping + range scaling**
 
