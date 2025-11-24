@@ -111,7 +111,7 @@ p
 
 
 ::: {.columns}
-::: {.column width="65%"}
+::: {.column width="60%"}
 
 
 ```{r}
@@ -120,7 +120,6 @@ p
 #| eval: true
 
 # Step 1: Robust scaling using MAD (Median Absolute Deviation)
-# MAD is not affected by outliers, unlike SD
 expr_scaled <- expr_data %>%
   mutate(across(-Sample, scale_mad))
 
@@ -134,17 +133,46 @@ expr_capped <- expr_scaled %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 # Step 4: Create symmetric breaks centered at 0
 max_abs <- max(abs(range(expr_capped[,-1])))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
+```
 
-# Mark capped values with borders
+
+
+
+:::
+
+::: {.column width="40%"}
+
+
+```{r}
+#| label: sd-cutoff-make-plot
+#| echo: true
+#| eval: true
+
+# First run pheatmap to get clustering order
+p_temp <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
+                   color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+                   breaks = breaks, scale = "none", silent = TRUE)
+
+# Reorder border_color matrix to match pheatmap clustering
 border_color <- matrix(NA, nrow = nrow(capped_cells), ncol = ncol(capped_cells))
 border_color[capped_cells] <- "black"
+border_color <- border_color[p_temp$tree_row$order, p_temp$tree_col$order]
 
+# Now create final plot with borders
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
               main = "MAD-scaled + capped at ±3 (black borders = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks, scale = "none",
               border_color = border_color, silent = TRUE)
 ```
+
+
+:::
+:::
+
+
+::: {.columns}
+::: {.column width="60%"}
 
 
 ```{r}
@@ -157,9 +185,11 @@ p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
 p
 ```
 
-:::
 
-::: {.column width="35%"}
+
+:::
+::: {.column width="40%"}
+
 
 **Robust scaling approach**
 
@@ -172,9 +202,6 @@ p
 
 :::
 :::
-
-
-
 
 ## Solution 2: Range scaling and Quantile-Based cut-off
 
@@ -203,10 +230,16 @@ expr_capped <- expr_data %>%
 # Step 3: Range scaling (min-max normalization to [0,1])
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
 
-# Mark capped values
+# First run pheatmap to get clustering order
+p_temp_q <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
+                     color = rev(viridis::magma(100)), silent = TRUE)
+
+# Reorder border_color matrix to match pheatmap clustering
 border_color_q <- matrix(NA, nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
 border_color_q[capped_cells_q] <- "black"
+border_color_q <- border_color_q[p_temp_q$tree_row$order, p_temp_q$tree_col$order]
 
+# Now create final plot with borders
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
               main = "Capped at 5-95 percentiles + range-scaled (black borders = capped)",
               color = rev(viridis::magma(100)),
@@ -516,9 +549,17 @@ expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, 
 max_abs_comp <- max(abs(range(expr_capped_comp[,-1])))
 breaks_comp <- seq(-max_abs_comp, max_abs_comp, length.out = 101)
 
+# First run to get clustering order
+p2_temp <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
+                    color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+                    breaks = breaks_comp, scale = "none", silent = TRUE)
+
+# Reorder border_color matrix
 border_color_comp <- matrix(NA, nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
 border_color_comp[capped_cells_comp] <- "black"
+border_color_comp <- border_color_comp[p2_temp$tree_row$order, p2_temp$tree_col$order]
 
+# Final plot with borders
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
                main = "MAD-scaled + capped at ±3 (black borders = capped)",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
