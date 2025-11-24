@@ -68,8 +68,6 @@ pheatmap(expr_matrix,
 #| label: sd-cutoff
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
 
 # Cap at ±3 SD
 mean_val <- mean(expr_matrix, na.rm = TRUE)
@@ -78,17 +76,32 @@ sd_val <- sd(expr_matrix, na.rm = TRUE)
 expr_capped <- pmin(pmax(expr_matrix, mean_val - 3*sd_val),
                     mean_val + 3*sd_val)
 
-pheatmap(expr_capped,
-         main = "Values capped at ±3 SD",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-         breaks = seq(-3, 3, length.out = 101))
+p <- pheatmap(expr_capped,
+              main = "Values capped at ±3 SD",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+              breaks = seq(-3, 3, length.out = 101))
 ```
 
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
 
-- Scale: -3 to +3 (capped at ±3 SD)
-- ~99.7% of data: -3 to +3
-- Uses 100% of color range
-- Patterns visible!
+::: {.column width="40%"}
+**Most common approach**
+
+- Cap at ±2 or ±3 SD
+- ~99.7% of data preserved
+- Uses full color range
+- Patterns now visible!
+:::
+:::
 
 ## Solution 2: Quantile-Based
 
@@ -96,8 +109,6 @@ pheatmap(expr_capped,
 #| label: quantile-cutoff
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
 
 # Cap at 5th and 95th percentiles
 lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
@@ -105,12 +116,31 @@ upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
 
 expr_quantile <- pmin(pmax(expr_matrix, lower), upper)
 
-pheatmap(expr_quantile,
-         main = "Values capped at 5-95 percentiles",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
+p <- pheatmap(expr_quantile,
+              main = "Values capped at 5-95 percentiles",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 ```
 
-Robust to extreme outliers
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+
+::: {.column width="40%"}
+**More robust approach**
+
+- Uses percentiles instead of SD
+- Not affected by extreme outliers
+- Good for non-normal data
+- Common: 5-95% or 2-98%
+:::
+:::
 
 ## Solution 3: Manual Breaks
 
@@ -118,21 +148,38 @@ Robust to extreme outliers
 #| label: manual-breaks
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
 
 # Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
 
-pheatmap(expr_matrix,
-         breaks = breaks,
-         main = "Custom breaks: -3 to +3",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
+p <- pheatmap(expr_matrix,
+              breaks = breaks,
+              main = "Custom breaks: -3 to +3",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 
 # Values outside range automatically assigned to extremes
 ```
 
-Full control over color mapping
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+
+::: {.column width="40%"}
+**Maximum control**
+
+- Define exact color mapping
+- Values outside range → extremes
+- Good when you know your data
+- Can combine with other methods
+:::
+:::
 
 ## Solution 4: Log Transformation
 
@@ -142,8 +189,6 @@ Full control over color mapping
 #| label: log-transform
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
 
 # Create positive data (e.g., count data)
 set.seed(123)
@@ -155,10 +200,31 @@ colnames(count_matrix) <- paste0("Sample", 1:10)
 # Log transform BEFORE plotting
 count_log <- log10(count_matrix + 1)  # +1 to handle zeros
 
-pheatmap(count_log,
-         main = "Log10 transformed counts",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
+p <- pheatmap(count_log,
+              main = "Log10 transformed counts",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 ```
+
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+
+::: {.column width="40%"}
+**For count/intensity data**
+
+- Compresses wide ranges
+- Add +1 to handle zeros
+- Common for RNA-seq, proteomics
+- Use log2, log10, or ln
+:::
+:::
 
 
 
