@@ -33,16 +33,21 @@ library(massageR)
 #| echo: false
 #| eval: true
 
-# Simulate data with outlier
+library(tibble)
+library(dplyr)
+library(tidyr)
+
+# Simulate data with outlier as tibble
 set.seed(123)
-expr_matrix <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
-rownames(expr_matrix) <- paste0("Gene", 1:10)
-colnames(expr_matrix) <- paste0("Sample", 1:10)
-expr_matrix[5, 5] <- 6  # One extreme outlier
+expr_data <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10, ncol = 10) %>%
+  as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
+  mutate(Gene = paste0("Gene", 1:10), .before = 1)
+
+expr_data[5, "Sample5"] <- 6  # One extreme outlier
 
 # Use divergent ColorBrewer scale with white at 0
 # RdBu = Red-Blue divergent scale (reversed so blue is positive)
-p <- pheatmap(expr_matrix,
+p <- pheatmap(expr_data %>% column_to_rownames("Gene"),
               main = "With outlier: All data compressed!",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = seq(-6, 6, length.out = 101),
@@ -81,13 +86,15 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale variables to unit variance (mean=0, sd=1)
-expr_scaled <- scale(expr_matrix)
+# Step 1: Scale to unit variance (mean=0, sd=1) by row
+expr_scaled <- expr_data %>%
+  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
 
 # Step 2: Cap at ±3 (only meaningful after scaling!)
-expr_capped <- pmin(pmax(expr_scaled, -3), 3)
+expr_capped <- expr_scaled %>%
+  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
 
-p <- pheatmap(expr_capped,
+p <- pheatmap(expr_capped %>% column_to_rownames("Gene"),
               main = "Scaled + capped at ±3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = seq(-3, 3, length.out = 101),
@@ -123,20 +130,16 @@ p
 #| echo: true
 #| eval: true
 
-library(dplyr)
-
 # Cap at 5th and 95th percentiles PER COLUMN (sample)
 # Important: columns may be on different scales!
-expr_quantile <- expr_matrix %>%
-  as.data.frame() %>%
-  mutate(across(everything(), ~ {
+expr_quantile <- expr_data %>%
+  mutate(across(-Gene, ~ {
     lower <- quantile(.x, 0.05, na.rm = TRUE)
     upper <- quantile(.x, 0.95, na.rm = TRUE)
     pmin(pmax(.x, lower), upper)
-  })) %>%
-  as.matrix()
+  }))
 
-p <- pheatmap(expr_quantile,
+p <- pheatmap(expr_quantile %>% column_to_rownames("Gene"),
               main = "Values capped at 5-95 percentiles (per sample)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
@@ -171,13 +174,14 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale to unit variance first
-expr_scaled <- t(scale(t(expr_matrix)))
+# Step 1: Scale to unit variance first by row
+expr_scaled <- expr_data %>%
+  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
 
 # Step 2: Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
 
-p <- pheatmap(expr_scaled,
+p <- pheatmap(expr_scaled %>% column_to_rownames("Gene"),
               breaks = breaks,
               main = "Scaled + custom breaks: -3 to +3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
@@ -220,15 +224,17 @@ p
 
 # Create positive data (e.g., count data)
 set.seed(123)
-count_matrix <- matrix(rpois(100, lambda = 50), nrow = 10)
-count_matrix[5, 5] <- 5000  # Extreme count
-rownames(count_matrix) <- paste0("Gene", 1:10)
-colnames(count_matrix) <- paste0("Sample", 1:10)
+count_data <- matrix(rpois(100, lambda = 50), nrow = 10, ncol = 10) %>%
+  as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
+  mutate(Gene = paste0("Gene", 1:10), .before = 1)
+
+count_data[5, "Sample5"] <- 5000  # Extreme count
 
 # Log transform BEFORE plotting
-count_log <- log10(count_matrix + 1)  # +1 to handle zeros
+count_log <- count_data %>%
+  mutate(across(-Gene, ~ log10(.x + 1)))  # +1 to handle zeros
 
-p <- pheatmap(count_log,
+p <- pheatmap(count_log %>% column_to_rownames("Gene"),
               main = "Log10 transformed counts",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
