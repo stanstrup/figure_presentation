@@ -9,6 +9,7 @@
 library(ggplot2)
 library(dplyr)
 library(forcats)
+library(patchwork)
 
 # Set default theme for all plots
 theme_set(theme_bw())
@@ -445,7 +446,7 @@ p
 
 # Order facets by median highway mpg for each vehicle class
 p <- mpg %>%
-  filter(class %in% c("compact", "midsize", "suv")) %>%
+  filter(class %in% c("pickup", "minivan", "compact")) %>%
   mutate(class = fct_reorder(class, hwy, median)) %>%
   ggplot(aes(x = displ, y = hwy)) +
   geom_point(color = "steelblue", alpha = 0.6) +
@@ -520,7 +521,7 @@ print(dose_factor)
 
 # Looks fine, right? But look at the internal structure:
 str(dose_factor)
-# Levels: "10" "100" "20" "200" "50" (alphabetical!)
+levels(dose_factor)
 ```
 :::
 
@@ -537,7 +538,6 @@ str(dose_factor)
 
 # Try to convert back to numeric - WRONG!
 as.numeric(dose_factor)
-# Returns: 1 3 5 4 2 (NOT original!)
 ```
 
 :::
@@ -551,7 +551,6 @@ as.numeric(dose_factor)
 
 # Correct way: convert via character
 as.numeric(as.character(dose_factor))
-# Returns: 10 20 50 100 200 (correct!)
 ```
 
 :::
@@ -568,42 +567,51 @@ as.numeric(as.character(dose_factor))
 
 **Even worse: missing levels get renumbered!**
 
-\
+
 
 ::: {.fragment}
+::: {.columns}
+::: {.column width="50%"}
+
 ```{r}
 #| label: factors-missing-levels-1
-#| echo: true
+#| echo: false
 #| eval: true
 
-# Groups 1, 2, 4, 5 (group 3 doesn't exist in your data)
-groups <- c(1, 2, 4, 5, 1, 2, 4, 5)
+# Subjects 1, 2, 4, 5 (subject 3 missing!)
+subject <- c(1, 2, 4, 5, 1, 2, 4, 5)
 response <- c(10, 15, 25, 30, 11, 16, 24, 29)
 
-data.frame(group = groups, response = response)
+data.frame(subject = subject, response = response)
 ```
+
 :::
 
-\
+::: {.column width="50%"}
 
-::: {.fragment}
 ```{r}
 #| label: factors-missing-levels-2
 #| echo: true
 #| eval: true
 
-# Convert to factor (happens during data import!)
-groups_factor <- factor(groups)
-str(groups_factor)
-# Levels: "1" "2" "4" "5" - looks OK so far
+# Convert to factor (happens during import!)
+subject_factor <- factor(subject)
+str(subject_factor)
 ```
+
+Levels: "1" "2" "4" "5" - looks OK...
+
+:::
+:::
 :::
 
-\
+
 
 ::: {.fragment}
 ::: {.columns}
 ::: {.column width="50%"}
+
+\
 
 ```{r}
 #| label: factors-missing-levels-3
@@ -611,29 +619,18 @@ str(groups_factor)
 #| eval: true
 
 # Try to convert back - DATA CORRUPTION!
-as.numeric(groups_factor)
-# Returns: 1 2 3 4 1 2 3 4
-# Your group 4 became 3!
-# Your group 5 became 4!
+as.numeric(subject_factor)
 ```
+
+**Returns:** 1 2 3 4 1 2 3 4
+
+**Your subject 4 became 3!**
+
+**Your subject 5 became 4!**
 
 :::
 
 ::: {.column width="50%"}
-
-```{r}
-#| label: factors-missing-levels-4
-#| echo: true
-#| eval: true
-
-# Correct conversion
-as.numeric(as.character(groups_factor))
-# Returns: 1 2 4 5 1 2 4 5 (correct!)
-```
-
-:::
-:::
-:::
 
 \
 
@@ -641,15 +638,22 @@ as.numeric(as.character(groups_factor))
 ::: {.callout-warning}
 ## This is catastrophic for analysis!
 
-Your statistical models will use the wrong group numbers. **Always use as.numeric(as.character(factor))** not as.numeric(factor)
+Your statistical models and plots will use the wrong subject numbers. **Always use as.numeric(as.character(factor))** not as.numeric(factor). \
+Or better yet. **NEVER** use numbers for categorical data!
 :::
 :::
+
+
+:::
+:::
+:::
+
+
 
 ## ⚠️ Numeric Factors After Reordering
 
-**It gets worse when you've reordered the factor:**
-
-\
+::: {.columns}
+::: {.column width="50%"}
 
 ::: {.fragment}
 ```{r}
@@ -657,20 +661,19 @@ Your statistical models will use the wrong group numbers. **Always use as.numeri
 #| echo: true
 #| eval: true
 
-library(patchwork)
+dose_data <- tibble(
+  dose = factor(c(0, 10, 50, 100, 200)),
+  response = c(5, 25, 80, 70, 30)
+) %>%
+  mutate(dose_ordered =
+         fct_reorder(dose, response))
 
-# Create data with doses as factors, reordered
-dose_data <- data.frame(
-  dose = factor(c(10, 20, 50, 100, 200)),
-  response = c(5, 10, 25, 45, 80)
-)
-
-# Reorder by response (common operation!)
-dose_data$dose_ordered <- fct_reorder(dose_data$dose, dose_data$response)
+dose_data
 ```
+
 :::
 
-\
+
 
 ::: {.fragment}
 ```{r}
@@ -678,128 +681,60 @@ dose_data$dose_ordered <- fct_reorder(dose_data$dose, dose_data$response)
 #| echo: true
 #| eval: true
 
-# Now try to use it numerically - DISASTER!
-dose_data$wrong_numeric <- as.numeric(dose_data$dose_ordered)
-dose_data$correct_numeric <- as.numeric(as.character(dose_data$dose_ordered))
-
-print(data.frame(
-  dose_ordered = dose_data$dose_ordered,
-  wrong = dose_data$wrong_numeric,
-  correct = dose_data$correct_numeric
-))
+# Try to use numerically - DISASTER!
+dose_data <- dose_data %>%
+  mutate(
+    wrong = as.numeric(dose_ordered),
+    correct = as.numeric(as.character(dose_ordered))
+  )
 ```
+
+```{r}
+#| label: factors-numeric-danger-reordered-convert-show
+#| echo: false
+#| eval: true
+
+dose_data
+```
+
 :::
 
-\
+:::
+
+::: {.column width="50%"}
 
 ::: {.fragment}
 ```{r}
 #| label: factors-numeric-danger-reordered-plot
 #| echo: false
 #| eval: true
-#| fig-width: 11
-#| fig-height: 4
+#| fig-width: 6
+#| fig-height: 8
 
 # Show the disaster
-p1 <- ggplot(dose_data, aes(x = wrong_numeric, y = response)) +
+p1 <- ggplot(dose_data, aes(x = wrong, y = response)) +
   geom_point(size = 3, color = "red") +
   geom_line() +
   labs(title = "WRONG: as.numeric(factor)",
        x = "as.numeric(dose_ordered)",
        y = "Response") +
-  theme(plot.title = element_text(color = "red"))
+  theme(plot.title = element_text(color = "red", size = 11))
 
-p2 <- ggplot(dose_data, aes(x = correct_numeric, y = response)) +
+p2 <- ggplot(dose_data, aes(x = correct, y = response)) +
   geom_point(size = 3, color = "darkgreen") +
   geom_line() +
-  labs(title = "CORRECT: as.numeric(as.character(factor))",
+  labs(title = "CORRECT: as.numeric(as.character())",
        x = "Actual dose",
        y = "Response") +
-  theme(plot.title = element_text(color = "darkgreen"))
+  theme(plot.title = element_text(color = "darkgreen", size = 11))
 
-p1 | p2
+p1 / p2
 ```
 :::
 
-## ⚠️ Function Ambiguity with Numeric Factors
-
-**You're never sure how a function will treat numeric factors!**
-
-\
-
-::: {.fragment}
-::: {.columns}
-::: {.column width="45%"}
-
-```{r}
-#| label: factors-function-ambiguity
-#| echo: true
-#| eval: true
-
-# Numeric data stored as factor (very common!)
-values <- factor(c("5", "10", "20", "50", "100"))
-
-# Different functions treat it differently:
-mean(values)  # NA! Can't compute mean of factor
-```
-
-:::
-
-::: {.column width="55%"}
-
-```{r}
-#| label: factors-function-ambiguity-1b
-#| echo: true
-#| eval: true
-
-# Some functions use underlying integers:
-as.numeric(values)  # 1 2 3 4 5 (WRONG!)
-
-# Some functions coerce to character first:
-paste("Dose:", values)  # Works as expected
-```
-
-:::
 :::
 :::
 
-\
-
-::: {.fragment}
-**Real danger: statistical functions**
-
-```{r}
-#| label: factors-function-ambiguity-2
-#| echo: true
-#| eval: true
-
-# Statistical models
-dose_factor <- factor(c(10, 20, 50, 100))
-response <- c(5, 10, 25, 45)
-
-# This will use factor integers (1,2,3,4), not doses!
-wrong_model <- lm(response ~ as.numeric(dose_factor))
-coef(wrong_model)
-```
-:::
-
-\
-
-::: {.fragment}
-```{r}
-#| label: factors-function-ambiguity-3
-#| echo: true
-#| eval: true
-
-# Correct approach
-correct_model <- lm(response ~ as.numeric(as.character(dose_factor)))
-coef(correct_model)
-
-# The slope is completely different!
-```
-
-**Always check your data types before analysis!**
-:::
 
 ## Recommendations: Avoid Numeric Factors
 
@@ -809,13 +744,12 @@ coef(correct_model)
 1. **Never store numeric values as factors** unless they represent categories
 2. **Prefix categorical numbers**: Use "Group_1", "Group_2" instead of "1", "2"
 3. **Check imported data**: CSV imports often convert numbers to factors
-4. **Use `readr::read_csv()`** instead of `read.csv()` - better type detection
+4. **Use `readr::read_csv()`** instead of `read.csv()` - better type detection and no implicit conversion to factors.
 5. **Always convert via character**: `as.numeric(as.character(factor))` not `as.numeric(factor)`
 6. **Check with `str()`** before analysis to verify data types
-7. **For dose-response data**: Keep doses numeric, only convert to factor for plotting order
 :::
 
-\
+
 
 ::: {.fragment}
 ::: {.columns}
@@ -856,30 +790,8 @@ str(groups)
 :::
 :::
 
-\
 
-::: {.fragment}
-**For dose-response data:**
 
-```{r}
-#| label: factors-numeric-best-practice
-#| echo: true
-#| eval: false
-
-# Keep doses numeric for analysis
-dose_data <- data.frame(
-  dose_numeric = c(10, 20, 50, 100, 200),
-  response = c(5, 10, 25, 45, 80)
-)
-
-# Only convert to factor for plotting order:
-ggplot(dose_data, aes(x = factor(dose_numeric), y = response)) +
-  geom_boxplot()
-
-# But use numeric for analysis:
-model <- lm(response ~ dose_numeric, data = dose_data)
-```
-:::
 
 ## forcats Cheat Sheet
 
@@ -912,17 +824,20 @@ factor(x, levels = gtools::mixedsort(unique(x)))
 #| echo: true
 #| eval: true
 
-# Check current levels
-levels(mtcars$cyl)
+# Example: vehicle classes in mpg dataset
+vehicle_class <- factor(mpg$class)
 
 # Check level order
-factor(mtcars$cyl) %>% levels()
+vehicle_class %>% levels()
 
-# See factor structure
-str(factor(mtcars$cyl))
+# See factor structure (shows integer encoding)
+str(vehicle_class)
 
-# Convert to character if needed
-mtcars$cyl_char <- as.character(mtcars$cyl)
+# Check how many observations per level
+table(vehicle_class)
+
+# Convert to character if needed for text operations
+class_char <- as.character(vehicle_class)
 ```
 
 ## Key Takeaways & Best Practices
@@ -931,11 +846,13 @@ mtcars$cyl_char <- as.character(mtcars$cyl)
 ## Remember
 
 **The Problem:**
+
 - **R defaults to alphabetical** factor ordering - usually wrong!
 - **Numeric factors are dangerous** - converting destroys your data
 - **Missing levels get renumbered** - group 4 becomes 3!
 
 **The Solutions:**
+
 - **forcats package** provides powerful ordering tools:
   - **`fct_reorder()`** orders by another variable (most useful!)
   - **`fct_infreq()`** orders by frequency
@@ -945,6 +862,7 @@ mtcars$cyl_char <- as.character(mtcars$cyl)
 - **Prefix categorical numbers**: "Group_1" not "1"
 
 **Always:**
+
 - **Check factor order** before plotting with `str()` or `levels()`
 - **Convert via character**: `as.numeric(as.character(f))` not `as.numeric(f)`
 - **Think about your reader** - what order makes sense?
