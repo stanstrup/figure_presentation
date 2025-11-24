@@ -413,8 +413,6 @@ The `massageR` package provides `heat.clust()` which handles scaling and dendrog
 #| label: heat-clust-pheatmap
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 6
 
 library(massageR)
 
@@ -438,14 +436,30 @@ row_dend <- as.hclust(z$Rowv)
 col_dend <- as.hclust(z$Colv)
 
 # Use with pheatmap
-pheatmap(z$data,
-         cluster_rows = row_dend,
-         cluster_cols = col_dend,
-         scale = "none",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-         breaks = seq(-3, 3, length.out = 101),
-         main = "heat.clust + pheatmap: Properly scaled!")
+p <- pheatmap(z$data,
+              cluster_rows = row_dend,
+              cluster_cols = col_dend,
+              scale = "none",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+              breaks = seq(-3, 3, length.out = 101),
+              main = "heat.clust + pheatmap: Properly scaled!",
+              silent = TRUE)
 ```
+
+::: {.columns}
+::: {.column width="40%"}
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+:::
 
 ## Complete Example: Proper Scaling
 
@@ -453,8 +467,6 @@ pheatmap(z$data,
 #| label: proper-scaling-example
 #| echo: true
 #| eval: true
-#| fig-width: 10
-#| fig-height: 6
 
 # Step 1: Scale by row (metabolite)
 data_scaled <- expr_data %>%
@@ -470,14 +482,30 @@ row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
 # Step 4: Plot with consistent scaling
-pheatmap(data_mat,
-         cluster_rows = row_dend,
-         cluster_cols = col_dend,
-         scale = "none",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-         breaks = seq(-2.5, 2.5, length.out = 101),
-         main = "Properly scaled: dendrograms match colors!")
+p <- pheatmap(data_mat,
+              cluster_rows = row_dend,
+              cluster_cols = col_dend,
+              scale = "none",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+              breaks = seq(-2.5, 2.5, length.out = 101),
+              main = "Properly scaled: dendrograms match colors!",
+              silent = TRUE)
 ```
+
+::: {.columns}
+::: {.column width="40%"}
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+:::
 
 ## Diverging Scales for Centered Data
 
