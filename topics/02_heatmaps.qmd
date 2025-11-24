@@ -116,17 +116,26 @@ p
 # Step 1: Scale variables to unit variance (mean=0, sd=1)
 expr_scaled <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
 
-# Step 2: Cap at ±3 (only meaningful after scaling!)
+# Step 2: Identify which values will be capped
+expr_mat_scaled <- expr_scaled %>% column_to_rownames("Sample") %>% as.matrix()
+capped_cells <- (expr_mat_scaled < -3) | (expr_mat_scaled > 3)
+
+# Step 3: Cap at ±3 (only meaningful after scaling!)
 expr_capped <- expr_scaled %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 
-# Step 3: Create symmetric breaks centered at 0
+# Step 4: Create symmetric breaks centered at 0
 max_abs <- max(abs(range(expr_capped[,-1])))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
 
+# Mark capped values with borders
+border_color <- matrix("", nrow = nrow(capped_cells), ncol = ncol(capped_cells))
+border_color[capped_cells] <- "black"
+
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
-              main = "Scaled + capped at ±3",
+              main = "Scaled + capped at ±3 (black borders = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = breaks, scale = "none", silent = TRUE)
+              breaks = breaks, scale = "none",
+              border_color = border_color, silent = TRUE)
 ```
 
 
@@ -165,7 +174,16 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Cap at 5th and 95th percentiles PER COLUMN (metabolite)
+# Step 1: Identify values outside 5-95 percentiles PER COLUMN
+expr_mat_raw <- expr_data %>% column_to_rownames("Sample") %>% as.matrix()
+capped_cells_q <- matrix(FALSE, nrow = nrow(expr_mat_raw), ncol = ncol(expr_mat_raw))
+for (j in 1:ncol(expr_mat_raw)) {
+  lower <- quantile(expr_mat_raw[, j], 0.05, na.rm = TRUE)
+  upper <- quantile(expr_mat_raw[, j], 0.95, na.rm = TRUE)
+  capped_cells_q[, j] <- (expr_mat_raw[, j] < lower) | (expr_mat_raw[, j] > upper)
+}
+
+# Step 2: Cap at 5th and 95th percentiles PER COLUMN (metabolite)
 expr_capped <- expr_data %>%
   mutate(across(-Sample, ~ {
     lower <- quantile(.x, 0.05, na.rm = TRUE)
@@ -173,12 +191,17 @@ expr_capped <- expr_data %>%
     pmin(pmax(.x, lower), upper)
   }))
 
-# Step 2: Range scaling (min-max normalization to [0,1])
+# Step 3: Range scaling (min-max normalization to [0,1])
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
 
+# Mark capped values
+border_color_q <- matrix("", nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
+border_color_q[capped_cells_q] <- "black"
+
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
-              main = "Capped at 5-95 percentiles + range-scaled",
-              color = rev(viridis::magma(100)), silent = TRUE)
+              main = "Capped at 5-95 percentiles + range-scaled (black borders = capped)",
+              color = rev(viridis::magma(100)),
+              border_color = border_color_q, silent = TRUE)
 ```
 
 ::: {.columns}
@@ -490,22 +513,31 @@ p
 data_scaled <- expr_data %>%
   mutate(across(-Sample, ~ scale(.x)[,1]))
 
-# Step 2: Cap extremes at ±2.5
+# Step 2: Identify capped values
+data_mat_scaled <- data_scaled %>% column_to_rownames("Sample") %>% as.matrix()
+capped_cells_prop <- (data_mat_scaled < -2.5) | (data_mat_scaled > 2.5)
+
+# Step 3: Cap extremes at ±2.5
 data_capped <- data_scaled %>%
   mutate(across(-Sample, ~ pmin(pmax(.x, -2.5), 2.5)))
 
-# Step 3: Calculate dendrograms on scaled data
+# Step 4: Calculate dendrograms on scaled data
 data_mat <- data_capped %>% column_to_rownames("Sample") %>% as.matrix()
 row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
-# Step 4: Plot with consistent scaling
+# Mark capped values
+border_color_prop <- matrix("", nrow = nrow(capped_cells_prop), ncol = ncol(capped_cells_prop))
+border_color_prop[capped_cells_prop] <- "black"
+
+# Step 5: Plot with consistent scaling
 p <- pheatmap(data_mat,
               cluster_rows = row_dend,
               cluster_cols = col_dend,
               scale = "none",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = seq(-2.5, 2.5, length.out = 101),
+              border_color = border_color_prop,
               main = "Properly scaled: dendrograms match colors!",
               silent = TRUE)
 ```
@@ -568,14 +600,20 @@ p1 <- pheatmap(expr_mat_outlier_comp,
 
 # After: scaled + capped (from "Solution 1: Standard Deviation Cutoffs")
 expr_scaled_comp <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
+expr_mat_scaled_comp <- expr_scaled_comp %>% column_to_rownames("Sample") %>% as.matrix()
+capped_cells_comp <- (expr_mat_scaled_comp < -3) | (expr_mat_scaled_comp > 3)
 expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 max_abs_comp <- max(abs(range(expr_capped_comp[,-1])))
 breaks_comp <- seq(-max_abs_comp, max_abs_comp, length.out = 101)
 
+border_color_comp <- matrix("", nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
+border_color_comp[capped_cells_comp] <- "black"
+
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
-               main = "Scaled + capped at ±3",
+               main = "Scaled + capped at ±3 (black borders = capped)",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                breaks = breaks_comp,
+               border_color = border_color_comp,
                scale = "none",
                silent = TRUE)
 
