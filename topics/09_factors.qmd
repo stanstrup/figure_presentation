@@ -154,6 +154,54 @@ ggplot(treatment_data,
 
 Preserves the order from your data!
 
+## Natural Sorting: var1, var2, ..., var10
+
+**The problem with alphabetical sorting:**
+
+```{r}
+#| label: factors-natural-sort-problem
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Create data with numbered variables
+var_data <- data.frame(
+  variable = rep(c("var1", "var2", "var10", "var20"), each = 5),
+  value = rnorm(20, mean = rep(c(10, 15, 20, 25), each = 5), sd = 2)
+)
+
+# Alphabetical order: var1, var10, var2, var20 (wrong!)
+ggplot(var_data, aes(x = variable, y = value)) +
+  geom_boxplot(fill = "coral") +
+  theme_classic() +
+  labs(title = "Alphabetical: var1, var10, var2, var20")
+```
+
+## Natural Sorting: The Solution
+
+```{r}
+#| label: factors-natural-sort-solution
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Use gtools::mixedsort() for natural/alphanumeric sorting
+library(gtools)
+
+var_data$variable <- factor(var_data$variable,
+                            levels = mixedsort(unique(var_data$variable)))
+
+# Natural order: var1, var2, var10, var20 (correct!)
+ggplot(var_data, aes(x = variable, y = value)) +
+  geom_boxplot(fill = "steelblue") +
+  theme_classic() +
+  labs(title = "Natural sort: var1, var2, var10, var20")
+```
+
+**Note:** `forcats::fct_inseq()` only works if entire level is numeric
+
 ## fct_rev(): Reverse Order
 
 ```{r}
