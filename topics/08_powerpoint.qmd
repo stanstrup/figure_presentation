@@ -10,6 +10,7 @@
 - **Terrible when projected**
 - Pixelated and blurry
 - Doesn't scale well
+- The "Copy Plot to Clipboard" offers a "Copy as Metadata" which does give you a vector format... But it is crap for some reason.
 :::
 
 ## The Solution: Save First, Insert Second
