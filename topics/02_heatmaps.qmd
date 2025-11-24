@@ -42,8 +42,12 @@ rownames(expr_matrix) <- paste0("Gene", 1:10)
 colnames(expr_matrix) <- paste0("Sample", 1:10)
 expr_matrix[5, 5] <- 20  # One extreme outlier
 
-# Default heatmap - terrible!
-pheatmap(expr_matrix, main = "With outlier: All data compressed!")
+# Use divergent ColorBrewer scale with white at 0
+# RdBu = Red-Blue divergent scale (reversed so blue is positive)
+pheatmap(expr_matrix,
+         main = "With outlier: All data compressed!",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-20, 20, length.out = 101))
 ```
 
 ::: {.fragment}
