@@ -48,7 +48,7 @@ expr_data <- rbind(group1, group2) %>%
   as_tibble(.name_repair = ~paste0("Metabolite_", 1:10)) %>%
   mutate(Sample = c(paste0("Control", 1:5), paste0("Treatment", 1:5)), .before = 1)
 
-expr_data[5, "Treatment3"] <- 1000  # One extreme outlier
+expr_data[5, "Metabolite_3"] <- 1000  # One extreme outlier
 
 # Log-transform for visualization (metabolomics data is often log-transformed)
 expr_log <- expr_data %>%
@@ -56,9 +56,12 @@ expr_log <- expr_data %>%
 
 # Use divergent ColorBrewer scale centered at mean
 # RdBu = Red-Blue divergent scale (reversed so blue is high)
-expr_mat_outlier <- expr_log %>% column_to_rownames("Sample")
-data_center <- mean(as.matrix(expr_mat_outlier), na.rm = TRUE)
-max_diff <- max(abs(as.matrix(expr_mat_outlier) - data_center))
+expr_mat_outlier <- expr_log %>%
+  column_to_rownames("Sample") %>%
+  as.matrix()
+
+data_center <- mean(expr_mat_outlier, na.rm = TRUE)
+max_diff <- max(abs(expr_mat_outlier - data_center), na.rm = TRUE)
 breaks <- seq(data_center - max_diff, data_center + max_diff, length.out = 101)
 
 p <- pheatmap(expr_mat_outlier,
