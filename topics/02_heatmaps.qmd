@@ -351,18 +351,34 @@ corrplot(cor(t(expr_scaled)), method = "color",
 #| fig-width: 12
 #| fig-height: 5
 
-# Scatter plot: two samples against each other
-par(mfrow = c(1, 2))
+library(ggpubr)
+library(patchwork)
+
+# Prepare data for ggplot
+scatter_data_unscaled <- data.frame(
+  Treatment5 = expr_mat["Treatment5",],
+  Control5 = expr_mat["Control5",]
+)
+
+scatter_data_scaled <- data.frame(
+  Treatment5 = expr_scaled["Treatment5",],
+  Control5 = expr_scaled["Control5",]
+)
 
 # Unscaled: correlation driven by high-variance metabolites
-plot(expr_mat["Control1",], expr_mat["Control2",],
-     main = "Unscaled samples",
-     xlab = "Control1", ylab = "Control2")
+p1 <- ggscatter(scatter_data_unscaled, x = "Treatment5", y = "Control5",
+                add = "reg.line", conf.int = TRUE,
+                cor.coef = TRUE, cor.method = "pearson",
+                title = "Unscaled samples")
 
 # Scaled: true relationship visible
-plot(expr_scaled["Control1",], expr_scaled["Control2",],
-     main = "Scaled samples",
-     xlab = "Control1 (scaled)", ylab = "Control2 (scaled)")
+p2 <- ggscatter(scatter_data_scaled, x = "Treatment5", y = "Control5",
+                add = "reg.line", conf.int = TRUE,
+                cor.coef = TRUE, cor.method = "pearson",
+                title = "Scaled samples",
+                xlab = "Treatment5 (scaled)", ylab = "Control5 (scaled)")
+
+p1 + p2
 ```
 
 ::: {.fragment}
