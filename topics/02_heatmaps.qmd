@@ -26,6 +26,11 @@ library(pheatmap)
 library(RColorBrewer)
 library(patchwork)
 library(massageR)
+
+# Define robust MAD scaling function (reusable)
+scale_mad <- function(x) {
+  (x - median(x, na.rm = TRUE)) / mad(x, na.rm = TRUE)
+}
 ```
 
 ```{r}
@@ -117,7 +122,7 @@ p
 # Step 1: Robust scaling using MAD (Median Absolute Deviation)
 # MAD is not affected by outliers, unlike SD
 expr_scaled <- expr_data %>%
-  mutate(across(-Sample, ~ (.x - median(.x)) / mad(.x)))
+  mutate(across(-Sample, scale_mad))
 
 # Step 2: Identify which values will be capped
 expr_mat_scaled <- expr_scaled %>% column_to_rownames("Sample") %>% as.matrix()
@@ -161,7 +166,7 @@ p
 - **Use MAD instead of SD** - not affected by outliers
 - Center by median (robust)
 - Scale by MAD (Median Absolute Deviation)
-- Then cap at ±3 MAD
+- Then cap at ±3 MAD (~99% of normal data)
 - Outliers now exceed threshold!
 - Set `scale = "none"` (already scaled!)
 
@@ -409,13 +414,15 @@ library(massageR)
 # Convert tibble to matrix for heat.clust
 expr_matrix <- expr_data %>% column_to_rownames("Sample") %>% as.matrix()
 
-# Use heat.clust to scale and cluster
+# Use heat.clust with robust MAD scaling
 z <- heat.clust(expr_matrix,
                 scaledim = "column",           # Scale by column
-                zlim = c(-3, 3),            # Cap at ±3
+                zlim = c(-3, 3),               # Cap at ±3 MAD
                 zlim_select = c("dend", "outdata"),  # Apply to both
-                reorder = c(),        # Reorder dendrograms off for consistency
-                distfun = function(x) dist(x))
+                reorder = c(),                 # Reorder dendrograms off for consistency
+                distfun = function(x) dist(x),
+                hclustfun = function(x) hclust(x, method = "complete"),
+                scalefun = scale_mad)          # Use MAD scaling instead of default
 
 max_abs <- max(abs(range(z$data)))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
@@ -502,7 +509,7 @@ p1 <- pheatmap(expr_mat_outlier_comp,
 
 # After: MAD-scaled + capped (from "Solution 1: Robust MAD Scaling")
 expr_scaled_comp <- expr_data %>%
-  mutate(across(-Sample, ~ (.x - median(.x)) / mad(.x)))
+  mutate(across(-Sample, scale_mad))
 expr_mat_scaled_comp <- expr_scaled_comp %>% column_to_rownames("Sample") %>% as.matrix()
 capped_cells_comp <- (expr_mat_scaled_comp < -3) | (expr_mat_scaled_comp > 3)
 expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
