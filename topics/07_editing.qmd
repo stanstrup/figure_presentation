@@ -312,39 +312,47 @@ pa + pb +
 ::: {.columns}
 ::: {.column width="50%"}
 
-**Default behavior:** Each plot keeps its own axes
-
-**Control with `axes` parameter:**
-
 ```{r}
 #| label: patchwork-axes-demo
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 6
 
 # Share y-axes for side-by-side plots
 (p1 | p2) + plot_layout(axes = "collect_y")
-
-# Share x-axes for stacked plots
-(p1 / p2) + plot_layout(axes = "collect_x")
-
-# Complex: collect within groups first
-((p1 | p2) + plot_layout(axes = "collect_y")) /
-((p3 | p4) + plot_layout(axes = "collect_y"))
-
-# Or more simply:
-((p1 | p2) + plot_layout(axes = "collect")) /
- (p3 | p4)
 ```
 
 :::
 
 ::: {.column width="50%"}
 
-**When to use:**
+```{r}
+#| label: patchwork-axes-demo-complex
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
 
-- **`collect_x`**: Remove duplicate x-axes when plots are **stacked vertically** (same x-scale)
+# Complex: collect within groups first
+((p1 | p2) + plot_layout(axes = "collect_y")) /
+ (p3 | p4)
+```
+
+:::
+:::
+
+::: {.columns}
+::: {.column width="50%"}
+
+**Control with `axes` parameter:**
+
 - **`collect_y`**: Remove duplicate y-axes when plots are **side-by-side** (same y-scale)
-- **`collect`**: Remove both (same scales in both directions)
+- Apply to groups where it makes sense before combining
+
+:::
+
+::: {.column width="50%"}
 
 **Benefits:**
 
