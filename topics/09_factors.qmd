@@ -9,6 +9,9 @@
 library(ggplot2)
 library(dplyr)
 library(forcats)
+
+# Set default theme for all plots
+theme_set(theme_bw())
 ```
 
 ## The Problem: Alphabetical Ordering
