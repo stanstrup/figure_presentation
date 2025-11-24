@@ -153,17 +153,19 @@ p_temp <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
                    color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                    breaks = breaks, scale = "none", silent = TRUE)
 
-# Reorder border_color matrix to match pheatmap clustering
-border_color <- matrix(NA, nrow = nrow(capped_cells), ncol = ncol(capped_cells))
-border_color[capped_cells] <- "black"
-border_color <- border_color[p_temp$tree_row$order, p_temp$tree_col$order]
+# Create asterisk markers for capped values
+asterisk_matrix <- matrix("", nrow = nrow(capped_cells), ncol = ncol(capped_cells))
+asterisk_matrix[capped_cells] <- "*"
+asterisk_matrix <- asterisk_matrix[p_temp$tree_row$order, p_temp$tree_col$order]
 
-# Now create final plot with borders
+# Now create final plot with asterisk markers
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
-              main = "MAD-scaled + capped at ±3 (black borders = capped)",
+              main = "MAD-scaled + capped at ±3 (* = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks, scale = "none",
-              border_color = border_color,
+              display_numbers = asterisk_matrix,
+              number_color = "black",
+              fontsize_number = 14,
               silent = TRUE)
 ```
 
@@ -235,16 +237,18 @@ expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(
 p_temp_q <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
                      color = rev(viridis::magma(100)), silent = TRUE)
 
-# Reorder border_color matrix to match pheatmap clustering
-border_color_q <- matrix(NA, nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
-border_color_q[capped_cells_q] <- "black"
-border_color_q <- border_color_q[p_temp_q$tree_row$order, p_temp_q$tree_col$order]
+# Create asterisk markers for capped values
+asterisk_matrix_q <- matrix("", nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
+asterisk_matrix_q[capped_cells_q] <- "*"
+asterisk_matrix_q <- asterisk_matrix_q[p_temp_q$tree_row$order, p_temp_q$tree_col$order]
 
-# Now create final plot with borders
+# Now create final plot with asterisk markers
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
-              main = "Capped at 5-95 percentiles + range-scaled (black borders = capped)",
+              main = "Capped at 5-95 percentiles + range-scaled (* = capped)",
               color = rev(viridis::magma(100)),
-              border_color = border_color_q,
+              display_numbers = asterisk_matrix_q,
+              number_color = "white",
+              fontsize_number = 14,
               silent = TRUE)
 ```
 
@@ -556,17 +560,19 @@ p2_temp <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
                     color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                     breaks = breaks_comp, scale = "none", silent = TRUE)
 
-# Reorder border_color matrix
-border_color_comp <- matrix(NA, nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
-border_color_comp[capped_cells_comp] <- "black"
-border_color_comp <- border_color_comp[p2_temp$tree_row$order, p2_temp$tree_col$order]
+# Create asterisk markers for capped values
+asterisk_matrix_comp <- matrix("", nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
+asterisk_matrix_comp[capped_cells_comp] <- "*"
+asterisk_matrix_comp <- asterisk_matrix_comp[p2_temp$tree_row$order, p2_temp$tree_col$order]
 
-# Final plot with borders
+# Final plot with asterisk markers
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
-               main = "MAD-scaled + capped at ±3 (black borders = capped)",
+               main = "MAD-scaled + capped at ±3 (* = capped)",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                breaks = breaks_comp,
-               border_color = border_color_comp,
+               display_numbers = asterisk_matrix_comp,
+               number_color = "black",
+               fontsize_number = 14,
                scale = "none",
                silent = TRUE)
 
