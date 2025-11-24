@@ -117,6 +117,7 @@ p
 
 - **Scale FIRST** to unit variance
 - Then cap at ±2 or ±3
+- ±2 captures ~95.4% of data
 - ±3 captures ~99.7% of data
 - Uses full color range
 - Set `scale = "none"` (already scaled!)
@@ -460,7 +461,8 @@ pheatmap(data_mat,
 #| fig-height: 5
 
 # When zero is meaningful (fold-change, z-scores, etc.)
-pheatmap(data_capped,
+# Use data_mat from previous chunk (already scaled and capped)
+pheatmap(data_mat,
          color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
          breaks = seq(-2.5, 2.5, length.out = 101),
          main = "Diverging scale: zero = white")
