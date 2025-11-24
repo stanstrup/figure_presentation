@@ -101,7 +101,7 @@ p
 
 
 
-## Solution 1: Standard Deviation Cutoffs
+## Solution 1: Unit-variance Sscaling and Standard Deviation Cutoffs
 
 
 ::: {.columns}
@@ -167,7 +167,7 @@ p
 
 
 
-## Solution 2: Quantile-Based
+## Solution 2: Range scaling and Quantile-Based cut-off
 
 ```{r}
 #| label: quantile-cutoff
@@ -226,50 +226,8 @@ p
 :::
 :::
 
-## Solution 3: Manual Breaks
 
-```{r}
-#| label: manual-breaks
-#| echo: true
-#| eval: true
-
-# Step 1: Scale to unit variance (per metabolite/column)
-expr_scaled <- expr_data %>%
-  mutate(across(-Sample, ~ scale(.x)[,1]))
-
-# Step 2: Define your own color breaks
-breaks <- seq(-3, 3, length.out = 101)
-
-p <- pheatmap(expr_scaled %>% column_to_rownames("Sample"),
-              breaks = breaks,
-              main = "Scaled + custom breaks: -3 to +3",
-              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              scale = "none", silent = TRUE)
-```
-
-::: {.columns}
-::: {.column width="60%"}
-```{r}
-#| echo: false
-#| eval: true
-#| fig-width: 6
-#| fig-height: 4
-p
-```
-:::
-
-::: {.column width="40%"}
-**Maximum control**
-
-- **Scale FIRST** to unit variance
-- Then define exact breaks
-- Values outside range → extremes
-- Good when you know your data
-- Can combine with capping
-:::
-:::
-
-## Solution 4: Log Transformation
+## Solution 3: Log Transformation
 
 **For positive values only** (e.g., counts, intensities)
 
@@ -367,6 +325,9 @@ corrplot(cor(t(expr_scaled)), method = "color",
          mar = c(0,0,2,0), tl.cex = 0.8)
 ```
 
+
+## Why Scaling Matters for Clustering (2)
+
 ```{r}
 #| label: scatter-demo
 #| echo: false
@@ -410,18 +371,6 @@ p1 + p2
 Scaling ensures all metabolites contribute equally to sample clustering.
 :::
 
-## Proper Heatmap Workflow
-
-::: {.callout-important}
-## The Right Approach
-
-1. **Scale your data FIRST** (before creating heatmap)
-2. **Calculate dendrograms on scaled data**
-3. **Pass pre-calculated dendrograms to heatmap function**
-4. **Set `scale = "none"`** in heatmap call
-
-
-:::
 
 ## Using massageR::heat.clust
 
@@ -481,16 +430,6 @@ p <- pheatmap(z$data,
 ```
 
 ::: {.columns}
-::: {.column width="40%"}
-**One-step workflow**
-
-- Scales data automatically
-- Calculates dendrograms on scaled data
-- Caps at specified zlim
-- Returns everything needed for pheatmap
-- Ensures consistency throughout
-:::
-
 ::: {.column width="60%"}
 ```{r}
 #| echo: false
@@ -499,6 +438,16 @@ p <- pheatmap(z$data,
 #| fig-height: 6
 p
 ```
+:::
+
+::: {.column width="40%"}
+**One-step workflow**
+
+- Scales data automatically
+- Calculates dendrograms on scaled data
+- Caps at specified zlim
+- Returns everything needed for pheatmap
+- Ensures consistency throughout
 :::
 :::
 
