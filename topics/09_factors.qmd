@@ -26,8 +26,6 @@ theme_set(theme_bw())
 #| fig-width: 5
 #| fig-height: 3.5
 
-library(ggplot2)
-
 # Create data with logical categories
 category_df <- data.frame(
   category = c("Low", "Medium", "High", "Very High", "Low", "High"),
@@ -250,18 +248,14 @@ ggplot(mpg, aes(x = fct_rev(fct_infreq(class)))) +
 #| label: factors-fct-relevel
 #| echo: true
 #| eval: true
-#| fig-width: 8
-#| fig-height: 5
 
-# Move "Ideal" cut to front
-diamonds %>%
-  mutate(cut = fct_relevel(cut, "Ideal")) %>%
-  ggplot(aes(x = cut, fill = cut)) +
-  geom_bar(show.legend = FALSE) +
-  labs(x = "Diamond Cut", y = "Count",
-       title = "Ideal cut shown first")
+# Move "4" to front for cylinders
+mtcars %>%
+  mutate(cyl_group = fct_relevel(factor(cyl), "4")) %>%
+  ggplot(aes(cyl_group, mpg)) +
+  geom_boxplot()
 
-# "Ideal" always shown first
+# 4-cylinder always shown first
 ```
 
 Common in experimental data!
