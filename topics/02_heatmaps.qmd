@@ -181,9 +181,9 @@ pheatmap(count_log,
 
 ## Why Scaling Matters for Clustering
 
-**The Outlier Correlation Problem**
+**The Problem: High-variance features dominate distance**
 
-Extreme values in both variables artificially inflate correlation!
+Without scaling, features with large values dominate sample similarity!
 
 ```{r}
 #| label: scaling-demo
@@ -192,44 +192,43 @@ Extreme values in both variables artificially inflate correlation!
 #| fig-width: 12
 #| fig-height: 5
 
-# Create uncorrelated data with outliers
 set.seed(42)
-# Core data: NO correlation
-demo_data <- data.frame(
-  var1 = rnorm(48, mean = 0, sd = 1),
-  var2 = rnorm(48, mean = 0, sd = 1)
+
+# Create sample clustering example (genes × samples)
+# Gene 1: small variation (0-1 range)
+# Gene 2: HUGE variation (0-1000 range) - dominates if not scaled!
+gene_data <- data.frame(
+  Sample1 = c(0.5, 100),
+  Sample2 = c(0.6, 150),
+  Sample3 = c(0.55, 900),
+  Sample4 = c(0.58, 950),
+  row.names = c("Gene1", "Gene2")
 )
 
-# Add 2 extreme outliers in BOTH variables (same samples)
-demo_data <- rbind(demo_data,
-                   data.frame(var1 = c(5, -5), var2 = c(5, -5)))
+# Calculate sample distances WITHOUT scaling
+dist_unscaled <- dist(t(gene_data))
 
-# Without scaling: outliers dominate, creating spurious correlation!
-p1 <- ggplot(demo_data, aes(var1, var2)) +
-  geom_point(size = 2) +
-  geom_point(data = demo_data[49:50, ], aes(var1, var2),
-             color = "red", size = 4) +
-  labs(title = "Unscaled: Outliers create fake correlation!",
-       subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
-  theme_classic()
+# Calculate sample distances WITH scaling
+gene_scaled <- t(scale(t(gene_data)))
+dist_scaled <- dist(t(gene_scaled))
 
-# After scaling: true (lack of) correlation revealed
-demo_scaled <- as.data.frame(scale(demo_data))
-p2 <- ggplot(demo_scaled, aes(var1, var2)) +
-  geom_point(size = 2) +
-  geom_point(data = demo_scaled[49:50, ], aes(var1, var2),
-             color = "red", size = 4) +
-  labs(title = "Scaled: True relationship visible",
-       subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
-  theme_classic()
+# Visualize
+par(mfrow = c(1, 2))
 
-p1 + p2
+# Unscaled: Gene2 dominates!
+plot(hclust(dist_unscaled), main = "Unscaled: Gene2 dominates clustering",
+     xlab = paste("Sample1-2 close, Sample3-4 close\n",
+                  "(only Gene2 matters!)"))
+
+# Scaled: Both genes contribute
+plot(hclust(dist_scaled), main = "Scaled: Both genes contribute equally",
+     xlab = "Different clustering pattern")
 ```
 
 ::: {.fragment}
-**Key point**: Outliers (red points) pull correlation from ~0 to high value!
+**Key point**: Without scaling, high-variance features (Gene2) completely dominate the distance calculation between samples!
 
-After scaling, outliers have less leverage → true correlation revealed.
+Scaling by row ensures all features contribute equally to sample clustering.
 :::
 
 ## Proper Heatmap Workflow
