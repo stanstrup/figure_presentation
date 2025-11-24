@@ -15,21 +15,21 @@
 
 ::: {.columns}
 ::: {.column width="50%"}
-**Adobe Illustrator**
-
-- Industry standard
-- Commercial ($$$)
-- Best PDF/EPS import
-- Precise typography
-:::
-
-::: {.column width="50%"}
 **Inkscape**
 
 - Free & open source
-- Excellent alternative
 - Native SVG format
+- Excellent PDF import
 - Cross-platform
+- Full-featured vector editor
+:::
+
+::: {.column width="50%"}
+**Adobe Illustrator**
+
+- Industry standard (commercial)
+- Also an option for vector editing
+- We'll focus on Inkscape examples
 :::
 :::
 
@@ -40,10 +40,10 @@
 #| echo: true
 #| eval: false
 
-# For Inkscape: use SVG
+# For Inkscape: use SVG (preferred)
 ggsave("plot.svg", p, width = 7, height = 5)
 
-# For Illustrator: use PDF with embedded fonts
+# Or PDF with embedded fonts (also works well)
 ggsave("plot.pdf", p, width = 7, height = 5,
        device = cairo_pdf)
 
@@ -54,21 +54,21 @@ ggsave("plot.pdf", p, width = 7, height = 5,
 
 ## Aligning Multiple Plots
 
-**In Illustrator/Inkscape:**
+**In Inkscape:**
 
 1. Import all plots
 2. Select all panels
-3. Use alignment tools:
+3. Use alignment tools (Ctrl+Shift+A):
    - Align left edges
    - Distribute vertically with equal spacing
 4. Ensure axis widths match for stacked plots
 
 ## Inkscape Basics
 
-**Opening PDFs:**
+**Opening PDFs/SVGs:**
 
-1. File → Open → Select PDF
-2. Choose "Import via Poppler" for best results
+1. File → Open → Select PDF or SVG
+2. For PDFs: Choose "Import via Poppler" for best results
 3. Each plot element is now editable
 
 **Useful tools:**
@@ -76,20 +76,13 @@ ggsave("plot.pdf", p, width = 7, height = 5,
 - Selection tool (F1): Move and resize
 - Text tool (F8): Edit or add text
 - Align and Distribute (Ctrl+Shift+A)
+- Guides (drag from rulers): Align elements precisely
 
-## Illustrator Basics
+**Tips:**
 
-**Opening PDFs:**
-
-1. File → Open → Select PDF
-2. Plots import as grouped objects
-3. Use Direct Selection Tool (A) to edit individual elements
-
-**Useful features:**
-
-- Artboards: Multiple figures in one file
-- Symbols: Reuse panel labels
-- Guides: Align elements precisely
+- Group related elements (Ctrl+G)
+- Lock layers to prevent accidental edits
+- Use layers for complex figures
 
 ## Combining Plots: R vs. Post-Processing
 
@@ -113,7 +106,7 @@ Fully reproducible!
 :::
 
 ::: {.column width="50%"}
-**In Illustrator**
+**In Inkscape**
 
 - More layout control
 - Easier fine-tuning
@@ -130,7 +123,7 @@ Fully reproducible!
 - Need to regenerate frequently
 - Sharing code with collaborators
 
-**Use Illustrator/Inkscape:**
+**Use Inkscape:**
 
 - Complex layouts with mixed content
 - Final publication figure
@@ -171,7 +164,7 @@ walk2(list(p1, p2, p3, p4),
       paste0("panel_", letters[1:4], ".pdf"),
       ~ggsave(.y, .x, width = 3, height = 3))
 
-# Then combine in Illustrator/Inkscape
+# Then combine in Inkscape
 # 2×2 layout with labels A-D
 ```
 
@@ -467,7 +460,7 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 :::
 
 ::: {.column width="50%"}
-**Illustrator/Inkscape**
+**Inkscape**
 
 ✅ Pixel-perfect control
 
@@ -493,7 +486,7 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 - Sharing code with collaborators
 - Figures may need updates
 
-**Use Illustrator/Inkscape when:**
+**Use Inkscape when:**
 
 - Need pixel-perfect alignment
 - Adding photos, diagrams, or non-R content
