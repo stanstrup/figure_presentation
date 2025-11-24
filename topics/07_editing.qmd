@@ -348,6 +348,7 @@ pa + pb +
 **When to use:**
 
 - **Default behavior:** Each plot keeps its own axes
+- **`collect_x`**: Remove duplicate x-axes when plots are **stacked vertically** (same x-scale)
 - **`collect_y`**: Remove duplicate y-axes when plots are **side-by-side** (same y-scale)
 - **`collect`**: Remove both x and y axes (same scales in both directions)
 - Apply to groups where it makes sense before combining
