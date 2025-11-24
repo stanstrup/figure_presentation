@@ -11,62 +11,6 @@ library(dplyr)
 library(forcats)
 ```
 
-## The Alphabetical Problem
-
-**R's default behavior:**
-
-```{r}
-#| label: factors-default-behavior
-#| echo: true
-#| eval: false
-
-categories <- c("High", "Medium", "Low", "Very High")
-factor(categories)
-# Levels: High Low Medium Very High
-
-# Alphabetical! Not logical! 😞
-```
-
-## Visual Impact
-
-::: {.columns}
-::: {.column width="50%"}
-**Alphabetical (bad):**
-
-```
-High
-Low
-Medium
-Very High
-```
-
-Nonsensical!
-:::
-
-::: {.column width="50%"}
-**Logical (good):**
-
-```
-Low
-Medium
-High
-Very High
-```
-
-Makes sense!
-:::
-:::
-
-## Why This Matters
-
-::: {.incremental}
-- **Bar charts**: Random bar order confuses readers
-- **Legends**: Illogical color assignment
-- **Line plots**: Colors don't match expectations
-- **Facets**: Panels in wrong sequence
-- **Boxplots**: Treatments in random order
-:::
-
 ## The Problem: Alphabetical Ordering
 
 ::: {.columns}
@@ -130,7 +74,7 @@ Much better - order makes sense!
 ```{r}
 #| label: factors-forcats-intro
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(forcats)
 
@@ -148,7 +92,7 @@ mtcars %>%
 ```{r}
 #| label: factors-fct-reorder
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Order categories by mean of values
 mtcars %>%
@@ -169,7 +113,7 @@ Bars ordered by height!
 ```{r}
 #| label: factors-fct-infreq
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Order by how common each level is
 ggplot(mtcars, aes(x = fct_infreq(factor(cyl)))) +
@@ -187,7 +131,7 @@ Great for survey data
 ```{r}
 #| label: factors-fct-rev
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Sometimes you want reverse order
 mtcars %>%
@@ -203,7 +147,7 @@ mtcars %>%
 ```{r}
 #| label: factors-fct-relevel
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Move "4" to front for cylinders
 mtcars %>%
@@ -221,7 +165,7 @@ Common in experimental data!
 ```{r}
 #| label: factors-ordered-bar
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Calculate summary statistics
 summary_data <- mtcars %>%
@@ -245,7 +189,7 @@ Much easier to read than alphabetical!
 ```{r}
 #| label: factors-time-ordering
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Create data with months
 month_data <- data.frame(
@@ -269,7 +213,7 @@ ggplot(month_data, aes(month, value)) +
 ```{r}
 #| label: factors-legend-ordering
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Order legend by maximum mpg of each cylinder group
 mtcars$cyl_group <- factor(mtcars$cyl)
@@ -288,7 +232,7 @@ ggplot(mtcars, aes(x = wt,
 ```{r}
 #| label: factors-facet-ordering
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Order facets by median mpg for each cylinder
 mtcars %>%
@@ -306,7 +250,7 @@ mtcars %>%
 ```{r}
 #| label: factors-cheatsheet
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(forcats)
 
@@ -324,7 +268,7 @@ fct_explicit_na(f)       # Make NA a visible level
 ```{r}
 #| label: factors-survey-example
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Likert scale survey responses
 set.seed(42)
@@ -350,7 +294,7 @@ ggplot(survey, aes(x = response)) +
 ```{r}
 #| label: factors-treatment-example
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(forcats)
 
@@ -376,7 +320,7 @@ ggplot(clinical, aes(treatment, response)) +
 ```{r}
 #| label: factors-combining
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Combine multiple forcats functions
 mtcars %>%
@@ -454,7 +398,7 @@ ggplot(msleep %>% filter(!is.na(vore)),
 ```{r}
 #| label: factors-pattern-sorted-bar
 #| echo: true
-#| eval: false
+#| eval: true
 
 mtcars %>%
   count(cyl) %>%
@@ -468,7 +412,7 @@ mtcars %>%
 ```{r}
 #| label: factors-pattern-control
 #| echo: true
-#| eval: false
+#| eval: true
 
 mtcars %>%
   mutate(group = fct_relevel(factor(cyl), "4")) %>%
@@ -481,7 +425,7 @@ mtcars %>%
 ```{r}
 #| label: factors-pattern-chrono
 #| echo: true
-#| eval: false
+#| eval: true
 
 mtcars %>%
   mutate(cyl_group = fct_reorder(factor(cyl), cyl)) %>%
@@ -495,7 +439,7 @@ mtcars %>%
 ```{r}
 #| label: factors-debugging
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Check current levels
 levels(mtcars$cyl)
@@ -528,7 +472,7 @@ mtcars$cyl_char <- as.character(mtcars$cyl)
 ```{r}
 #| label: factors-complete-example
 #| echo: true
-#| eval: false
+#| eval: true
 
 library(ggplot2)
 library(dplyr)
