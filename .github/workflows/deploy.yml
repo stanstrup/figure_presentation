@@ -43,7 +43,7 @@ jobs:
         run: |
           R -e 'install.packages(c("remotes","ggplot2", "tidyverse", "patchwork", "magick", "glue", "viridis", "scales", "colorspace", "dichromat", "RColorBrewer", "ggpubr", "ggthemes", "hrbrthemes", "pheatmap", "plotly", "htmlwidgets", "crosstalk", "ggiraph", "forcats", "dplyr", "cowplot", "gridExtra", "devEMF", "conflicted", "grid", "rmarkdown", "knitr", "gplots", "devtools"))'
           R -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager"); BiocManager::install("mixOmics")'
-          R -e 'remotes::install_gitlab("R_packages/massageR")'
+          R -e 'remotes::install_gitlab("stanstrup_R_packages/massageR")'
 
       - name: Render Quarto presentation
         run: |
