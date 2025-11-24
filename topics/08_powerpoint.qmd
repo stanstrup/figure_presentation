@@ -28,9 +28,9 @@ Instead:
 
 **Three options:**
 
-1. **EMF** (Windows only) - best
-2. **PDF** (cross-platform) - good
-3. **SVG** (modern PowerPoint) - good
+1. **SVG** (modern PowerPoint) - good
+2. **EMF** (Windows only) - obsolete and of no benifit in newer PowerPoint
+3. **PDF** (cross-platform) - very bad! low res import and no editing
 
 ## Option 1: EMF (Windows)
 

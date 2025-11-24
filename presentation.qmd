@@ -43,13 +43,13 @@
 4. Text Sizing
 5. Themes & Styling
 6. Saving Plots
-7. Factor Ordering
+7. Post-Processing
 
-8. Post-Processing
-9. PowerPoint Import
-10. Rendering Issues
+8. PowerPoint Import
+9. Factor Ordering
+10. Interactive Plots
 
-11. Interactive Plots
+11. Rendering Issues
 
 :::
 ::::
@@ -84,19 +84,19 @@
 
 
 
-{{< include topics/08_factors.qmd >}}
+{{< include topics/08_powerpoint.qmd >}}
 
 
 
-{{< include topics/09_powerpoint.qmd >}}
+{{< include topics/09_factors.qmd >}}
 
 
 
-{{< include topics/10_rendering.qmd >}}
+{{< include topics/10_interactive.qmd >}}
 
 
 
-{{< include topics/11_interactive.qmd >}}
+{{< include topics/11_rendering.qmd >}}
 
 
 

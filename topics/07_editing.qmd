@@ -22,6 +22,8 @@
 - Excellent PDF import
 - Cross-platform
 - Full-featured vector editor
+- Converts between vector formats
+- Slow...
 :::
 
 ::: {.column width="50%"}
@@ -42,21 +44,21 @@
 - Text becomes uneditable
 - Quality degrades when resized
 
-**Keep it vector!** Use Inkscape, Illustrator, or PowerPoint with SVG.
+**Keep it vector!** Use Inkscape, Illustrator, or PowerPoint with SVG input and PDF output.
 :::
 
 
 
-## Aligning Multiple Plots
+## editing in Inkscape
 
-**In Inkscape:**
-
-1. Import all plots
-2. Select all panels
-3. Use alignment tools (Ctrl+Shift+A):
-   - Align left edges
-   - Distribute vertically with equal spacing
-4. Ensure axis widths match for stacked plots
+1. Import
+2. Ungroup
+3. Delete
+4. Move objects
+5. Add annotation
+6. Align objects
+7. Distribute objects evenly
+8. Crop canvas
 
 ## Inkscape Basics
 
@@ -79,51 +81,6 @@
 - Lock layers to prevent accidental edits
 - Use layers for complex figures
 
-## Combining Plots: R vs. Post-Processing
-
-::: {.columns}
-::: {.column width="50%"}
-**In R (patchwork)**
-
-```{r}
-#| label: editing-patchwork
-#| echo: true
-#| eval: false
-
-library(patchwork)
-p1 + p2 +
-  plot_annotation(
-    tag_levels = 'A'
-  )
-```
-
-Fully reproducible!
-:::
-
-::: {.column width="50%"}
-**In Inkscape**
-
-- More layout control
-- Easier fine-tuning
-- Less reproducible
-- Good for final polish
-:::
-:::
-
-## When to Use Each Approach
-
-**Use R (patchwork):**
-
-- Simple multi-panel layouts
-- Need to regenerate frequently
-- Sharing code with collaborators
-
-**Use Inkscape:**
-
-- Complex layouts with mixed content
-- Final publication figure
-- Need pixel-perfect alignment
-- Adding non-data elements (photos, diagrams)
 
 ## Avoiding Common Pitfalls
 
@@ -137,36 +94,12 @@ Fully reproducible!
 5. **Document changes**: Note what was done manually
 :::
 
-## Example: Multi-Panel Figure
-
-```{r}
-#| label: editing-multi-panel
-#| echo: true
-#| eval: false
-
-# Create 4 plots in R
-p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point() +
-      theme_classic(base_size = 10)
-p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line() +
-      theme_classic(base_size = 10)
-p3 <- ggplot(faithful, aes(eruptions)) + geom_histogram() +
-      theme_classic(base_size = 10)
-p4 <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot() +
-      theme_classic(base_size = 10)
-
-# Export each
-walk2(list(p1, p2, p3, p4),
-      paste0("panel_", letters[1:4], ".pdf"),
-      ~ggsave(.y, .x, width = 3, height = 3))
-
-# Then combine in Inkscape
-# 2×2 layout with labels A-D
-```
-
 
 # Combine figures directly in R instead {background-color="#16a085"}
 
-## The patchwork Package
+
+## patchwork: Side by Side
+
 
 **A better alternative to manual composition!**
 
@@ -201,17 +134,6 @@ p4 <- ggplot(mtcars, aes(hp, mpg)) +
   theme_classic(base_size = 10)
 ```
 
-::: {.callout-tip}
-## Why patchwork?
-
-- **Fully reproducible** - no manual editing needed
-- **Intuitive syntax** - `|` for side-by-side, `/` for stacked
-- **Automatic labeling** - A, B, C, etc.
-- **Flexible layouts** - complex arrangements possible
-:::
-
-
-## patchwork: Side by Side
 
 ```{r}
 #| label: patchwork-horizontal

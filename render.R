@@ -196,14 +196,14 @@ preview_presentation <- function() {
 # Quick helper functions
 # ============================================================
 
-# Render just the color topic (topic 2)
-test_colors <- function() render_topic(2)
+# Render just the color topic (topic 1)
+test_colors <- function() render_topic(1)
 
-# Render just the heatmap topic (topic 4)
-test_heatmaps <- function() render_topic(4)
+# Render just the heatmap topic (topic 2)
+test_heatmaps <- function() render_topic(2)
 
-# Render just the factors topic (topic 11)
-test_factors <- function() render_topic(11)
+# Render just the factors topic (topic 9)
+test_factors <- function() render_topic(9)
 
 # ============================================================
 # USAGE EXAMPLES
@@ -222,9 +222,9 @@ Available commands:
 2. Test a single topic (by number):
    render_topic(2)                    # Test topic 02 as slides
    render_topic(2, as_slides = FALSE) # Test topic 02 as HTML doc
-   test_colors()                      # Shortcut for topic 2
-   test_heatmaps()                    # Shortcut for topic 4
-   test_factors()                     # Shortcut for topic 11
+   test_colors()                      # Shortcut for topic 1
+   test_heatmaps()                    # Shortcut for topic 2
+   test_factors()                     # Shortcut for topic 9
 
 3. Test all topics - PARALLEL (FASTER!):
    results <- test_all_topics_parallel()
@@ -245,7 +245,7 @@ Example workflow:
   results <- test_all_topics_parallel()
 
   # Fix any errors, then test specific topic
-  render_topic(2)
+  render_topic(1)
 
   # When all pass, render full presentation
   render_presentation()
