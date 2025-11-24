@@ -51,18 +51,6 @@ ggsave("plot.pdf", p, width = 7, height = 5,
 # Text remains editable
 ```
 
-## Common Editing Tasks
-
-### Adding Panel Labels
-
-::: {.fragment}
-**Typical style:**
-
-- Position: Top-left of each panel
-- Font: Arial or Helvetica, **Bold**
-- Size: 14-16 pt
-- Label: **A**, **B**, **C**, etc.
-:::
 
 ## Aligning Multiple Plots
 
@@ -74,74 +62,6 @@ ggsave("plot.pdf", p, width = 7, height = 5,
    - Align left edges
    - Distribute vertically with equal spacing
 4. Ensure axis widths match for stacked plots
-
-## What NOT to Edit
-
-::: {.callout-warning}
-## Keep These in R!
-
-**Never manually edit:**
-
-- Data points themselves
-- Axis scales or ranges
-- Statistical elements (error bars, fit lines, p-values)
-- Color mappings
-
-**Why?** Breaks reproducibility! Always regenerate from R.
-:::
-
-## The Golden Rule
-
-::: {.r-fit-text}
-R scripts = Source of Truth
-:::
-
-::: {.fragment}
-Illustrator/Inkscape = Final polish only
-:::
-
-## Workflow Example
-
-```{r}
-#| label: editing-workflow
-#| echo: true
-#| eval: false
-
-# 1_analysis.R - Data analysis and initial plots
-p1 <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
-p2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_line()
-
-# 2_export_figures.R - Standardized export
-ggsave("figures/panel_a.pdf", p1, width = 3.5, height = 3)
-ggsave("figures/panel_b.pdf", p2, width = 3.5, height = 3)
-
-# 3_combine_in_illustrator.ai - Manual combining
-# - Add panel labels (A, B)
-# - Align panels
-# - Add title/caption
-
-# 4_README.txt - Document manual edits
-# "Added bold panel labels (A, B) in Arial 16pt"
-```
-
-## Maintaining Reproducibility
-
-**Document your workflow:**
-
-```
-project/
-├── data/
-├── scripts/
-│   ├── 01_analysis.R
-│   ├── 02_generate_figures.R
-├── figures/
-│   ├── raw/           # Direct from R
-│   ├── panel_a.pdf
-│   ├── panel_b.pdf
-│   └── final/         # After Illustrator
-│       └── figure1_combined.pdf
-└── README.md          # Documents manual edits
-```
 
 ## Inkscape Basics
 
@@ -204,7 +124,7 @@ Fully reproducible!
 
 ## When to Use Each Approach
 
-**Use R (patchwork/cowplot):**
+**Use R (patchwork):**
 
 - Simple multi-panel layouts
 - Need to regenerate frequently
@@ -587,16 +507,12 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 #| echo: true
 #| eval: false
 
-# cowplot - also good for multi-panel
-library(cowplot)
-plot_grid(p1, p2, p3, p4, labels = "AUTO", ncol = 2)
-
 # gridExtra - basic functionality
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 ```
 
-**Recommendation:** Use patchwork for most cases - most intuitive syntax!
+**Recommendation:** Use patchwork for most cases - most intuitive syntax and best features!
 
 ## Powerpoint
 
