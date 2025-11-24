@@ -20,9 +20,9 @@ render_presentation <- function() {
 # ============================================================
 # Option 2: Test a single topic
 # ============================================================
-render_topic <- function(topic_number) {
+render_topic <- function(topic_number, as_slides = TRUE) {
   topic_file <- sprintf("topics/%02d_*.qmd", topic_number)
-  topic_files <- list.files("topics", pattern = sprintf("^%02d_", topic_number), full.names = TRUE)
+  topic_files <- list.files("topics", pattern = sprintf("^%02d_.*\\.qmd$", topic_number), full.names = TRUE)
 
   if (length(topic_files) == 0) {
     cat("❌ Topic", topic_number, "not found\n")
@@ -33,7 +33,13 @@ render_topic <- function(topic_number) {
   cat("Rendering", basename(topic_file), "...\n")
 
   tryCatch({
-    quarto_render(topic_file)
+    if (as_slides) {
+      # Render as revealjs slides
+      quarto_render(topic_file, output_format = "revealjs")
+    } else {
+      # Render as HTML document (default)
+      quarto_render(topic_file)
+    }
     cat("✓", basename(topic_file), "rendered successfully\n")
     return(TRUE)
   }, error = function(e) {
@@ -214,10 +220,11 @@ Available commands:
    render_presentation()
 
 2. Test a single topic (by number):
-   render_topic(2)        # Test topic 02_colors.qmd
-   test_colors()          # Shortcut for topic 2
-   test_heatmaps()        # Shortcut for topic 4
-   test_factors()         # Shortcut for topic 11
+   render_topic(2)                    # Test topic 02 as slides
+   render_topic(2, as_slides = FALSE) # Test topic 02 as HTML doc
+   test_colors()                      # Shortcut for topic 2
+   test_heatmaps()                    # Shortcut for topic 4
+   test_factors()                     # Shortcut for topic 11
 
 3. Test all topics - PARALLEL (FASTER!):
    results <- test_all_topics_parallel()
