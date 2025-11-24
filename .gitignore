@@ -26,3 +26,4 @@ public/
 .claude
 
 /.quarto/
+*.revealjs.md
