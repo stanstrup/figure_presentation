@@ -311,9 +311,9 @@ P.S: `pheatmap()` seems to apply scaling and cropping before clustering!
 
 ## Why Scaling Matters for Clustering
 
-**The Problem: High-variance features dominate distance**
+**The Problem: High-variance features dominate correlations**
 
-Without scaling, features with large values dominate sample similarity!
+Without scaling, features with large values dominate sample correlations!
 
 ```{r}
 #| label: scaling-demo
@@ -322,43 +322,53 @@ Without scaling, features with large values dominate sample similarity!
 #| fig-width: 12
 #| fig-height: 5
 
-set.seed(42)
+library(corrplot)
 
-# Create sample clustering example (metabolites × samples)
-# Gene 1: small variation (0-1 range)
-# Gene 2: HUGE variation (0-1000 range) - dominates if not scaled!
-metabolite_data <- data.frame(
-  Sample1 = c(0.5, 100),
-  Sample2 = c(0.6, 150),
-  Sample3 = c(0.55, 900),
-  Sample4 = c(0.58, 950),
-  row.names = c("Feature1", "Feature2")
-)
+# Use our metabolomics data (samples in rows, metabolites in columns)
+expr_mat <- expr_data %>%
+  column_to_rownames("Sample") %>%
+  as.matrix()
 
-# Calculate sample distances WITHOUT scaling
-dist_unscaled <- dist(t(metabolite_data))
-
-# Calculate sample distances WITH scaling
-metabolite_scaled <- t(scale(t(metabolite_data)))
-dist_scaled <- dist(t(metabolite_scaled))
-
-# Visualize
+# Correlation plots: samples correlated across metabolites
 par(mfrow = c(1, 2))
 
-# Unscaled: Feature2 dominates!
-plot(hclust(dist_unscaled), main = "Unscaled: Feature2 dominates clustering",
-     xlab = paste("Sample1-2 close, Sample3-4 close\n",
-                  "(only Feature2 matters!)"))
+# WITHOUT scaling: appears highly correlated
+corrplot(cor(t(expr_mat)), method = "color",
+         title = "Unscaled: Everything looks correlated!",
+         mar = c(0,0,2,0), tl.cex = 0.8)
 
-# Scaled: Both metabolites contribute
-plot(hclust(dist_scaled), main = "Scaled: Both metabolites contribute equally",
-     xlab = "Different clustering pattern")
+# WITH scaling: true correlation structure revealed
+expr_scaled <- scale(expr_mat)
+corrplot(cor(t(expr_scaled)), method = "color",
+         title = "Scaled: True sample relationships",
+         mar = c(0,0,2,0), tl.cex = 0.8)
+```
+
+```{r}
+#| label: scatter-demo
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# Scatter plot: two samples against each other
+par(mfrow = c(1, 2))
+
+# Unscaled: correlation driven by high-variance metabolites
+plot(expr_mat["Control1",], expr_mat["Control2",],
+     main = "Unscaled samples",
+     xlab = "Control1", ylab = "Control2")
+
+# Scaled: true relationship visible
+plot(expr_scaled["Control1",], expr_scaled["Control2",],
+     main = "Scaled samples",
+     xlab = "Control1 (scaled)", ylab = "Control2 (scaled)")
 ```
 
 ::: {.fragment}
-**Key point**: Without scaling, high-variance features (Feature2) completely dominate the distance calculation between samples!
+**Key point**: Without scaling, high-variance metabolites completely dominate the correlation calculation between samples!
 
-Scaling by row ensures all features contribute equally to sample clustering.
+Scaling ensures all metabolites contribute equally to sample clustering.
 :::
 
 ## Proper Heatmap Workflow
