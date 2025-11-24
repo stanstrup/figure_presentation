@@ -60,12 +60,12 @@ for (i in 1:5) {  # First 5 metabolites get outliers
   outlier_samples <- sample(1:10, n_outliers)
 
   for (s in outlier_samples) {
-    # Randomly make it very high (2-4x) or very low (0.25-0.5x)
-      expr_data[s, metab_col] <- normal_range * runif(1, 1.2, 2)
+    # Make it high (1.2-2x normal range)
+    expr_data[s, metab_col] <- normal_range * runif(1, 1.2, 2)
   }
 }
 
-# Use viridis scale for positive-only data (no meaningful center)
+# Use magma scale for positive-only data (no meaningful center)
 expr_mat_outlier <- expr_data %>%
   column_to_rownames("Sample") %>%
   as.matrix()
@@ -91,10 +91,10 @@ p
 ::: {.fragment}
 **Without Outlier Handling**
 
-- Scale: -6 to +6
-- ~99.7% of data: -3 to +3 (±3 SD)
-- Uses only half the color range
-- Real patterns invisible 😱
+- Outliers dominate the color scale
+- Most data compressed into narrow range
+- Group differences invisible
+- Patterns lost 😱
 :::
 :::
 :::
@@ -233,7 +233,7 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale to unit variance first by row
+# Step 1: Scale to unit variance (per metabolite/column)
 expr_scaled <- expr_data %>%
   mutate(across(-Sample, ~ scale(.x)[,1]))
 
@@ -509,7 +509,7 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale by row (metabolite)
+# Step 1: Scale per metabolite (column)
 data_scaled <- expr_data %>%
   mutate(across(-Sample, ~ scale(.x)[,1]))
 
