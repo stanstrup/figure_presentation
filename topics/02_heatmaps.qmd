@@ -174,13 +174,11 @@ expr_capped <- expr_data %>%
   }))
 
 # Step 2: Range scaling (min-max normalization to [0,1])
-expr_quantile <- expr_capped %>%
-  mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
+expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
 
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
               main = "Capped at 5-95 percentiles + range-scaled",
-              color = rev(viridis::magma(100)),
-              silent = TRUE)
+              color = rev(viridis::magma(100)), silent = TRUE)
 ```
 
 ::: {.columns}
@@ -188,8 +186,8 @@ p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
 ```{r}
 #| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 6
+#| fig-width: 6
+#| fig-height: 4
 p
 ```
 :::
@@ -223,10 +221,7 @@ p <- pheatmap(expr_scaled %>% column_to_rownames("Sample"),
               breaks = breaks,
               main = "Scaled + custom breaks: -3 to +3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              scale = "none",  # Already scaled!
-              silent = TRUE)
-
-# Values outside range automatically assigned to extremes
+              scale = "none", silent = TRUE)
 ```
 
 ::: {.columns}
@@ -234,8 +229,8 @@ p <- pheatmap(expr_scaled %>% column_to_rownames("Sample"),
 ```{r}
 #| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 6
+#| fig-width: 6
+#| fig-height: 4
 p
 ```
 :::
@@ -260,21 +255,13 @@ p
 #| echo: true
 #| eval: true
 
-# Create positive data (e.g., count data for metabolites)
-set.seed(123)
-count_data <- matrix(rpois(100, lambda = 50), nrow = 10, ncol = 10) %>%
-  as_tibble(.name_repair = ~paste0("Metabolite_", 1:10)) %>%
-  mutate(Sample = paste0("Sample", 1:10), .before = 1)
+# Log transform BEFORE plotting (metabolomics data is positive-only)
+expr_log_sol4 <- expr_data %>%
+  mutate(across(-Sample, ~ log2(.x + 1)))  # +1 to handle zeros
 
-count_data[5, "Sample5"] <- 5000  # Extreme count
-
-# Log transform BEFORE plotting
-count_log <- count_data %>%
-  mutate(across(-Sample, ~ log10(.x + 1)))  # +1 to handle zeros
-
-p <- pheatmap(count_log %>% column_to_rownames("Sample"),
-              main = "Log10 transformed counts",
-              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+p <- pheatmap(expr_log_sol4 %>% column_to_rownames("Sample"),
+              main = "Log2 transformed metabolite intensities",
+              color = rev(viridis::magma(100)),
               silent = TRUE)
 ```
 
@@ -283,8 +270,8 @@ p <- pheatmap(count_log %>% column_to_rownames("Sample"),
 ```{r}
 #| echo: false
 #| eval: true
-#| fig-width: 8
-#| fig-height: 6
+#| fig-width: 6
+#| fig-height: 4
 p
 ```
 :::
@@ -312,6 +299,10 @@ p
 - But **NOT** dendrogram calculation!
 
 **Result**: Dendrograms cluster on unscaled data while colors show scaled data!
+
+\
+
+P.S: `pheatmap()` seems to apply scaling and cropping before clustering!
 :::
 
 
