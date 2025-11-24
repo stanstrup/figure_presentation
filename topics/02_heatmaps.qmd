@@ -47,10 +47,15 @@ expr_data[5, "Sample5"] <- 6  # One extreme outlier
 
 # Use divergent ColorBrewer scale with white at 0
 # RdBu = Red-Blue divergent scale (reversed so blue is positive)
-p <- pheatmap(expr_data %>% column_to_rownames("Gene"),
+# Create symmetric breaks centered at 0
+expr_mat_outlier <- expr_data %>% column_to_rownames("Gene")
+max_abs <- max(abs(range(expr_mat_outlier)))
+breaks <- seq(-max_abs, max_abs, length.out = 101)
+
+p <- pheatmap(expr_mat_outlier,
               main = "With outlier: All data compressed!",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = seq(-6, 6, length.out = 101),
+              breaks = breaks,
               silent = TRUE)
 ```
 
@@ -86,18 +91,23 @@ p
 #| echo: true
 #| eval: true
 
-# Step 1: Scale to unit variance (mean=0, sd=1) by row
+# Step 1: Scale variables to unit variance (mean=0, sd=1)
 expr_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ scale(.x)[,1]))
+                  mutate(across(-Gene, ~ scale(.x)[,1]))
 
 # Step 2: Cap at ±3 (only meaningful after scaling!)
 expr_capped <- expr_scaled %>%
-  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
+                  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
 
-p <- pheatmap(expr_capped %>% column_to_rownames("Gene"),
+# Create symmetric breaks centered at 0
+expr_mat <- expr_capped %>% column_to_rownames("Gene")
+max_abs <- max(abs(range(expr_mat)))
+breaks <- seq(-max_abs, max_abs, length.out = 101)
+
+p <- pheatmap(expr_mat,
               main = "Scaled + capped at ±3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = seq(-3, 3, length.out = 101),
+              breaks = breaks,
               scale = "none",  # Already scaled!
               silent = TRUE)
 ```
