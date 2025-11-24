@@ -39,19 +39,12 @@ library(tidyr)
 
 # Simulate metabolomics data (positive only, with clustering)
 set.seed(123)
-# Create base metabolite levels
-base_levels <- rlnorm(10, meanlog = 2, sdlog = 0.5)
+# Create two groups of samples with different metabolite patterns
+group1 <- matrix(rlnorm(50, meanlog = 2, sdlog = 0.8), nrow = 5, ncol = 10)
+group2 <- matrix(rlnorm(50, meanlog = 2.5, sdlog = 0.8), nrow = 5, ncol = 10)
 
-# Create two groups of samples: Control and Treatment
-# Control samples: close to base levels
-# Treatment samples: some metabolites elevated
-control_samples <- sapply(1:5, function(i) base_levels * rlnorm(10, meanlog = 0, sdlog = 0.3))
-treatment_samples <- sapply(1:5, function(i) {
-  effect <- ifelse(1:10 <= 5, 1.8, 1)  # First 5 metabolites elevated in treatment
-  base_levels * effect * rlnorm(10, meanlog = 0, sdlog = 0.3)
-})
-
-expr_data <- cbind(control_samples, treatment_samples) %>%
+expr_data <- rbind(group1, group2) %>%
+  t() %>%  # Transpose so metabolites are rows, samples are columns
   as_tibble(.name_repair = ~c(paste0("Control", 1:5), paste0("Treatment", 1:5))) %>%
   mutate(Metabolite = paste0("Metabolite_", 1:10), .before = 1)
 
