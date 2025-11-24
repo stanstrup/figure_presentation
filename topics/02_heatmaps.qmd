@@ -12,7 +12,6 @@
 
 Color scale: -6 to +6
 
-Result: All the colors look pale and differences are obscured 😱
 :::
 
 ## Visual Example: The Outlier Effect
@@ -33,8 +32,6 @@ library(massageR)
 #| label: heatmap-outlier-example
 #| echo: false
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
 
 # Simulate data with outlier
 set.seed(123)
@@ -45,19 +42,33 @@ expr_matrix[5, 5] <- 6  # One extreme outlier
 
 # Use divergent ColorBrewer scale with white at 0
 # RdBu = Red-Blue divergent scale (reversed so blue is positive)
-pheatmap(expr_matrix,
-         main = "With outlier: All data compressed!",
-         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-         breaks = seq(-6, 6, length.out = 101))
+p <- pheatmap(expr_matrix,
+              main = "With outlier: All data compressed!",
+              color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+              breaks = seq(-6, 6, length.out = 101))
 ```
 
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+p
+```
+:::
+
+::: {.column width="40%"}
 ::: {.fragment}
 **Without Outlier Handling**
 
 - Scale: -6 to +6
 - ~99.7% of data: -3 to +3 (±3 SD)
-- Uses only halfthe color range
-- Real patterns invisible
+- Uses only half the color range
+- Real patterns invisible 😱
+:::
+:::
 :::
 
 
