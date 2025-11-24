@@ -343,16 +343,20 @@ Scaling by row ensures all features contribute equally to sample clustering.
 4. **Set `scale = "none"`** in heatmap call
 
 ```r
-# Proper workflow
-data_scaled <- t(scale(t(expr_matrix)))  # Scale by row
-data_capped <- pmin(pmax(data_scaled, -3), 3)  # Cap extremes
+# Proper workflow (using tibbles)
+data_scaled <- expr_data %>%
+  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
+
+data_capped <- data_scaled %>%
+  mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
 
 # Calculate dendrograms on scaled data
-row_dend <- hclust(dist(data_capped))
-col_dend <- hclust(dist(t(data_capped)))
+data_mat <- data_capped %>% column_to_rownames("Gene") %>% as.matrix()
+row_dend <- hclust(dist(data_mat))
+col_dend <- hclust(dist(t(data_mat)))
 
 # Plot with pre-computed dendrograms
-pheatmap(data_capped,
+pheatmap(data_mat,
          cluster_rows = row_dend,
          cluster_cols = col_dend,
          scale = "none")  # Already scaled!
@@ -384,6 +388,11 @@ The `massageR` package provides `heat.clust()` which handles scaling and dendrog
 #| fig-height: 6
 
 library(massageR)
+
+# Convert tibble to matrix for heat.clust
+expr_matrix <- expr_data %>%
+  column_to_rownames("Gene") %>%
+  as.matrix()
 
 # Use heat.clust to scale and cluster
 z <- heat.clust(expr_matrix,
@@ -419,17 +428,20 @@ pheatmap(z$data,
 #| fig-height: 6
 
 # Step 1: Scale by row (gene)
-data_scaled <- t(scale(t(expr_matrix)))
+data_scaled <- expr_data %>%
+  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
 
 # Step 2: Cap extremes at ±2.5
-data_capped <- pmin(pmax(data_scaled, -2.5), 2.5)
+data_capped <- data_scaled %>%
+  mutate(across(-Gene, ~ pmin(pmax(.x, -2.5), 2.5)))
 
 # Step 3: Calculate dendrograms on scaled data
-row_dend <- hclust(dist(data_capped))
-col_dend <- hclust(dist(t(data_capped)))
+data_mat <- data_capped %>% column_to_rownames("Gene") %>% as.matrix()
+row_dend <- hclust(dist(data_mat))
+col_dend <- hclust(dist(t(data_mat)))
 
 # Step 4: Plot with consistent scaling
-pheatmap(data_capped,
+pheatmap(data_mat,
          cluster_rows = row_dend,
          cluster_cols = col_dend,
          scale = "none",
@@ -481,13 +493,13 @@ pheatmap(data_capped,
 library(gridExtra)
 
 # Before: with outlier
-p1 <- pheatmap(expr_matrix,
+p1 <- pheatmap(expr_data %>% column_to_rownames("Gene"),
                main = "Uncapped: Pattern lost",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                silent = TRUE)
 
-# After: outlier capped
-p2 <- pheatmap(data_capped,
+# After: outlier capped (data_mat from previous chunk)
+p2 <- pheatmap(data_mat,
                main = "Capped at ±2.5 SD: Patterns visible",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                breaks = seq(-2.5, 2.5, length.out = 101),
