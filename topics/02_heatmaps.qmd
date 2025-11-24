@@ -509,8 +509,8 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 2. **Consider log transformation**
 3. **Scale data BEFORE** passing to heatmap function
 4. Cap extremes
-  - **Cap at 2-3 SD** for large datasets with outliers, if using unit variance scaling
-  - **Cap using quantiles** (5-95%) if using range scaling
+   - **Cap at 2-3 SD** for large datasets with outliers, if using unit variance scaling
+   - **Cap using quantiles** (5-95%) if using range scaling
 5. **Calculate dendrograms** on the same scaled and capped data
 6. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
 7. **Use appropriate palette**:
