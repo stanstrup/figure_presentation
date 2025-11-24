@@ -56,30 +56,61 @@ Makes sense!
 - **Boxplots**: Treatments in random order
 :::
 
-## Solution 1: Manual Ordering
+## The Problem: Alphabetical Ordering
+
+::: {.columns}
+::: {.column width="50%"}
 
 ```{r}
-#| label: factors-manual-ordering
+#| label: factors-problem-alphabetical
 #| echo: true
 #| eval: true
+#| fig-width: 5
+#| fig-height: 4
 
 library(ggplot2)
 
-# Specify levels explicitly
+# Create data with logical categories
 category_df <- data.frame(
   category = c("Low", "Medium", "High", "Very High", "Low", "High"),
   value = c(10, 20, 15, 30, 12, 25)
 )
 
+# R defaults to alphabetical!
+ggplot(category_df, aes(x = category, y = value)) +
+  geom_col(fill = "coral") +
+  theme_classic(base_size = 12) +
+  labs(title = "Alphabetical (Wrong!)")
+```
+
+Random order makes no sense!
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: factors-solution-ordered
+#| echo: true
+#| eval: true
+#| fig-width: 5
+#| fig-height: 4
+
+# Specify levels explicitly
 category_df$category <- factor(category_df$category,
                        levels = c("Low", "Medium", "High", "Very High"))
 
-# Now plots will use this order!
+# Now plots use logical order!
 ggplot(category_df, aes(x = category, y = value)) +
-  geom_col()
+  geom_col(fill = "steelblue") +
+  theme_classic(base_size = 12) +
+  labs(title = "Logical Order (Correct!)")
 ```
 
-Full control over order
+Much better - order makes sense!
+
+:::
+:::
 
 ## Solution 2: forcats Package
 
@@ -350,48 +381,58 @@ mtcars %>%
   geom_bar()
 ```
 
-## Before and After
+## Before and After: Real Example
 
 ::: {.columns}
 ::: {.column width="50%"}
-**Before (alphabetical):**
 
 ```{r}
 #| label: factors-before
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 5
+#| fig-height: 4
 
-ggplot(msleep,
+# Before: alphabetical order
+ggplot(msleep %>% filter(!is.na(vore)),
   aes(x = vore,
       y = sleep_total)) +
-  geom_boxplot()
+  geom_boxplot(fill = "coral") +
+  theme_classic(base_size = 10) +
+  labs(title = "Before: Alphabetical",
+       x = "Diet Type", y = "Sleep (hours)")
 
-# Order: carni, herbi,
-#        insecti, omni
+# Order: carni, herbi, insecti, omni
 # Meaningless!
 ```
+
 :::
 
 ::: {.column width="50%"}
-**After (by median):**
 
 ```{r}
 #| label: factors-after
 #| echo: true
-#| eval: false
+#| eval: true
+#| fig-width: 5
+#| fig-height: 4
 
 library(forcats)
-ggplot(msleep,
-  aes(x = fct_reorder(
-           vore,
+# After: ordered by median sleep
+ggplot(msleep %>% filter(!is.na(vore)),
+  aes(x = fct_reorder(vore,
            sleep_total,
            median,
            na.rm = TRUE),
       y = sleep_total)) +
-  geom_boxplot()
+  geom_boxplot(fill = "steelblue") +
+  theme_classic(base_size = 10) +
+  labs(title = "After: Ordered by Median",
+       x = "Diet Type", y = "Sleep (hours)")
 
-# Ordered by sleep time!
+# Ordered by sleep time - logical!
 ```
+
 :::
 :::
 
