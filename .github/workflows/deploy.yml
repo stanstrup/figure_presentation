@@ -37,11 +37,11 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libfontconfig1-dev libmagick++-dev libfribidi-dev libcairo2-dev libharfbuzz-dev
+          sudo apt-get install -y libcurl4-openssl-dev libfontconfig1-dev libmagick++-dev libfribidi-dev libcairo2-dev libharfbuzz-dev librsvg2-dev
 
       - name: Install R packages
         run: |
-          R -e 'install.packages(c("remotes", "ggplot2", "tidyverse", "patchwork", "magick", "glue", "viridis", "scales", "colorspace", "dichromat", "RColorBrewer", "ggpubr", "ggthemes", "hrbrthemes", "pheatmap", "plotly", "htmlwidgets", "crosstalk", "ggiraph", "forcats", "dplyr", "gridExtra", "devEMF", "conflicted", "grid", "rmarkdown", "knitr", "tibble", "tidyr", "corrplot", "extrafont", "devtools", "svglite", "pkgdown"))'
+          R -e 'install.packages(c("remotes", "ggplot2", "tidyverse", "patchwork", "magick", "glue", "viridis", "scales", "colorspace", "dichromat", "RColorBrewer", "ggpubr", "ggthemes", "hrbrthemes", "pheatmap", "plotly", "htmlwidgets", "crosstalk", "ggiraph", "forcats", "dplyr", "gridExtra", "devEMF", "conflicted", "grid", "rmarkdown", "knitr", "tibble", "tidyr", "corrplot", "extrafont", "devtools", "svglite", "pkgdown", "rsvg"))'
           R -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager"); BiocManager::install("mixOmics")'
           R -e 'remotes::install_gitlab("stanstrup_R_packages/massageR")'
 
