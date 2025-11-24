@@ -397,25 +397,7 @@ Scaling ensures all metabolites contribute equally to sample clustering.
 3. **Pass pre-calculated dendrograms to heatmap function**
 4. **Set `scale = "none"`** in heatmap call
 
-```r
-# Proper workflow (using tibbles)
-data_scaled <- expr_data %>%
-  mutate(across(-Sample, ~ scale(.x)[,1]))
 
-data_capped <- data_scaled %>%
-  mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
-
-# Calculate dendrograms on scaled data
-data_mat <- data_capped %>% column_to_rownames("Sample") %>% as.matrix()
-row_dend <- hclust(dist(data_mat))
-col_dend <- hclust(dist(t(data_mat)))
-
-# Plot with pre-computed dendrograms
-pheatmap(data_mat,
-         cluster_rows = row_dend,
-         cluster_cols = col_dend,
-         scale = "none")  # Already scaled!
-```
 :::
 
 ## Using massageR::heat.clust
@@ -449,13 +431,16 @@ expr_matrix <- expr_data %>%
 
 # Use heat.clust to scale and cluster
 z <- heat.clust(expr_matrix,
-                scaledim = "row",           # Scale by row
+                scaledim = "column",           # Scale by column
                 zlim = c(-3, 3),            # Cap at ±3
                 zlim_select = c("dend", "outdata"),  # Apply to both
-                reorder = c("column", "row"),        # Reorder dendrograms
+                reorder = c(),        # Reorder dendrograms
                 distfun = function(x) dist(x),
                 hclustfun = function(x) hclust(x, method = "complete"),
                 scalefun = scale)
+
+max_abs <- max(abs(range(z$data)))
+breaks  <- seq(-max_abs, max_abs, length.out = 101)
 
 # Extract dendrograms and convert to hclust objects
 row_dend <- as.hclust(z$Rowv)
@@ -467,7 +452,7 @@ p <- pheatmap(z$data,
               cluster_cols = col_dend,
               scale = "none",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-              breaks = seq(-3, 3, length.out = 101),
+              breaks = breaks,
               main = "heat.clust + pheatmap: Properly scaled!",
               silent = TRUE)
 ```
@@ -603,23 +588,21 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 ## Workflow
 
 1. **Inspect data distribution** before making heatmap
-2. **Cap at 2-3 SD** for large datasets with outliers
-3. **Use quantiles** (5-95%) for robustness
-4. **Scale data BEFORE** passing to heatmap function
-5. **Calculate dendrograms** on the same scaled data
+2. **Consider log transformation**
+3. **Scale data BEFORE** passing to heatmap function
+4. Cap extremes
+  - **Cap at 2-3 SD** for large datasets with outliers, if using unit variance scaling
+  - **Cap using quantiles** (5-95%) if using range scaling
+5. **Calculate dendrograms** on the same scaled and capped data
 6. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
+7. **Use appropriate palette**:
+   - Often centering data highlights contrasts
+   - Diverging color scale for data that has been centered (red-white-blue)
+   - Sequential color scale for one-directional data (viridis, magma)
+
 :::
 
-::: {.callout-important}
-## Color Scales
 
-1. **Always include color scale bar** with numeric labels
-2. **Center at meaningful value** (often zero for diverging data)
-3. **Label extremes if capped**: "<-2.5" or ">+2.5"
-4. **Use appropriate palette**:
-   - Diverging for data with meaningful center (red-white-blue)
-   - Sequential for one-directional (viridis, magma)
-:::
 
 ::: {.callout-warning}
 ## When NOT to Cap
@@ -628,5 +611,4 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 - Small datasets where each value matters
 - When you want to highlight extreme values
 
-**Alternative**: Use asterisks or separate panel for outliers
 :::
