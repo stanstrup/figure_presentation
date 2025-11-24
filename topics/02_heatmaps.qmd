@@ -540,7 +540,7 @@ pheatmap(data_mat,
 
 ```{r}
 #| label: heatmap-comparison
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 14
 #| fig-height: 6
@@ -548,17 +548,27 @@ pheatmap(data_mat,
 # Side-by-side comparison
 library(gridExtra)
 
-# Before: with outlier
-p1 <- pheatmap(expr_data %>% column_to_rownames("Sample"),
-               main = "Uncapped: Pattern lost",
-               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+# Before: with outliers (from "Visual Example: The Outlier Effect")
+expr_mat_outlier_comp <- expr_data %>%
+  column_to_rownames("Sample") %>%
+  as.matrix()
+
+p1 <- pheatmap(expr_mat_outlier_comp,
+               main = "With outliers: All data compressed!",
+               color = rev(viridis::magma(100)),
                silent = TRUE)
 
-# After: outlier capped (data_mat from previous chunk)
-p2 <- pheatmap(data_mat,
-               main = "Capped at ±2.5 SD: Patterns visible",
+# After: scaled + capped (from "Solution 1: Standard Deviation Cutoffs")
+expr_scaled_comp <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
+expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
+max_abs_comp <- max(abs(range(expr_capped_comp[,-1])))
+breaks_comp <- seq(-max_abs_comp, max_abs_comp, length.out = 101)
+
+p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
+               main = "Scaled + capped at ±3",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-               breaks = seq(-2.5, 2.5, length.out = 101),
+               breaks = breaks_comp,
+               scale = "none",
                silent = TRUE)
 
 grid.arrange(p1[[4]], p2[[4]], ncol = 2)
