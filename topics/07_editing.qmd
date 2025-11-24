@@ -48,19 +48,10 @@
 :::
 
 
-
-## Editing in Inkscape
-
-1. Import
-2. Ungroup
-3. Delete
-4. Move objects
-5. Add annotation
-6. Align objects
-7. Distribute objects evenly
-8. Crop canvas
-
 ## Inkscape Basics
+
+::: {.columns}
+::: {.column width="50%"}
 
 **Opening PDFs/SVGs:**
 
@@ -80,18 +71,25 @@
 - Lock layers to prevent accidental edits
 - Use layers for complex figures
 
+:::
+
+::: {.column width="50%"}
+
 **Handling Missing Fonts:**
 
 When opening files, you may see a font warning:
 
-![](../sources/keep_font_names.png){width=50%}
+![](../sources/keep_font_names.png){width=90%}
 
 **Keep the font names!** Don't substitute - preserves original font info and prevents text reflow issues
+
+:::
+:::
 
 ## Cropping Canvas to Remove Whitespace
 
 ::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
 
 **The Page Tool approach:**
 
@@ -99,9 +97,11 @@ When opening files, you may see a font warning:
 2. Use **Edit → Resize Page to Selection** (or **Ctrl+Shift+R**)
 3. This resizes the canvas to fit your selection
 
+![](../sources/hidden_objects.png){width=100%}
+
 :::
 
-::: {.column width="50%"}
+::: {.column width="40%"}
 
 ::: {.callout-warning}
 ## Hidden Objects from R Plots!
@@ -124,7 +124,7 @@ R exports contain many **invisible/empty objects** that prevent proper cropping!
 :::
 :::
 
-![](../sources/hidden_objects.png){width=70%}
+
 
 ## Example: Before and After Editing
 
