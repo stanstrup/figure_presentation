@@ -27,7 +27,6 @@ library(pheatmap)
 library(RColorBrewer)
 library(patchwork)
 library(massageR)
-library(gplots)
 ```
 
 ```{r}
@@ -182,6 +181,10 @@ pheatmap(count_log,
 
 ## Why Scaling Matters for Clustering
 
+**The Outlier Correlation Problem**
+
+Extreme values in both variables artificially inflate correlation!
+
 ```{r}
 #| label: scaling-demo
 #| echo: true
@@ -189,33 +192,45 @@ pheatmap(count_log,
 #| fig-width: 12
 #| fig-height: 5
 
-# Create data where scaling matters
+# Create uncorrelated data with outliers
 set.seed(42)
-# Variable 1: mean 0, sd 1
-# Variable 2: mean 100, sd 10 (different scale!)
+# Core data: NO correlation
 demo_data <- data.frame(
-  var1 = rnorm(50, mean = 0, sd = 1),
-  var2 = rnorm(50, mean = 100, sd = 10)
+  var1 = rnorm(48, mean = 0, sd = 1),
+  var2 = rnorm(48, mean = 0, sd = 1)
 )
 
-# Without scaling: var2 dominates distance calculations
-# With scaling: both variables contribute equally
+# Add 2 extreme outliers in BOTH variables (same samples)
+demo_data <- rbind(demo_data,
+                   data.frame(var1 = c(5, -5), var2 = c(5, -5)))
 
+# Without scaling: outliers dominate, creating spurious correlation!
 p1 <- ggplot(demo_data, aes(var1, var2)) +
-  geom_point() +
-  labs(title = "Unscaled: var2 dominates",
+  geom_point(size = 2) +
+  geom_point(data = demo_data[49:50, ], aes(var1, var2),
+             color = "red", size = 4) +
+  labs(title = "Unscaled: Outliers create fake correlation!",
        subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
   theme_classic()
 
+# After scaling: true (lack of) correlation revealed
 demo_scaled <- as.data.frame(scale(demo_data))
 p2 <- ggplot(demo_scaled, aes(var1, var2)) +
-  geom_point() +
-  labs(title = "Scaled: Equal contribution",
+  geom_point(size = 2) +
+  geom_point(data = demo_scaled[49:50, ], aes(var1, var2),
+             color = "red", size = 4) +
+  labs(title = "Scaled: True relationship visible",
        subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
   theme_classic()
 
 p1 + p2
 ```
+
+::: {.fragment}
+**Key point**: Outliers (red points) pull correlation from ~0 to high value!
+
+After scaling, outliers have less leverage → true correlation revealed.
+:::
 
 ## Proper Heatmap Workflow
 
@@ -256,42 +271,8 @@ The `massageR` package provides `heat.clust()` which handles scaling and dendrog
 - Scales data and calculates dendrograms together
 - Controls exactly where limits are applied (data and/or dendrograms)
 - Returns pre-computed dendrograms
-- Works with `heatmap.2()` or `pheatmap`
+- Works seamlessly with pheatmap
 :::
-
-## heat.clust Example
-
-```{r}
-#| label: heat-clust-example
-#| echo: true
-#| eval: true
-#| fig-width: 10
-#| fig-height: 6
-
-library(massageR)
-library(gplots)
-
-# Use heat.clust to scale and cluster
-z <- heat.clust(expr_matrix,
-                scaledim = "row",           # Scale by row
-                zlim = c(-3, 3),            # Cap at ±3
-                zlim_select = c("dend", "outdata"),  # Apply to both
-                reorder = c("column", "row"),        # Reorder dendrograms
-                distfun = function(x) dist(x),
-                hclustfun = function(x) hclust(x, method = "complete"),
-                scalefun = scale)
-
-# Plot with heatmap.2 using pre-computed dendrograms
-heatmap.2(z$data,
-          Rowv = z$Rowv,
-          Colv = z$Colv,
-          trace = "none",
-          scale = "none",           # Already scaled!
-          symbreaks = TRUE,
-          col = rev(colorRampPalette(brewer.pal(11, "RdBu"))(256)),
-          margins = c(5, 8),
-          main = "Using heat.clust: Proper scaling + dendrograms")
-```
 
 ## heat.clust with pheatmap
 
@@ -302,12 +283,16 @@ heatmap.2(z$data,
 #| fig-width: 10
 #| fig-height: 6
 
-# heat.clust also works with pheatmap
+library(massageR)
+
+# Use heat.clust to scale and cluster
 z <- heat.clust(expr_matrix,
-                scaledim = "row",
-                zlim = c(-3, 3),
-                zlim_select = c("dend", "outdata"),
-                reorder = c("column", "row"),
+                scaledim = "row",           # Scale by row
+                zlim = c(-3, 3),            # Cap at ±3
+                zlim_select = c("dend", "outdata"),  # Apply to both
+                reorder = c("column", "row"),        # Reorder dendrograms
+                distfun = function(x) dist(x),
+                hclustfun = function(x) hclust(x, method = "complete"),
                 scalefun = scale)
 
 # Extract dendrograms and convert to hclust objects
@@ -321,7 +306,7 @@ pheatmap(z$data,
          scale = "none",
          color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
          breaks = seq(-3, 3, length.out = 101),
-         main = "heat.clust + pheatmap")
+         main = "heat.clust + pheatmap: Properly scaled!")
 ```
 
 ## Complete Example: Proper Scaling
