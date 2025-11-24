@@ -21,7 +21,7 @@ library(forcats)
 #| echo: true
 #| eval: true
 #| fig-width: 5
-#| fig-height: 4
+#| fig-height: 3.5
 
 library(ggplot2)
 
@@ -38,8 +38,6 @@ ggplot(category_df, aes(x = category, y = value)) +
   labs(title = "Alphabetical (Wrong!)")
 ```
 
-Random order makes no sense!
-
 :::
 
 ::: {.column width="50%"}
@@ -49,7 +47,7 @@ Random order makes no sense!
 #| echo: true
 #| eval: true
 #| fig-width: 5
-#| fig-height: 4
+#| fig-height: 3.5
 
 # Specify levels explicitly
 category_df$category <- factor(category_df$category,
@@ -62,12 +60,24 @@ ggplot(category_df, aes(x = category, y = value)) +
   labs(title = "Logical Order (Correct!)")
 ```
 
+:::
+:::
+
+::: {.columns}
+::: {.column width="50%"}
+
+Random order makes no sense!
+
+:::
+
+::: {.column width="50%"}
+
 Much better - order makes sense!
 
 :::
 :::
 
-## Solution 2: forcats Package
+## Solution: forcats Package
 
 **Part of tidyverse, designed for factor manipulation**
 
