@@ -129,7 +129,7 @@ max_abs <- max(abs(range(expr_capped[,-1])))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
 
 # Mark capped values with borders
-border_color <- matrix("", nrow = nrow(capped_cells), ncol = ncol(capped_cells))
+border_color <- matrix(NA, nrow = nrow(capped_cells), ncol = ncol(capped_cells))
 border_color[capped_cells] <- "black"
 
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
@@ -197,7 +197,7 @@ expr_capped <- expr_data %>%
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
 
 # Mark capped values
-border_color_q <- matrix("", nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
+border_color_q <- matrix(NA, nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
 border_color_q[capped_cells_q] <- "black"
 
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
@@ -486,7 +486,7 @@ expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, 
 max_abs_comp <- max(abs(range(expr_capped_comp[,-1])))
 breaks_comp <- seq(-max_abs_comp, max_abs_comp, length.out = 101)
 
-border_color_comp <- matrix("", nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
+border_color_comp <- matrix(NA, nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
 border_color_comp[capped_cells_comp] <- "black"
 
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
