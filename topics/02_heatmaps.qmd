@@ -203,6 +203,11 @@ p
 
 ## Solution 2: Range scaling and Quantile-Based cut-off
 
+
+::: {.columns}
+::: {.column width="65%"}
+
+
 ```{r}
 #| label: quantile-cutoff
 #| echo: true
@@ -227,6 +232,13 @@ expr_capped <- expr_data %>%
 
 # Step 3: Range scaling (min-max normalization to [0,1])
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
+```
+
+
+```{r}
+#| label: quantile-cutoff-make-plot
+#| echo: true
+#| eval: true
 
 # Create asterisk markers for capped values (in original order)
 asterisk_matrix_q <- matrix("", nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
@@ -242,19 +254,21 @@ p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
               silent = TRUE)
 ```
 
-::: {.columns}
-::: {.column width="60%"}
+
 ```{r}
 #| label: quantile-cutoff-plot
 #| echo: false
 #| eval: true
 #| fig-width: 6
 #| fig-height: 4
+
 p
 ```
+
 :::
 
-::: {.column width="40%"}
+::: {.column width="35%"}
+
 **Quantile capping + range scaling**
 
 - Cap first to remove outliers **per metabolite**
@@ -262,6 +276,7 @@ p
 - More robust to outliers than variance scaling
 - Good for non-normal data
 - Common quantiles: 5-95% or 2-98%
+
 :::
 :::
 
