@@ -26,6 +26,8 @@ library(ggplot2)
 library(pheatmap)
 library(RColorBrewer)
 library(patchwork)
+library(massageR)
+library(gplots)
 ```
 
 ```{r}
@@ -61,61 +63,6 @@ pheatmap(expr_matrix,
 
 
 
-- Scale: -3 to +3 (capped at ±3 SD)
-- ~99.7% of data: -3 to +3
-- Uses 100% of color range
-- Patterns visible!
-
-## The Dendrogram Scaling Trap
-
-::: {.callout-warning}
-## Hidden Technical Issue
-
-**Critical R bug**: Functions like `heatmap()`, `heatmap.2()`, and `heatplot()` have a dangerous inconsistency:
-
-- The `scale` parameter affects **color visualization**
-- But **NOT** dendrogram calculation!
-
-**Result**: Dendrograms cluster on unscaled data while colors show scaled data!
-:::
-
-## Why Scaling Matters for Clustering
-
-```{r}
-#| label: scaling-demo
-#| echo: true
-#| eval: true
-#| fig-width: 12
-#| fig-height: 5
-
-# Create data where scaling matters
-set.seed(42)
-# Variable 1: mean 0, sd 1
-# Variable 2: mean 100, sd 10 (different scale!)
-demo_data <- data.frame(
-  var1 = rnorm(50, mean = 0, sd = 1),
-  var2 = rnorm(50, mean = 100, sd = 10)
-)
-
-# Without scaling: var2 dominates distance calculations
-# With scaling: both variables contribute equally
-
-p1 <- ggplot(demo_data, aes(var1, var2)) +
-  geom_point() +
-  labs(title = "Unscaled: var2 dominates",
-       subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
-  theme_classic()
-
-demo_scaled <- as.data.frame(scale(demo_data))
-p2 <- ggplot(demo_scaled, aes(var1, var2)) +
-  geom_point() +
-  labs(title = "Scaled: Equal contribution",
-       subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
-  theme_classic()
-
-p1 + p2
-```
-
 ## Solution 1: Standard Deviation Cutoffs
 
 ```{r}
@@ -138,7 +85,11 @@ pheatmap(expr_capped,
          breaks = seq(-3, 3, length.out = 101))
 ```
 
-Most common: ±2 or ±3 SD cutoff
+
+- Scale: -3 to +3 (capped at ±3 SD)
+- ~99.7% of data: -3 to +3
+- Uses 100% of color range
+- Patterns visible!
 
 ## Solution 2: Quantile-Based
 
@@ -210,6 +161,62 @@ pheatmap(count_log,
          color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 ```
 
+
+
+## The Dendrogram Scaling Trap
+
+::: {.callout-warning}
+## Hidden Technical Issue
+
+**Critical R bug**: Functions like `heatmap()`, `heatmap.2()`, and `heatplot()` have a dangerous inconsistency:
+
+- The `scale` parameter affects **color visualization**
+- But **NOT** dendrogram calculation!
+
+**Result**: Dendrograms cluster on unscaled data while colors show scaled data!
+:::
+
+
+
+
+
+## Why Scaling Matters for Clustering
+
+```{r}
+#| label: scaling-demo
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# Create data where scaling matters
+set.seed(42)
+# Variable 1: mean 0, sd 1
+# Variable 2: mean 100, sd 10 (different scale!)
+demo_data <- data.frame(
+  var1 = rnorm(50, mean = 0, sd = 1),
+  var2 = rnorm(50, mean = 100, sd = 10)
+)
+
+# Without scaling: var2 dominates distance calculations
+# With scaling: both variables contribute equally
+
+p1 <- ggplot(demo_data, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Unscaled: var2 dominates",
+       subtitle = paste("Correlation:", round(cor(demo_data$var1, demo_data$var2), 2))) +
+  theme_classic()
+
+demo_scaled <- as.data.frame(scale(demo_data))
+p2 <- ggplot(demo_scaled, aes(var1, var2)) +
+  geom_point() +
+  labs(title = "Scaled: Equal contribution",
+       subtitle = paste("Correlation:", round(cor(demo_scaled$var1, demo_scaled$var2), 2))) +
+  theme_classic()
+
+p1 + p2
+```
+
 ## Proper Heatmap Workflow
 
 ::: {.callout-important}
@@ -236,6 +243,86 @@ pheatmap(data_capped,
          scale = "none")  # Already scaled!
 ```
 :::
+
+## Using massageR::heat.clust
+
+::: {.callout-tip}
+## Better Approach: heat.clust
+
+The `massageR` package provides `heat.clust()` which handles scaling and dendrogram calculation correctly in one step!
+
+**Key advantages:**
+
+- Scales data and calculates dendrograms together
+- Controls exactly where limits are applied (data and/or dendrograms)
+- Returns pre-computed dendrograms
+- Works with `heatmap.2()` or `pheatmap`
+:::
+
+## heat.clust Example
+
+```{r}
+#| label: heat-clust-example
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+library(massageR)
+library(gplots)
+
+# Use heat.clust to scale and cluster
+z <- heat.clust(expr_matrix,
+                scaledim = "row",           # Scale by row
+                zlim = c(-3, 3),            # Cap at ±3
+                zlim_select = c("dend", "outdata"),  # Apply to both
+                reorder = c("column", "row"),        # Reorder dendrograms
+                distfun = function(x) dist(x),
+                hclustfun = function(x) hclust(x, method = "complete"),
+                scalefun = scale)
+
+# Plot with heatmap.2 using pre-computed dendrograms
+heatmap.2(z$data,
+          Rowv = z$Rowv,
+          Colv = z$Colv,
+          trace = "none",
+          scale = "none",           # Already scaled!
+          symbreaks = TRUE,
+          col = rev(colorRampPalette(brewer.pal(11, "RdBu"))(256)),
+          margins = c(5, 8),
+          main = "Using heat.clust: Proper scaling + dendrograms")
+```
+
+## heat.clust with pheatmap
+
+```{r}
+#| label: heat-clust-pheatmap
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# heat.clust also works with pheatmap
+z <- heat.clust(expr_matrix,
+                scaledim = "row",
+                zlim = c(-3, 3),
+                zlim_select = c("dend", "outdata"),
+                reorder = c("column", "row"),
+                scalefun = scale)
+
+# Extract dendrograms and convert to hclust objects
+row_dend <- as.hclust(z$Rowv)
+col_dend <- as.hclust(z$Colv)
+
+# Use with pheatmap
+pheatmap(z$data,
+         cluster_rows = row_dend,
+         cluster_cols = col_dend,
+         scale = "none",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-3, 3, length.out = 101),
+         main = "heat.clust + pheatmap")
+```
 
 ## Complete Example: Proper Scaling
 
@@ -345,8 +432,9 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 1. **Inspect data distribution** before making heatmap
 2. **Cap at 2-3 SD** for large datasets with outliers
 3. **Use quantiles** (5-95%) for robustness
-4. **Always annotate** what you did: "Values capped at ±2 SD"
+4. **Always annotate** what you did: "Values capped at ±3 SD"
 5. **Include color scale** with actual values
 6. **Scale data BEFORE** passing to heatmap function
 7. **Calculate dendrograms** on the same scaled data
+8. **Consider `massageR::heat.clust()`** for automatic proper scaling workflow
 :::
