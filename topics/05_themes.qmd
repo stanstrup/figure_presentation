@@ -362,7 +362,7 @@ p <- ggboxplot(ToothGrowth,
   stat_compare_means(
                       comparisons = my_comparisons,
                       method = "t.test",
-                      p.adjust.method = "BH"  # Holm correction
+                      p.adjust.method = "BH"  # Benjamini-Hochberg (FDR) correction
                     ) +
   stat_compare_means(
                       method = "anova",

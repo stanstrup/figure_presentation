@@ -333,7 +333,7 @@ p <- ggplot(var_data, aes(x = variable, y = value)) +
   labs(title = "Natural sort: var1, var2, var10, var20")
 ```
 
-**Note:** `forcats::fct_inseq()` only works if entire level is numeric
+**Note:** `forcats::fct_inseq()` only works if factor levels are purely numeric strings (e.g., "1", "2", "10"), not mixed alphanumeric like "var1", "var10"
 
 :::
 

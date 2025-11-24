@@ -247,7 +247,7 @@ combined
 | Format | Type | Compression | Container? | Notes |
 |--------|------|-------------|------------|-------|
 | **PDF** | Vector + Raster | Lossless | Yes | Can embed both vector and raster data |
-| **EPS** | Vector | Lossless | Yes | Can embed fonts and images |
+| **EPS** | Vector | Lossless | Yes | Older format required by some journals. Use `device = "eps"` in ggsave(). PDF is preferred when accepted. |
 | **SVG** | Vector | Lossless | No | XML-based, web-native |
 | **PNG** | Raster | Lossless | No | Supports transparency |
 | **TIFF** | Raster | Lossless or Lossy | Yes | Multiple pages, various compression options |
