@@ -163,7 +163,9 @@ p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
               main = "MAD-scaled + capped at ±3 (black borders = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks, scale = "none",
-              border_color = border_color, silent = TRUE)
+              border_color = border_color,
+              cellwidth = 15, cellheight = 15,  # Make cells larger for visible borders
+              silent = TRUE)
 ```
 
 
@@ -243,7 +245,9 @@ border_color_q <- border_color_q[p_temp_q$tree_row$order, p_temp_q$tree_col$orde
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
               main = "Capped at 5-95 percentiles + range-scaled (black borders = capped)",
               color = rev(viridis::magma(100)),
-              border_color = border_color_q, silent = TRUE)
+              border_color = border_color_q,
+              cellwidth = 15, cellheight = 15,  # Make cells larger for visible borders
+              silent = TRUE)
 ```
 
 ::: {.columns}
@@ -565,6 +569,7 @@ p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                breaks = breaks_comp,
                border_color = border_color_comp,
+               cellwidth = 15, cellheight = 15,  # Make cells larger for visible borders
                scale = "none",
                silent = TRUE)
 
