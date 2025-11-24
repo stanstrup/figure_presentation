@@ -88,7 +88,7 @@ p
 
 # Step 1: Scale to unit variance (mean=0, sd=1) by row
 expr_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
+  mutate(across(-Gene, ~ scale(.x)[,1]))
 
 # Step 2: Cap at ±3 (only meaningful after scaling!)
 expr_capped <- expr_scaled %>%
@@ -177,7 +177,7 @@ p
 
 # Step 1: Scale to unit variance first by row
 expr_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
+  mutate(across(-Gene, ~ scale(.x)[,1]))
 
 # Step 2: Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
@@ -346,7 +346,7 @@ Scaling by row ensures all features contribute equally to sample clustering.
 ```r
 # Proper workflow (using tibbles)
 data_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
+  mutate(across(-Gene, ~ scale(.x)[,1]))
 
 data_capped <- data_scaled %>%
   mutate(across(-Gene, ~ pmin(pmax(.x, -3), 3)))
@@ -430,7 +430,7 @@ pheatmap(z$data,
 
 # Step 1: Scale by row (gene)
 data_scaled <- expr_data %>%
-  mutate(across(-Gene, ~ ((.x - mean(.x)) / sd(.x))))
+  mutate(across(-Gene, ~ scale(.x)[,1]))
 
 # Step 2: Cap extremes at ±2.5
 data_capped <- data_scaled %>%
