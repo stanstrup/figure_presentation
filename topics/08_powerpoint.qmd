@@ -27,16 +27,18 @@ Instead:
 
 ## Vector Formats for PowerPoint
 
-**Best option:**
+**Three options:**
 
-- **SVG**: Good support in *modern* PowerPoint → **Use this!**
-- Editable after import
-- Preserves vector format
-- Exports as SVG/PDF maintain vector quality
+1. **SVG**: Good support in *modern* PowerPoint → **Use this!**
+   - Editable after import
+   - Preserves vector format
+   - Exports as SVG/PDF maintain vector quality
 
-**Alternatives:**
+2. **EMF**: Windows only, obsolete and of no benefit in *newer* PowerPoint. Requires `devEMF`
 
-- **PNG**: If you must use raster, then 300+ DPI
+3. **PDF**: Very poorly supported! Low resolution import (rasterized!) and no editing
+
+4. **PNG**: If you must use raster, then 300+ DPI
 
 ## SVG Editing in PowerPoint
 
