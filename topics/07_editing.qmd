@@ -77,8 +77,6 @@
 
 **Handling Missing Fonts:**
 
-When opening files, you may see a font warning:
-
 ![](../sources/keep_font_names.png){width=90%}
 
 **Keep the font names!** Don't substitute - preserves original font info and prevents text reflow issues
@@ -130,13 +128,13 @@ R exports contain many **invisible/empty objects** that prevent proper cropping!
 
 ::: {.columns}
 ::: {.column width="50%"}
-**Original R output (pre-edit.svg)**
+**Original R output**
 
 ![](../sources/pre-edit.svg){width=100%}
 :::
 
 ::: {.column width="50%"}
-**After editing in Inkscape (post-edit.svg)**
+**After editing in Inkscape**
 
 ![](../sources/post-edit.svg){width=100%}
 
@@ -308,6 +306,56 @@ pa + pb +
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A')
 ```
+
+## Shared Axes with plot_layout()
+
+::: {.columns}
+::: {.column width="50%"}
+
+**Default behavior:** Each plot keeps its own axes
+
+**Control with `axes` parameter:**
+
+```{r}
+#| label: patchwork-axes-demo
+#| echo: true
+#| eval: false
+
+# Default - separate axes
+p1 / p2 / p3
+
+# Share x-axes (for stacked plots)
+p1 / p2 / p3 +
+  plot_layout(axes = "collect_x")
+
+# Share y-axes (for side-by-side)
+p1 | p2 | p3 +
+  plot_layout(axes = "collect_y")
+
+# Share both
+(p1 | p2) / (p3 | p4) +
+  plot_layout(axes = "collect")
+```
+
+:::
+
+::: {.column width="50%"}
+
+**When to use:**
+
+- **`collect_x`**: Remove duplicate x-axes when plots are **stacked vertically** (same x-scale)
+- **`collect_y`**: Remove duplicate y-axes when plots are **side-by-side** (same y-scale)
+- **`collect`**: Remove both (same scales in both directions)
+
+**Benefits:**
+
+- Cleaner appearance
+- Less redundant labels
+- Easier to compare across plots
+- Saves space
+
+:::
+:::
 
 ## Saving patchwork Figures
 
