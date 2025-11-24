@@ -1,18 +1,5 @@
 ---
-format:
-  revealjs:
-    theme: dark
-    css: custom.css
-    slide-number: true
-    chalkboard: true
-    preview-links: auto
-    footer: "Academic Figure Pitfalls"
-    code-fold: false
-    code-overflow: wrap
-    fig-width: 8
-    fig-height: 5
-keep-md: true
-keep-source: true
+# Settings inherited from _quarto.yml
 ---
 
 # Academic Figures: Common Pitfalls and Best Practices {.title-slide}
@@ -132,6 +119,7 @@ keep-source: true
 - "Fundamentals of Data Visualization" by Claus Wilke
 - ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
 - https://clauswilke.com/dataviz
-- https://www.nature.com/articles/s41467-020-19160-7?utm_source=chatgpt.com
+- https://www.nature.com/articles/s41467-020-19160-7
+- https://stanstrup.github.io/heatmaps.html
 
 Slides: github.com/yourrepo

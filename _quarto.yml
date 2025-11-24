@@ -1,3 +1,19 @@
 project:
   type: default
   execute-dir: project
+
+format:
+  revealjs:
+    theme: dark
+    css: custom.css
+    slide-number: true
+    chalkboard: true
+    preview-links: auto
+    footer: "Academic Figure Pitfalls"
+    code-fold: false
+    code-overflow: wrap
+    fig-width: 8
+    fig-height: 5
+
+keep-md: true
+keep-source: true
