@@ -326,17 +326,22 @@ mtcars %>%
 ```{r}
 #| label: factors-cheatsheet
 #| echo: true
-#| eval: true
+#| eval: false
 
 library(forcats)
 
 fct_reorder(f, x, fun)   # Order by another variable
 fct_infreq(f)            # Order by frequency
+fct_inorder(f)           # Order by appearance in data
+fct_inseq(f)             # Order by numeric value (if purely numeric)
 fct_rev(f)               # Reverse current order
 fct_relevel(f, "A", "B") # Move specific levels to front
 fct_recode(f, new = "old") # Rename levels
 fct_lump_n(f, n = 5)     # Keep top n, lump others as "Other"
 fct_explicit_na(f)       # Make NA a visible level
+
+# For natural sort (var1, var2, var10):
+factor(x, levels = gtools::mixedsort(unique(x)))
 ```
 
 ## Real-World Example: Survey Data
