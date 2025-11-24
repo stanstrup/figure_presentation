@@ -35,7 +35,6 @@ color_packages <- c(
 plotting_packages <- c(
   "ggpubr",       # Publication-ready plots
   "ggthemes",     # Additional themes
-  "hrbrthemes",   # hrbrthemes fonts and themes
   "ggiraph",      # Interactive ggplot2
   "grid",         # Grid graphics
   "gridExtra"     # Grid extras
@@ -110,11 +109,21 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 }
 BiocManager::install("mixOmics", update = FALSE, ask = FALSE)
 
-# Install GitLab packages
-cat("\n3. Installing GitLab packages...\n")
+# Install GitHub packages
+cat("\n3. Installing GitHub packages...\n")
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes", repos = "https://cloud.r-project.org/")
 }
+tryCatch({
+  remotes::install_github("hrbrmstr/hrbrthemes", upgrade = "never")
+  cat("✓ Successfully installed hrbrthemes from GitHub\n")
+}, error = function(e) {
+  cat("⚠ Failed to install hrbrthemes from GitHub:", conditionMessage(e), "\n")
+  cat("  This may not affect the presentation if hrbrthemes is not used.\n")
+})
+
+# Install GitLab packages
+cat("\n4. Installing GitLab packages...\n")
 tryCatch({
   remotes::install_gitlab("stanstrup_R_packages/massageR", upgrade = "never")
   cat("✓ Successfully installed massageR from GitLab\n")
@@ -130,10 +139,12 @@ cat(strrep("=", 60), "\n")
 
 installed <- all_cran_packages %in% installed.packages()[,"Package"]
 bioc_installed <- "mixOmics" %in% installed.packages()[,"Package"]
+github_installed <- "hrbrthemes" %in% installed.packages()[,"Package"]
 gitlab_installed <- "massageR" %in% installed.packages()[,"Package"]
 
 cat("\nCRAN packages:", sum(installed), "/", length(all_cran_packages), "\n")
 cat("Bioconductor packages:", ifelse(bioc_installed, "1/1", "0/1"), "\n")
+cat("GitHub packages:", ifelse(github_installed, "1/1", "0/1"), "\n")
 cat("GitLab packages:", ifelse(gitlab_installed, "1/1", "0/1"), "\n")
 
 if (sum(installed) == length(all_cran_packages) && bioc_installed) {
