@@ -61,16 +61,16 @@ pheatmap(expr_matrix,
 **Without Outlier Handling**
 
 - Scale: -20 to +20
-- Most data: -2 to +2
-- Uses only 20% of color range
+- ~99.7% of data: -3 to +3 (±3 SD)
+- Uses only 15% of color range
 - Real patterns invisible
 :::
 
 ::: {.column width="50%"}
 **With Proper Scaling**
 
-- Scale: -3 to +3 (capped)
-- Most data: -2 to +2
+- Scale: -3 to +3 (capped at ±3 SD)
+- ~99.7% of data: -3 to +3
 - Uses 100% of color range
 - Patterns visible!
 :::
