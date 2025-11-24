@@ -123,14 +123,16 @@ p
 #| echo: true
 #| eval: true
 
-# Cap at 5th and 95th percentiles
-lower <- quantile(expr_matrix, 0.05, na.rm = TRUE)
-upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
-
-expr_quantile <- pmin(pmax(expr_matrix, lower), upper)
+# Cap at 5th and 95th percentiles PER COLUMN (sample)
+# Important: columns may be on different scales!
+expr_quantile <- apply(expr_matrix, 2, function(x) {
+  lower <- quantile(x, 0.05, na.rm = TRUE)
+  upper <- quantile(x, 0.95, na.rm = TRUE)
+  pmin(pmax(x, lower), upper)
+})
 
 p <- pheatmap(expr_quantile,
-              main = "Values capped at 5-95 percentiles",
+              main = "Values capped at 5-95 percentiles (per sample)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
 ```
@@ -149,7 +151,8 @@ p
 ::: {.column width="40%"}
 **More robust approach**
 
-- Uses percentiles instead of SD
+- Uses percentiles **per sample**
+- Handles different scales across samples
 - Not affected by extreme outliers
 - Good for non-normal data
 - Common: 5-95% or 2-98%
