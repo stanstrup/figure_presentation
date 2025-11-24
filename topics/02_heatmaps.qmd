@@ -148,17 +148,12 @@ breaks  <- seq(-max_abs, max_abs, length.out = 101)
 #| echo: true
 #| eval: true
 
-# First run pheatmap to get clustering order
-p_temp <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
-                   color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-                   breaks = breaks, scale = "none", silent = TRUE)
-
-# Create asterisk markers for capped values
+# Create asterisk markers for capped values (in original order)
 asterisk_matrix <- matrix("", nrow = nrow(capped_cells), ncol = ncol(capped_cells))
 asterisk_matrix[capped_cells] <- "*"
-asterisk_matrix <- asterisk_matrix[p_temp$tree_row$order, p_temp$tree_col$order]
 
-# Now create final plot with asterisk markers
+# Create final plot with asterisk markers
+# display_numbers uses the original data order, clustering is applied automatically
 p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
               main = "MAD-scaled + capped at ±3 (* = capped)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
@@ -233,16 +228,11 @@ expr_capped <- expr_data %>%
 # Step 3: Range scaling (min-max normalization to [0,1])
 expr_quantile <- expr_capped %>% mutate(across(-Sample, ~ (.x - min(.x)) / (max(.x) - min(.x))))
 
-# First run pheatmap to get clustering order
-p_temp_q <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
-                     color = rev(viridis::magma(100)), silent = TRUE)
-
-# Create asterisk markers for capped values
+# Create asterisk markers for capped values (in original order)
 asterisk_matrix_q <- matrix("", nrow = nrow(capped_cells_q), ncol = ncol(capped_cells_q))
 asterisk_matrix_q[capped_cells_q] <- "*"
-asterisk_matrix_q <- asterisk_matrix_q[p_temp_q$tree_row$order, p_temp_q$tree_col$order]
 
-# Now create final plot with asterisk markers
+# Create final plot with asterisk markers
 p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
               main = "Capped at 5-95 percentiles + range-scaled (* = capped)",
               color = rev(viridis::magma(100)),
@@ -555,15 +545,9 @@ expr_capped_comp <- expr_scaled_comp %>% mutate(across(-Sample, ~ pmin(pmax(.x, 
 max_abs_comp <- max(abs(range(expr_capped_comp[,-1])))
 breaks_comp <- seq(-max_abs_comp, max_abs_comp, length.out = 101)
 
-# First run to get clustering order
-p2_temp <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
-                    color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-                    breaks = breaks_comp, scale = "none", silent = TRUE)
-
-# Create asterisk markers for capped values
+# Create asterisk markers for capped values (in original order)
 asterisk_matrix_comp <- matrix("", nrow = nrow(capped_cells_comp), ncol = ncol(capped_cells_comp))
 asterisk_matrix_comp[capped_cells_comp] <- "*"
-asterisk_matrix_comp <- asterisk_matrix_comp[p2_temp$tree_row$order, p2_temp$tree_col$order]
 
 # Final plot with asterisk markers
 p2 <- pheatmap(expr_capped_comp %>% column_to_rownames("Sample"),
