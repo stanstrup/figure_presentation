@@ -36,7 +36,7 @@ jobs:
 
       - name: Install R packages
         run: |
-          R -e 'install.packages(c("ggplot2", "patchwork", "magick", "glue", "viridis", "remotes", "mixOmics", "scales", "colorspace", "dichromat", "RColorBrewer"))'
+          R -e 'install.packages(c("ggplot2", "tidyverse", "patchwork", "magick", "glue", "viridis", "scales", "colorspace", "dichromat", "RColorBrewer", "ggpubr", "ggthemes", "hrbrthemes", "pheatmap", "plotly", "htmlwidgets", "crosstalk", "ggiraph", "forcats", "dplyr", "cowplot", "gridExtra", "devEMF", "conflicted", "grid", "mixOmics", "rmarkdown", "knitr"))'
 
       - name: Render Quarto presentation
         run: |
