@@ -40,23 +40,23 @@ library(tidyr)
 # Simulate metabolomics data (positive only, with clustering)
 set.seed(123)
 # Create two groups of samples with different metabolite patterns
+# Samples in rows, metabolites in columns (standard data format)
 group1 <- matrix(rlnorm(50, meanlog = 2, sdlog = 0.8), nrow = 5, ncol = 10)
 group2 <- matrix(rlnorm(50, meanlog = 2.5, sdlog = 0.8), nrow = 5, ncol = 10)
 
 expr_data <- rbind(group1, group2) %>%
-  t() %>%  # Transpose so metabolites are rows, samples are columns
-  as_tibble(.name_repair = ~c(paste0("Control", 1:5), paste0("Treatment", 1:5))) %>%
-  mutate(Metabolite = paste0("Metabolite_", 1:10), .before = 1)
+  as_tibble(.name_repair = ~paste0("Metabolite_", 1:10)) %>%
+  mutate(Sample = c(paste0("Control", 1:5), paste0("Treatment", 1:5)), .before = 1)
 
 expr_data[5, "Treatment3"] <- 1000  # One extreme outlier
 
 # Log-transform for visualization (metabolomics data is often log-transformed)
 expr_log <- expr_data %>%
-  mutate(across(-Metabolite, ~ log2(.x)))
+  mutate(across(-Sample, ~ log2(.x)))
 
 # Use divergent ColorBrewer scale centered at mean
 # RdBu = Red-Blue divergent scale (reversed so blue is high)
-expr_mat_outlier <- expr_log %>% column_to_rownames("Metabolite")
+expr_mat_outlier <- expr_log %>% column_to_rownames("Sample")
 data_center <- mean(as.matrix(expr_mat_outlier), na.rm = TRUE)
 max_diff <- max(abs(as.matrix(expr_mat_outlier) - data_center))
 breaks <- seq(data_center - max_diff, data_center + max_diff, length.out = 101)
@@ -106,16 +106,16 @@ p
 #| eval: true
 
 # Step 1: Scale variables to unit variance (mean=0, sd=1)
-expr_scaled <- expr_data %>% mutate(across(-Metabolite, ~ scale(.x)[,1]))
+expr_scaled <- expr_data %>% mutate(across(-Sample, ~ scale(.x)[,1]))
 
 # Step 2: Cap at ±3 (only meaningful after scaling!)
-expr_capped <- expr_scaled %>% mutate(across(-Metabolite, ~ pmin(pmax(.x, -3), 3)))
+expr_capped <- expr_scaled %>% mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 
 # Step 3: Create symmetric breaks centered at 0
 max_abs <- max(abs(range(expr_capped[,-1])))
 breaks  <- seq(-max_abs, max_abs, length.out = 101)
 
-p <- pheatmap(expr_capped %>% column_to_rownames("Metabolite"),
+p <- pheatmap(expr_capped %>% column_to_rownames("Sample"),
               main = "Scaled + capped at ±3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               breaks = breaks, scale = "none", silent = TRUE)
@@ -157,17 +157,17 @@ p
 #| echo: true
 #| eval: true
 
-# Cap at 5th and 95th percentiles PER COLUMN (sample)
+# Cap at 5th and 95th percentiles PER COLUMN (metabolite)
 # Important: columns may be on different scales!
 expr_quantile <- expr_data %>%
-  mutate(across(-Metabolite, ~ {
+  mutate(across(-Sample, ~ {
     lower <- quantile(.x, 0.05, na.rm = TRUE)
     upper <- quantile(.x, 0.95, na.rm = TRUE)
     pmin(pmax(.x, lower), upper)
   }))
 
-p <- pheatmap(expr_quantile %>% column_to_rownames("Metabolite"),
-              main = "Values capped at 5-95 percentiles (per sample)",
+p <- pheatmap(expr_quantile %>% column_to_rownames("Sample"),
+              main = "Values capped at 5-95 percentiles (per metabolite)",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
 ```
@@ -186,8 +186,8 @@ p
 ::: {.column width="40%"}
 **More robust approach**
 
-- Uses percentiles **per sample**
-- Handles different scales across samples
+- Uses percentiles **per metabolite**
+- Handles different scales across metabolites
 - Not affected by extreme outliers
 - Good for non-normal data
 - Common: 5-95% or 2-98%
@@ -203,12 +203,12 @@ p
 
 # Step 1: Scale to unit variance first by row
 expr_scaled <- expr_data %>%
-  mutate(across(-Metabolite, ~ scale(.x)[,1]))
+  mutate(across(-Sample, ~ scale(.x)[,1]))
 
 # Step 2: Define your own color breaks
 breaks <- seq(-3, 3, length.out = 101)
 
-p <- pheatmap(expr_scaled %>% column_to_rownames("Metabolite"),
+p <- pheatmap(expr_scaled %>% column_to_rownames("Sample"),
               breaks = breaks,
               main = "Scaled + custom breaks: -3 to +3",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
@@ -252,16 +252,16 @@ p
 # Create positive data (e.g., count data for metabolites)
 set.seed(123)
 count_data <- matrix(rpois(100, lambda = 50), nrow = 10, ncol = 10) %>%
-  as_tibble(.name_repair = ~paste0("Sample", 1:10)) %>%
-  mutate(Metabolite = paste0("Metabolite_", 1:10), .before = 1)
+  as_tibble(.name_repair = ~paste0("Metabolite_", 1:10)) %>%
+  mutate(Sample = paste0("Sample", 1:10), .before = 1)
 
 count_data[5, "Sample5"] <- 5000  # Extreme count
 
 # Log transform BEFORE plotting
 count_log <- count_data %>%
-  mutate(across(-Metabolite, ~ log10(.x + 1)))  # +1 to handle zeros
+  mutate(across(-Sample, ~ log10(.x + 1)))  # +1 to handle zeros
 
-p <- pheatmap(count_log %>% column_to_rownames("Metabolite"),
+p <- pheatmap(count_log %>% column_to_rownames("Sample"),
               main = "Log10 transformed counts",
               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
               silent = TRUE)
@@ -372,13 +372,13 @@ Scaling by row ensures all features contribute equally to sample clustering.
 ```r
 # Proper workflow (using tibbles)
 data_scaled <- expr_data %>%
-  mutate(across(-Metabolite, ~ scale(.x)[,1]))
+  mutate(across(-Sample, ~ scale(.x)[,1]))
 
 data_capped <- data_scaled %>%
-  mutate(across(-Metabolite, ~ pmin(pmax(.x, -3), 3)))
+  mutate(across(-Sample, ~ pmin(pmax(.x, -3), 3)))
 
 # Calculate dendrograms on scaled data
-data_mat <- data_capped %>% column_to_rownames("Metabolite") %>% as.matrix()
+data_mat <- data_capped %>% column_to_rownames("Sample") %>% as.matrix()
 row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
@@ -418,7 +418,7 @@ library(massageR)
 
 # Convert tibble to matrix for heat.clust
 expr_matrix <- expr_data %>%
-  column_to_rownames("Metabolite") %>%
+  column_to_rownames("Sample") %>%
   as.matrix()
 
 # Use heat.clust to scale and cluster
@@ -456,14 +456,14 @@ pheatmap(z$data,
 
 # Step 1: Scale by row (metabolite)
 data_scaled <- expr_data %>%
-  mutate(across(-Metabolite, ~ scale(.x)[,1]))
+  mutate(across(-Sample, ~ scale(.x)[,1]))
 
 # Step 2: Cap extremes at ±2.5
 data_capped <- data_scaled %>%
-  mutate(across(-Metabolite, ~ pmin(pmax(.x, -2.5), 2.5)))
+  mutate(across(-Sample, ~ pmin(pmax(.x, -2.5), 2.5)))
 
 # Step 3: Calculate dendrograms on scaled data
-data_mat <- data_capped %>% column_to_rownames("Metabolite") %>% as.matrix()
+data_mat <- data_capped %>% column_to_rownames("Sample") %>% as.matrix()
 row_dend <- hclust(dist(data_mat))
 col_dend <- hclust(dist(t(data_mat)))
 
@@ -521,7 +521,7 @@ pheatmap(data_mat,
 library(gridExtra)
 
 # Before: with outlier
-p1 <- pheatmap(expr_data %>% column_to_rownames("Metabolite"),
+p1 <- pheatmap(expr_data %>% column_to_rownames("Sample"),
                main = "Uncapped: Pattern lost",
                color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
                silent = TRUE)
