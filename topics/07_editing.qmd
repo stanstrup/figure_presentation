@@ -81,6 +81,36 @@
 - Lock layers to prevent accidental edits
 - Use layers for complex figures
 
+## Cropping Canvas to Remove Whitespace
+
+**The Page Tool approach:**
+
+1. Select the objects you want to keep (or Select All)
+2. Use **Edit → Resize Page to Selection** (or **Ctrl+Shift+R**)
+3. This resizes the canvas to fit your selection
+
+::: {.callout-warning}
+## Hidden Objects from R Plots
+
+R exports often contain many **invisible/empty objects** that prevent proper cropping!
+
+![](../sources/hidden_objects.png){width=80%}
+
+**The frustrating whack-a-mole problem:**
+
+- Press **Ctrl+A** (Select All) to reveal hidden objects
+- You'll see many white/empty rectangles and objects
+- **Delete these empty objects first** before resizing page
+- Otherwise, your canvas will include this invisible whitespace
+- This is tedious but necessary for clean cropping
+
+**Why clipping doesn't work:**
+
+- Object → Clip → Set can destroy your plot elements
+- May convert gradients/fills to colored rectangles
+- **Don't use clipping** - just delete empty objects instead
+:::
+
 ## Handling Missing Fonts
 
 When opening files in Inkscape, you may see a font warning:
