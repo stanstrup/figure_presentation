@@ -88,14 +88,18 @@ Much better - order makes sense!
 #| label: factors-forcats-intro
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
 library(forcats)
 
-# Reorder by another variable (e.g., median)
-mtcars %>%
-  mutate(cyl_group = fct_reorder(factor(cyl), mpg, .fun = median)) %>%
-  ggplot(aes(cyl_group, mpg)) +
-  geom_boxplot()
+# Reorder car classes by median highway mpg
+mpg %>%
+  ggplot(aes(x = fct_reorder(class, hwy, median), y = hwy)) +
+  geom_boxplot(fill = "lightblue") +
+  coord_flip() +
+  labs(x = "Vehicle Class", y = "Highway MPG",
+       title = "Ordered by median MPG")
 
 # Boxplots now ordered by median value!
 ```
@@ -106,17 +110,20 @@ mtcars %>%
 #| label: factors-fct-reorder
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-# Order categories by mean of values
-mtcars %>%
-  mutate(cyl_group = factor(cyl)) %>%
-  group_by(cyl_group) %>%
-  summarise(mean_mpg = mean(mpg)) %>%
-  ungroup() %>%
-  mutate(cyl_group = fct_reorder(cyl_group, mean_mpg, mean)) %>%
-  ggplot(aes(x = cyl_group, y = mean_mpg, fill = cyl_group)) +
-  geom_col() +
-  coord_flip()  # Horizontal bars easier to read
+# Order diamond cuts by mean price
+diamonds %>%
+  group_by(cut) %>%
+  summarise(mean_price = mean(price)) %>%
+  ggplot(aes(x = fct_reorder(cut, mean_price),
+             y = mean_price,
+             fill = cut)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = "Diamond Cut", y = "Mean Price ($)",
+       title = "Cuts ordered by average price")
 ```
 
 Bars ordered by height!
@@ -127,12 +134,15 @@ Bars ordered by height!
 #| label: factors-fct-infreq
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-# Order by how common each level is
-ggplot(mtcars, aes(x = fct_infreq(factor(cyl)))) +
-  geom_bar() +
-  labs(x = "Cylinders") +
-  coord_flip()
+# Order by how common each vehicle class is
+ggplot(mpg, aes(x = fct_infreq(class))) +
+  geom_bar(fill = "steelblue") +
+  coord_flip() +
+  labs(x = "Vehicle Class", y = "Count",
+       title = "Most common classes first")
 
 # Most common category first!
 ```
@@ -221,14 +231,17 @@ ggplot(var_data, aes(x = variable, y = value)) +
 #| label: factors-fct-rev
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-# Sometimes you want reverse order
-mtcars %>%
-  mutate(cyl_group = fct_reorder(factor(cyl), mpg) %>% fct_rev()) %>%
-  ggplot(aes(x = cyl_group, y = mpg)) +
-  geom_col()
+# Reverse the frequency order
+ggplot(mpg, aes(x = fct_rev(fct_infreq(class)))) +
+  geom_bar(fill = "coral") +
+  coord_flip() +
+  labs(x = "Vehicle Class", y = "Count",
+       title = "Least common classes first (reversed)")
 
-# Now highest values first instead of last
+# Now least common first instead of most common!
 ```
 
 ## fct_relevel(): Move Specific Levels
@@ -237,14 +250,18 @@ mtcars %>%
 #| label: factors-fct-relevel
 #| echo: true
 #| eval: true
+#| fig-width: 8
+#| fig-height: 5
 
-# Move "4" to front for cylinders
-mtcars %>%
-  mutate(cyl_group = fct_relevel(factor(cyl), "4")) %>%
-  ggplot(aes(cyl_group, mpg)) +
-  geom_boxplot()
+# Move "Ideal" cut to front
+diamonds %>%
+  mutate(cut = fct_relevel(cut, "Ideal")) %>%
+  ggplot(aes(x = cut, fill = cut)) +
+  geom_bar(show.legend = FALSE) +
+  labs(x = "Diamond Cut", y = "Count",
+       title = "Ideal cut shown first")
 
-# 4-cylinder always shown first
+# "Ideal" always shown first
 ```
 
 Common in experimental data!
