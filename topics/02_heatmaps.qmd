@@ -4,15 +4,15 @@
 
 **Scenario**: Gene expression data
 
-- 99% of values: -2 to +2
-- 1 outlier gene: +20
+- 99% of values: -3 to +3
+- 1 outlier gene: +6
 
 ::: {.fragment}
 **What happens with default scaling?**
 
-Color scale: -20 to +20
+Color scale: -6 to +6
 
-Result: Everything looks the same color! 😱
+Result: All the colors look pale and differences are obscured 😱
 :::
 
 ## Visual Example: The Outlier Effect
@@ -30,7 +30,7 @@ library(patchwork)
 
 ```{r}
 #| label: heatmap-outlier-example
-#| echo: true
+#| echo: false
 #| eval: true
 #| fig-width: 10
 #| fig-height: 5
@@ -40,41 +40,31 @@ set.seed(123)
 expr_matrix <- matrix(rnorm(100, mean = 0, sd = 1), nrow = 10)
 rownames(expr_matrix) <- paste0("Gene", 1:10)
 colnames(expr_matrix) <- paste0("Sample", 1:10)
-expr_matrix[5, 5] <- 20  # One extreme outlier
+expr_matrix[5, 5] <- 6  # One extreme outlier
 
 # Use divergent ColorBrewer scale with white at 0
 # RdBu = Red-Blue divergent scale (reversed so blue is positive)
 pheatmap(expr_matrix,
          main = "With outlier: All data compressed!",
          color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
-         breaks = seq(-20, 20, length.out = 101))
+         breaks = seq(-6, 6, length.out = 101))
 ```
 
 ::: {.fragment}
-99% of your data is invisible due to 1 outlier!
-:::
-
-## The Problem Illustrated
-
-::: {.columns}
-::: {.column width="50%"}
 **Without Outlier Handling**
 
-- Scale: -20 to +20
+- Scale: -6 to +6
 - ~99.7% of data: -3 to +3 (±3 SD)
-- Uses only 15% of color range
+- Uses only halfthe color range
 - Real patterns invisible
 :::
 
-::: {.column width="50%"}
-**With Proper Scaling**
+
 
 - Scale: -3 to +3 (capped at ±3 SD)
 - ~99.7% of data: -3 to +3
 - Uses 100% of color range
 - Patterns visible!
-:::
-:::
 
 ## The Dendrogram Scaling Trap
 
@@ -135,15 +125,17 @@ p1 + p2
 #| fig-width: 10
 #| fig-height: 5
 
-# Cap at ±2 SD
+# Cap at ±3 SD
 mean_val <- mean(expr_matrix, na.rm = TRUE)
 sd_val <- sd(expr_matrix, na.rm = TRUE)
 
-expr_capped <- pmin(pmax(expr_matrix, mean_val - 2*sd_val),
-                    mean_val + 2*sd_val)
+expr_capped <- pmin(pmax(expr_matrix, mean_val - 3*sd_val),
+                    mean_val + 3*sd_val)
 
 pheatmap(expr_capped,
-         main = "Values capped at ±2 SD")
+         main = "Values capped at ±3 SD",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-3, 3, length.out = 101))
 ```
 
 Most common: ±2 or ±3 SD cutoff
@@ -164,7 +156,8 @@ upper <- quantile(expr_matrix, 0.95, na.rm = TRUE)
 expr_quantile <- pmin(pmax(expr_matrix, lower), upper)
 
 pheatmap(expr_quantile,
-         main = "Values capped at 5-95 percentiles")
+         main = "Values capped at 5-95 percentiles",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 ```
 
 Robust to extreme outliers
@@ -179,11 +172,12 @@ Robust to extreme outliers
 #| fig-height: 5
 
 # Define your own color breaks
-breaks <- seq(-3, 3, length.out = 100)
+breaks <- seq(-3, 3, length.out = 101)
 
 pheatmap(expr_matrix,
          breaks = breaks,
-         main = "Custom breaks: -3 to +3")
+         main = "Custom breaks: -3 to +3",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 
 # Values outside range automatically assigned to extremes
 ```
@@ -212,7 +206,8 @@ colnames(count_matrix) <- paste0("Sample", 1:10)
 count_log <- log10(count_matrix + 1)  # +1 to handle zeros
 
 pheatmap(count_log,
-         main = "Log10 transformed counts")
+         main = "Log10 transformed counts",
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100))
 ```
 
 ## Proper Heatmap Workflow
@@ -266,7 +261,8 @@ pheatmap(data_capped,
          cluster_rows = row_dend,
          cluster_cols = col_dend,
          scale = "none",
-         color = colorRampPalette(brewer.pal(11, "RdBu"))(100),
+         color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+         breaks = seq(-2.5, 2.5, length.out = 101),
          main = "Properly scaled: dendrograms match colors!")
 ```
 
@@ -313,10 +309,17 @@ pheatmap(data_capped,
 library(gridExtra)
 
 # Before: with outlier
-p1 <- pheatmap(expr_matrix, main = "Uncapped: Pattern lost", silent = TRUE)
+p1 <- pheatmap(expr_matrix,
+               main = "Uncapped: Pattern lost",
+               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+               silent = TRUE)
 
 # After: outlier capped
-p2 <- pheatmap(data_capped, main = "Capped at ±2.5 SD: Patterns visible", silent = TRUE)
+p2 <- pheatmap(data_capped,
+               main = "Capped at ±2.5 SD: Patterns visible",
+               color = colorRampPalette(rev(brewer.pal(11, "RdBu")))(100),
+               breaks = seq(-2.5, 2.5, length.out = 101),
+               silent = TRUE)
 
 grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 ```
