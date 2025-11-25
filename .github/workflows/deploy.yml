@@ -48,6 +48,13 @@ jobs:
           quarto render presentation.qmd
           cp presentation.html index.html
 
+      - name: List files for debugging
+        run: |
+          echo "=== Files in root ==="
+          ls -la *.html *.md .nojekyll 2>/dev/null || true
+          echo "=== Presentation files generated ==="
+          ls -la presentation* index.html 2>/dev/null || true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
