@@ -115,7 +115,7 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes", repos = "https://cloud.r-project.org/")
 }
 tryCatch({
-  remotes::install_github("hrbrmstr/hrbrthemes", upgrade = "never")
+  remotes::install_git("https://codeberg.org/hrbrmstr/hrbrthemes.git")
   cat("✓ Successfully installed hrbrthemes from GitHub\n")
 }, error = function(e) {
   cat("⚠ Failed to install hrbrthemes from GitHub:", conditionMessage(e), "\n")
