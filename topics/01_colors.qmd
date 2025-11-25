@@ -127,7 +127,7 @@ ggplot(correct_data, aes(x = x, y = y)) +
 
 
 ::: {.fragment}
-![](sources/1-s2.0-S0924271622002659-gr1_lrg.jpg)
+![](../sources/1-s2.0-S0924271622002659-gr1_lrg.jpg)
 :::
 
 ::: {.notes}
@@ -365,7 +365,7 @@ p3 <- base_plot +
 
 ## Real world consequences
 
-![](sources/file-20211005-30173-hog6m.avif)
+![](../sources/file-20211005-30173-hog6m.avif)
 
 
 ::: {.notes}
@@ -385,10 +385,10 @@ https://theconversation.com/how-rainbow-colour-maps-can-distort-data-and-be-misl
 
 <div class="image-container" style="--max-width: 1200px; --img-scale: 0.7; position: relative;">
 <div class="cropped fragment fade-out" data-fragment-index="1" style="--crop-width: 62%; position: absolute;">
-![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+![](../sources/12870_2011_Article_914_Fig2_HTML.webp)
 </div>
 <div class="fragment fade-in" data-fragment-index="1">
-![](sources/12870_2011_Article_914_Fig2_HTML.webp)
+![](../sources/12870_2011_Article_914_Fig2_HTML.webp)
 </div>
 </div>
 
@@ -428,7 +428,7 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 :::: {.column width="50%"}
 
 
-![](sources/borkin.png)
+![](../sources/borkin.png)
 
 ::::
 
@@ -770,7 +770,7 @@ seq_wrap / div_wrap / qual_wrap +
 ## ColorBrewer Website
 
 
-![](sources/colorbrewer.png)
+![](../sources/colorbrewer.png)
 
 
 ## Yellow Color Warning

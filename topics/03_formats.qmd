@@ -29,7 +29,7 @@ dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
 :::
 
 ::: {.column width="50%"}
-![](sources/Rgb-raster-image.svg){width=100%}
+![](../sources/Rgb-raster-image.svg){width=100%}
 :::
 ::::
 
@@ -371,7 +371,7 @@ combined
 
 This is the graphical abstract
 
-![](sources/1-s2.0-S0003267012000062-fx1.jpg)
+![](../sources/1-s2.0-S0003267012000062-fx1.jpg)
 
 :::
 
@@ -379,7 +379,7 @@ This is the graphical abstract
 
 This was one of the figures
 
-![](sources/1-s2.0-S0003267012000062-gr4.jpg)
+![](../sources/1-s2.0-S0003267012000062-gr4.jpg)
 
 :::
 ::::
