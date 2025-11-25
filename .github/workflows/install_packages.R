@@ -31,11 +31,17 @@ color_packages <- c(
   "scales"        # Scale functions
 )
 
+# Statistical modeling packages (dependencies for car/ggpubr)
+stats_packages <- c(
+  "lme4",         # Linear mixed-effects models (required by car)
+  "pbkrtest",     # Parametric bootstrap tests (required by car)
+  "car",          # Companion to Applied Regression (required by rstatix)
+  "rstatix",      # Statistical tests (required by ggpubr)
+  "ggpubr"        # Publication-ready plots
+)
+
 # Plotting extension packages
 plotting_packages <- c(
-  "car",          # Dependency for rstatix
-  "rstatix",      # Statistical tests for ggpubr
-  "ggpubr",       # Publication-ready plots
   "ggthemes",     # Additional themes
   "ggiraph",      # Interactive ggplot2
   "grid",         # Grid graphics
@@ -70,6 +76,7 @@ all_cran_packages <- unique(c(
   core_packages,
   tidyverse_packages,
   color_packages,
+  stats_packages,
   plotting_packages,
   specialized_packages,
   utility_packages
