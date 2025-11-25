@@ -46,6 +46,7 @@ jobs:
       - name: Render Quarto presentation
         run: |
           quarto render presentation.qmd
+          cp presentation.html index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
