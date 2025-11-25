@@ -77,7 +77,7 @@
 
 **Handling Missing Fonts:**
 
-![](../sources/keep_font_names.png){width=90%}
+![](sources/keep_font_names.png){width=90%}
 
 **Keep the font names!** Don't substitute - preserves original font info and prevents text reflow issues
 
@@ -95,7 +95,7 @@
 2. Use **Edit → Resize Page to Selection** (or **Ctrl+Shift+R**)
 3. This resizes the canvas to fit your selection
 
-![](../sources/hidden_objects.png){width=100%}
+![](sources/hidden_objects.png){width=100%}
 
 :::
 
@@ -130,13 +130,13 @@ R exports contain many **invisible/empty objects** that prevent proper cropping!
 ::: {.column width="50%"}
 **Original R output**
 
-![](../sources/pre-edit.svg){width=100%}
+![](sources/pre-edit.svg){width=100%}
 :::
 
 ::: {.column width="50%"}
 **After editing in Inkscape**
 
-![](../sources/post-edit.svg){width=100%}
+![](sources/post-edit.svg){width=100%}
 
 **Changes made:**
 
