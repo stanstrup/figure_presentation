@@ -114,12 +114,16 @@
 
 ## Resources
 
-- ColorBrewer: [colorbrewer2.org](https://colorbrewer2.org)
-- Colorblind simulator: [coblis.org](https://www.coblis.com)
-- "Fundamentals of Data Visualization" by Claus Wilke
-- ggplot2 documentation: [ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
-- https://clauswilke.com/dataviz
-- https://www.nature.com/articles/s41467-020-19160-7
-- https://stanstrup.github.io/heatmaps.html
+**Color Tools:**
+- [ColorBrewer](https://colorbrewer2.org) - Color palette selection
+- [Coblis](https://www.coblis.com) - Colorblind simulator
 
-Slides: github.com/yourrepo
+**Books & Guides:**
+- [Fundamentals of Data Visualization](https://clauswilke.com/dataviz) - Claus Wilke
+- [ggplot2 documentation](https://ggplot2.tidyverse.org)
+
+**Papers & Tutorials:**
+- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7) - Nature Communications
+- [Heatmaps guide](https://stanstrup.github.io/heatmaps.html) - Jan Stanstrup
+
+**These slides:** [stanstrup.github.io/figure_presentation](https://stanstrup.github.io/figure_presentation/)
