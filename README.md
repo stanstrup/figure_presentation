@@ -6,7 +6,7 @@ A Quarto RevealJS presentation about common pitfalls in creating academic figure
 
 The presentation is automatically built and deployed to GitHub Pages on every commit to the main branch.
 
-**Live Presentation:** `https://<your-username>.github.io/<your-repo>/`
+**Live Presentation:** https://stanstrup.github.io/figure_presentation/
 
 ## Local Development
 
