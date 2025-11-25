@@ -30,9 +30,9 @@
 
 **Do it right**
 
-1. Color Gradients
-2. Heatmap Scaling
-3. File Formats
+1. [Color Gradients](#color-gradients)
+2. [Heatmap Scaling](#heatmap-scaling)
+3. [File Formats](#which-image-format-for-which-purpose)
 
 :::
 
@@ -40,16 +40,16 @@
 
 **Do it easily**
 
-4. Text Sizing
-5. Themes & Styling
-6. Saving Plots
-7. Post-Processing
+4. [Text Sizing](#text-and-element-sizing)
+5. [Themes & Styling](#default-ggplot2-theme)
+6. [Saving Plots](#saving-plots-in-r)
+7. [Post-Processing](#post-export-editing)
 
-8. PowerPoint Import
-9. Factor Ordering
-10. Interactive Plots
+8. [PowerPoint Import](#powerpoint-import)
+9. [Factor Ordering](#factor-ordering)
+10. [Interactive Plots](#interactive-plots)
 
-11. Rendering Issues
+11. [Rendering Issues](#rendering-issues)
 
 :::
 ::::
