@@ -7,6 +7,8 @@
 library(ggplot2)
 library(plotly)
 library(crosstalk)
+library(conflicted)
+conflict_prefer("layout", "plotly")
 theme_set(theme_bw())
 ```
 
