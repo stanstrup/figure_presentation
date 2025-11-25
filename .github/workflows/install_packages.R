@@ -33,6 +33,8 @@ color_packages <- c(
 
 # Plotting extension packages
 plotting_packages <- c(
+  "car",          # Dependency for rstatix
+  "rstatix",      # Statistical tests for ggpubr
   "ggpubr",       # Publication-ready plots
   "ggthemes",     # Additional themes
   "ggiraph",      # Interactive ggplot2
