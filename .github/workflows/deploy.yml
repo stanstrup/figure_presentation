@@ -11,6 +11,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: write  # Allow building and pushing Docker images
 
 concurrency:
   group: "pages"
@@ -21,6 +22,9 @@ jobs:
   ensure-docker-image:
     uses: ./.github/workflows/build-docker-image.yml
     secrets: inherit
+    permissions:
+      contents: read
+      packages: write
 
   build:
     needs: ensure-docker-image
