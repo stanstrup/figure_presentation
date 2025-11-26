@@ -14,7 +14,8 @@ core_packages <- c(
   "forcats",      # Factor handling
   "patchwork",    # Combining plots
   "rmarkdown",    # Document rendering
-  "knitr"         # Document rendering
+  "knitr",        # Document rendering
+  "learnr"        # Interactive tutorials/quiz
 )
 
 # Tidyverse (includes many of the above, but explicit is better)
