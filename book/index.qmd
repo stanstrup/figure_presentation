@@ -1,0 +1,95 @@
+# Welcome {.unnumbered}
+
+This comprehensive guide covers common pitfalls and best practices for creating academic figures, with a focus on R and ggplot2.
+
+## About This Guide
+
+Scientific figures are often the first—and sometimes the only—thing readers look at in a paper. Poor quality figures not only look unprofessional but can also mislead readers and undermine your research. This guide will help you create clear, accurate, and publication-ready figures.
+
+## Two Ways to Learn
+
+This material is available in two formats to suit different learning styles:
+
+### 📊 Presentation Slides
+
+Concise, visual presentation format perfect for:
+- Quick reference
+- Presentations and workshops
+- Getting an overview of key concepts
+
+[View the slides →](../presentation.html){.btn .btn-primary}
+
+### 📖 Book Format (You're Here!)
+
+Comprehensive tutorial with detailed explanations, perfect for:
+- In-depth learning
+- Step-by-step tutorials
+- Reference and lookup
+
+### ✅ Interactive Quiz
+
+Test your knowledge with 31 questions covering all topics:
+
+[Take the quiz →](../quiz.html){.btn .btn-success}
+
+## What You'll Learn
+
+This guide covers 11 essential topics:
+
+**Core Principles:**
+
+1. **Color Gradients** - Why rainbow scales are problematic and what to use instead
+2. **Heatmap Scaling** - Handling outliers and choosing appropriate scaling methods
+3. **File Formats** - Vector vs raster, when to use PDF, SVG, PNG, or TIFF
+
+**Practical Workflow:**
+
+4. **Text Sizing** - Making text readable at final dimensions
+5. **Themes & Styling** - Setting consistent, publication-ready styles
+6. **Saving Plots** - Using ggsave() properly with correct DPI and dimensions
+7. **Post-Processing** - When and how to edit exported figures
+
+**Advanced Topics:**
+
+8. **PowerPoint Import** - Importing figures without quality loss
+9. **Factor Ordering** - Avoiding common sorting pitfalls
+10. **Interactive Plots** - Creating interactive visualizations with plotly
+11. **Rendering Issues** - Troubleshooting common problems
+
+## Key Takeaways
+
+:::{.callout-tip}
+## Core Principles to Remember
+
+1. **Colors**: Use viridis family, avoid rainbow
+2. **Formats**: Vector (PDF/SVG) for plots, raster (PNG/TIFF) for photos
+3. **Sizing**: Use smaller dimensions to make text larger
+4. **Saving**: Use `ggsave()` with explicit dimensions and DPI
+5. **Reproducibility**: Keep R scripts as source of truth
+:::
+
+## Who This Guide Is For
+
+- Researchers preparing figures for publication
+- Graduate students learning data visualization
+- Anyone who creates plots in R
+- Workshop participants and instructors
+
+## Prerequisites
+
+Basic familiarity with:
+- R programming
+- ggplot2 plotting
+- Data manipulation with dplyr/tidyr
+
+## Getting Started
+
+Start with [Chapter 1: Color Gradients](chapters/01-colors.qmd) or jump to any topic that interests you. Each chapter is self-contained with code examples you can run yourself.
+
+## About the Author
+
+Jan Stanstrup is a researcher with expertise in data visualization and reproducible research practices.
+
+## License
+
+This work is licensed under the MIT License. See the [LICENSE](https://github.com/stanstrup/figure_presentation/blob/main/LICENSE) file for details.

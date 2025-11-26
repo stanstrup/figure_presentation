@@ -56,14 +56,29 @@ jobs:
       - name: Render Quarto presentation
         run: |
           quarto render presentation.qmd
-          cp presentation.html index.html
+
+      - name: Render Quarto book
+        run: |
+          quarto render book
+
+      - name: Render quiz
+        run: |
+          Rscript -e "rmarkdown::render('quiz.Rmd', output_file = 'quiz.html')"
+
+      - name: Organize output files
+        run: |
+          # Keep presentation.html as main file, create index that redirects to book
+          mv book/_book/* .
+          cp book.html index.html
+          # Keep quiz in root
+          # Keep presentation slides accessible
 
       - name: List files for debugging
         run: |
           echo "=== Files in root ==="
-          ls -la *.html *.md .nojekyll 2>/dev/null || true
-          echo "=== Presentation files generated ==="
-          ls -la presentation* index.html 2>/dev/null || true
+          ls -la *.html .nojekyll 2>/dev/null || true
+          echo "=== All HTML files ==="
+          find . -name "*.html" -type f | head -20
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

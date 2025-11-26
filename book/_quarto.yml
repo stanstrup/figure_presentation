@@ -1,0 +1,65 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Academic Figures: A Comprehensive Guide"
+  subtitle: "Common Pitfalls and Best Practices"
+  author: "Jan Stanstrup"
+  date: today
+
+  navbar:
+    background: primary
+    search: true
+    right:
+      - text: "Slides"
+        href: ../presentation.html
+      - text: "Quiz"
+        href: ../quiz.html
+      - icon: github
+        href: https://github.com/stanstrup/figure_presentation
+
+  sidebar:
+    style: "floating"
+    search: true
+    collapse-level: 1
+
+  chapters:
+    - index.qmd
+    - part: "Core Principles"
+      chapters:
+        - chapters/01-colors.qmd
+        - chapters/02-heatmaps.qmd
+        - chapters/03-formats.qmd
+    - part: "Practical Workflow"
+      chapters:
+        - chapters/04-sizing.qmd
+        - chapters/05-themes.qmd
+        - chapters/06-saving.qmd
+        - chapters/07-editing.qmd
+    - part: "Advanced Topics"
+      chapters:
+        - chapters/08-powerpoint.qmd
+        - chapters/09-factors.qmd
+        - chapters/10-interactive.qmd
+        - chapters/11-rendering.qmd
+    - references.qmd
+
+  appendices:
+    - quiz-info.qmd
+    - resources.qmd
+
+format:
+  html:
+    theme:
+      light: [cosmo, custom.css]
+      dark: [darkly, custom.css]
+    code-copy: true
+    code-overflow: wrap
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 2
+    link-external-newwindow: true
+
+bibliography: references.bib

@@ -1,0 +1,81 @@
+# Interactive Quiz {.unnumbered}
+
+Test your knowledge with an interactive quiz covering all topics from this guide!
+
+## About the Quiz
+
+The quiz contains **31 questions** organized into 9 sections:
+
+- Color gradients and palettes (7 questions)
+- Heatmap scaling (3 questions)
+- File formats (5 questions)
+- Text sizing (2 questions)
+- Themes and styling (2 questions)
+- Saving plots (3 questions)
+- Post-processing (2 questions)
+- Factor ordering (3 questions)
+- Interactive plots (4 questions)
+
+## Features
+
+- ✅ Progressive format (one section at a time)
+- ✅ Immediate feedback with explanations
+- ✅ Retry functionality for learning
+- ✅ Performance-based guidance
+- ✅ Clean, interactive interface
+
+## Taking the Quiz
+
+### Online Version
+
+The quiz is available as part of the presentation website:
+
+[Take the Quiz Online →](../../quiz.html){.btn .btn-success}
+
+### Local Version
+
+If you have the repository cloned, you can run the quiz locally:
+
+```r
+# Install learnr if needed
+if (!requireNamespace("learnr", quietly = TRUE)) {
+  install.packages("learnr")
+}
+
+# Run the quiz
+rmarkdown::run("quiz.Rmd")
+```
+
+The quiz will open in your web browser.
+
+## Score Interpretation
+
+After completing the quiz, you'll receive guidance based on your performance:
+
+- **🌟 Excellent (80%+)**: You have a strong grasp of the material
+- **✅ Good (60-79%)**: You understand most concepts, review missed sections
+- **📚 Needs Work (40-59%)**: Review the full guide and retake the quiz
+- **⚠️ Please Retake (<40%)**: Study the material carefully before retrying
+
+## Troubleshooting
+
+If you encounter a namespace error when running locally, restart your R session first:
+
+```r
+# In RStudio
+.rs.restartR()
+
+# Then run the quiz
+rmarkdown::run("quiz.Rmd")
+```
+
+## Using the Quiz
+
+The quiz is ideal for:
+
+- **Self-assessment** after reading the guide
+- **Workshop activities** as a follow-up to presentations
+- **Study groups** for collaborative learning
+- **Course assignments** for graduate-level courses
+
+Feel free to use and adapt the quiz for educational purposes under the MIT License.

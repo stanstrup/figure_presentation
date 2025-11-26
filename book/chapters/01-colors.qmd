@@ -1,0 +1,249 @@
+# Color Gradients
+
+```{r}
+#| label: setup-colors
+#| include: false
+library(ggplot2)
+library(viridis)
+library(RColorBrewer)
+library(colorspace)
+library(dichromat)
+library(scales)
+library(patchwork)
+```
+
+## Introduction
+
+Color choice is one of the most critical—and most commonly mishandled—aspects of data visualization. The rainbow color scale, despite its popularity, is fundamentally flawed and can mislead readers. This chapter explains why and shows you better alternatives.
+
+## The Problem with Rainbow Scales
+
+The rainbow color scale (red → orange → yellow → green → blue → purple) is ubiquitous in scientific visualization, but it has serious problems:
+
+### Perceptual Non-Uniformity
+
+**What is it?** Our eyes perceive color changes unevenly. Some transitions (like yellow to green) appear to create sharp boundaries, while others (like red to orange) appear smooth—even when the underlying data is uniformly distributed.
+
+**The consequence:** Rainbow scales create **false boundaries** in your data. Smooth gradients appear to have steps or edges that don't exist in the actual measurements.
+
+:::{.callout-warning}
+## Real-World Impact
+
+**Medical imaging example:** In a study of physicians diagnosing heart disease from medical images (Borkin et al., 2011, IEEE Visualization), doctors using jet/rainbow colormaps:
+
+- Made **more diagnostic errors**
+- Took **longer to diagnose**
+- Misinterpreted intensity levels due to perceptual bias
+
+Why? Bright yellow appeared more "intense" than dark red, even though dark red represented higher (more critical) values.
+:::
+
+### Colorblind Accessibility
+
+Approximately **8% of men** (1 in 12) and **0.5% of women** have some form of color vision deficiency, most commonly deuteranopia (red-green colorblindness).
+
+For these viewers, rainbow scales lose critical information—entire sections of the gradient become indistinguishable.
+
+### Grayscale Conversion
+
+When printed in black and white or photocopied, rainbow scales become nearly useless. Large sections collapse to similar gray values, losing all the information the color was meant to convey.
+
+## Better Alternatives: Viridis Family
+
+The **viridis** family of color scales was specifically designed to address all of rainbow's problems:
+
+- ✅ **Perceptually uniform** - Equal data steps = equal perceived color steps
+- ✅ **Colorblind-safe** - Distinguishable for all types of color vision
+- ✅ **Grayscale-safe** - Maintains information when printed in black and white
+- ✅ **Beautiful** - Aesthetically pleasing with good contrast
+
+### The Viridis Options
+
+```{r}
+#| label: viridis-demo
+#| echo: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Create sample data
+volcano_df <- data.frame(
+  x = rep(1:ncol(volcano), each = nrow(volcano)),
+  y = rep(1:nrow(volcano), ncol(volcano)),
+  z = as.vector(volcano)
+)
+
+base_plot <- ggplot(volcano_df, aes(x, y, fill = z)) +
+  geom_raster() +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5))
+
+p1 <- base_plot + scale_fill_viridis_c(option = "viridis") +
+  labs(title = "viridis (default)")
+p2 <- base_plot + scale_fill_viridis_c(option = "magma") +
+  labs(title = "magma")
+p3 <- base_plot + scale_fill_viridis_c(option = "plasma") +
+  labs(title = "plasma")
+p4 <- base_plot + scale_fill_viridis_c(option = "cividis") +
+  labs(title = "cividis (colorblind optimized)")
+
+(p1 | p2) / (p3 | p4)
+```
+
+## Using Viridis in ggplot2
+
+Using viridis scales is straightforward:
+
+```{r}
+#| label: viridis-usage
+#| eval: false
+#| echo: true
+
+# For continuous color scales
+ggplot(data, aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c()  # default is "viridis"
+
+# Choose a different option
+ggplot(data, aes(x, y, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "magma")
+
+# For discrete/categorical data
+ggplot(data, aes(x, y, color = category)) +
+  geom_point() +
+  scale_color_viridis_d()
+```
+
+## When to Use Diverging Scales
+
+For data with a **meaningful center point** (like zero in fold-change data or correlations), use **diverging scales**:
+
+```{r}
+#| label: diverging-demo
+#| echo: true
+#| fig-width: 8
+#| fig-height: 4
+
+# Simulate data with meaningful center
+set.seed(123)
+diverging_data <- expand.grid(x = 1:20, y = 1:20)
+diverging_data$z <- with(diverging_data, sin(x/3) * cos(y/3))
+
+p_div <- ggplot(diverging_data, aes(x, y, fill = z)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                       midpoint = 0) +
+  theme_minimal() +
+  labs(title = "Diverging Scale: Clear Zero Point")
+
+p_div
+```
+
+## ColorBrewer for Qualitative Data
+
+For **categorical data** (not ordered), use ColorBrewer qualitative palettes:
+
+```{r}
+#| label: colorbrewer-demo
+#| echo: true
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
+  geom_point(size = 3) +
+  scale_color_brewer(palette = "Set2") +  # or "Dark2", "Set1"
+  theme_minimal(base_size = 14)
+```
+
+:::{.callout-warning}
+## Yellow Problem
+
+Even ColorBrewer includes yellow in some palettes. Avoid yellow-heavy palettes for:
+
+- Print publications (yellow nearly invisible on white)
+- Projected presentations (yellow washes out)
+- Any situation requiring high contrast
+:::
+
+## Testing Your Colors
+
+Always test your color choices for:
+
+### 1. Colorblind Simulation
+
+Use online tools like [Coblis](https://www.coblis.com) or R packages:
+
+```{r}
+#| label: colorblind-test
+#| eval: false
+#| echo: true
+
+library(colorspace)
+
+# Simulate deuteranopia (green-blind)
+p_original <- ggplot(data, aes(x, y, fill = z)) +
+  geom_tile() +
+  scale_fill_viridis_c()
+
+# This is what it looks like to colorblind viewers
+deutan(p_original)
+```
+
+### 2. Grayscale Conversion
+
+```{r}
+#| label: grayscale-test
+#| eval: false
+#| echo: true
+
+library(colorspace)
+
+# Convert to grayscale
+desaturate(p_original)
+```
+
+## Quick Reference
+
+| Use Case | Recommended Scale | Code |
+|----------|------------------|------|
+| Continuous data (general) | Viridis | `scale_fill_viridis_c()` |
+| Data with meaningful center | Diverging (RdBu) | `scale_fill_gradient2()` or `scale_fill_distiller(palette="RdBu")` |
+| Categorical data (<8 categories) | ColorBrewer Set2 | `scale_color_brewer(palette="Set2")` |
+| Colorblind audience | Cividis | `scale_fill_viridis_c(option="cividis")` |
+
+## Summary
+
+:::{.callout-tip}
+## Best Practices
+
+1. **Never use rainbow or jet** for scientific figures
+2. **Use viridis family** as your default for continuous data
+3. **Use diverging scales** when data has a meaningful center (zero)
+4. **Test for colorblindness** using simulation tools
+5. **Check grayscale conversion** before publication
+6. **Avoid yellow** in palettes for print and presentations
+:::
+
+## Further Reading
+
+- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7) - Nature Communications
+- Borkin et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. IEEE Visualization
+- [Viridis documentation](https://cran.r-project.org/package=viridis)
+
+## Try It Yourself
+
+:::{.callout-note}
+## Exercise
+
+1. Take one of your existing plots that uses rainbow colors
+2. Replace it with `scale_fill_viridis_c()`
+3. Use `colorspace::desaturate()` to check grayscale
+4. Use [Coblis](https://www.coblis.com) to simulate colorblindness
+
+Compare the results!
+:::
+
+---
+
+**Next Chapter:** [Heatmap Scaling →](02-heatmaps.qmd)

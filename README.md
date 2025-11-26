@@ -2,11 +2,20 @@
 
 A Quarto RevealJS presentation about common pitfalls in creating academic figures using R.
 
-## Viewing the Presentation
+## Viewing the Materials
 
-The presentation is automatically built and deployed to GitHub Pages on every commit to the main branch.
+The materials are automatically built and deployed to GitHub Pages on every commit to the main branch.
 
-**Live Presentation:** https://stanstrup.github.io/figure_presentation/
+**📖 Book (Comprehensive Guide):** https://stanstrup.github.io/figure_presentation/
+
+**📊 Presentation Slides:** https://stanstrup.github.io/figure_presentation/presentation.html
+
+**✅ Interactive Quiz:** https://stanstrup.github.io/figure_presentation/quiz.html
+
+Choose the format that works best for you:
+- **Book**: In-depth tutorials with detailed explanations
+- **Slides**: Quick reference and presentations
+- **Quiz**: Test your knowledge (31 questions)
 
 ## Local Development
 
@@ -72,13 +81,22 @@ render_topic(9)  # Test topic 09
 render_presentation()
 ```
 
-## Structure
+## Repository Structure
 
-- `presentation.qmd` - Main presentation file
-- `topics/*.qmd` - Individual topic sections (modular structure)
-- `plots/` - Generated plots (auto-created during rendering)
-- `sources/` - Static source images
-- `custom.css` - Custom styling
+```
+.
+├── presentation.qmd          # Main presentation file (slides)
+├── topics/*.qmd              # Individual slide topics (modular)
+├── book/                     # Quarto Book (comprehensive guide)
+│   ├── _quarto.yml          # Book configuration
+│   ├── index.qmd            # Book homepage
+│   ├── chapters/*.qmd       # Expanded tutorial chapters
+│   └── references.qmd       # Bibliography
+├── quiz.Rmd                  # Interactive learnr quiz
+├── plots/                    # Generated plots (auto-created)
+├── sources/                  # Static source images
+└── custom.css                # Custom styling
+```
 
 ## Topics Covered
 

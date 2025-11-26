@@ -1,0 +1,12 @@
+# Rendering Issues
+
+::: {.callout-note}
+## Coming Soon
+This chapter is being developed.
+:::
+
+For now, refer to the [presentation slides](../../presentation.html) for this content.
+
+---
+
+**Previous:** [← Interactive Plots](10-*.qmd) | **Next:** [References →](12-*.qmd)
