@@ -135,8 +135,9 @@ The quiz contains **31 questions** with immediate feedback, performance-based gu
 
 This project uses GitHub Actions with a custom Docker image for fast builds:
 
-- **Docker Image**: Pre-built with all R packages (~40 min build time saved)
-- **Build**: Renders presentation, book, and quiz (~5 minutes)
+- **Docker Image**: Pre-built with all R packages
+- **Content changes**: ~5 min build (35 min faster!)
+- **Package changes**: ~45 min build (rebuilds Docker image)
 - **Deploy**: Publishes to GitHub Pages
 - **Trigger**: Commits to `main` or `master` branch
 

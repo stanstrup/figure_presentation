@@ -6,7 +6,8 @@ This project uses a custom Docker image with all R packages pre-installed to dra
 
 **Build time improvement:**
 - ❌ Before: ~40 minutes (installing packages every time)
-- ✅ After: ~5 minutes (packages already installed in image)
+- ✅ After (content changes): ~5 minutes (packages already installed in image)
+- ⚠️ After (package changes): ~45 minutes (rebuild image + deploy, but only when adding packages)
 
 ## How It Works
 
@@ -27,15 +28,16 @@ The `.github/workflows/build-docker-image.yml` workflow:
   - `Dockerfile` changes (base image or system dependencies)
   - Manually via workflow_dispatch
 - **Builds and pushes:** Updated image to GitHub Container Registry (GHCR)
-- **Uses layer caching:** Rebuilds are fast (~10 minutes)
+- **Build time:** ~40 minutes (installing all R packages from scratch)
 
 ### 3. Fast Deployment Workflow
 
 The `.github/workflows/deploy.yml` workflow:
 - **Uses:** Pre-built Docker image `ghcr.io/stanstrup/figure_presentation:latest`
-- **Skips:** Package installation entirely
+- **Skips:** Package installation entirely (if image exists)
 - **Only renders:** Quarto slides, book, and quiz
-- **Total time:** ~5 minutes instead of 40 minutes
+- **Content-only changes:** ~5 minutes (35-minute savings!)
+- **First deploy or after package changes:** ~45 minutes (build image + render)
 
 ## Workflow
 
@@ -44,13 +46,15 @@ graph LR
     A[Add new R package] --> B[Update install_packages.R]
     B --> C[Push to main]
     C --> D[build-docker-image.yml runs]
-    D --> E[New image pushed to GHCR]
-    E --> F[deploy.yml uses new image]
-    F --> G[Fast build ~5 min]
+    D --> E[Build image ~40 min]
+    E --> F[Image pushed to GHCR]
+    F --> G[deploy.yml renders ~5 min]
+    G --> H[Total: ~45 min]
 
-    H[Content change only] --> C2[Push to main]
-    C2 --> F2[deploy.yml uses existing image]
-    F2 --> G2[Fast build ~5 min]
+    I[Content change only] --> J[Push to main]
+    J --> K[deploy.yml checks image]
+    K --> L[Image exists, skip build]
+    L --> M[Render only ~5 min]
 ```
 
 ## When Image Rebuilds
@@ -121,8 +125,14 @@ docker run -it --rm \
 
 ## Benefits
 
-✅ **40-minute savings** per build
+✅ **35-40 minute savings per content deploy** (most common case)
 ✅ **Consistent environment** across all builds
 ✅ **Easier debugging** - can test locally with same image
 ✅ **Version controlled** - Dockerfile tracks environment changes
 ✅ **Automatic updates** - rebuilds when packages change
+
+## Cost vs. Benefit
+
+- **Package changes (rare):** ~45 min build (5 min slower than before)
+- **Content changes (frequent):** ~5 min build (35 min faster than before)
+- **Net benefit:** Massive time savings for typical workflow
