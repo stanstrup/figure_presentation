@@ -1,5 +1,22 @@
 # Saving Plots in R {background-color="#34495e"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+The worst mistake is relying on "Export" buttons or right-clicking to save plots. This chapter teaches you the proper, reproducible way to save plots in R using `ggsave()` and graphics devices, with complete control over dimensions, resolution, and format.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand the graphics device system in R
+- Know how to use `ggsave()` properly with all parameters
+- Learn when to use `cairo_pdf` for better font handling
+- Be able to save both PDF and PNG versions automatically
+- Know how to batch-save multiple plots efficiently
+- Understand the difference between exporting manually vs. scripted saving
+:::
+
 ```{r}
 #| label: setup-saving
 #| echo: false
@@ -331,4 +348,59 @@ plot_data$plot[[1]]
 4. **Use cairo_pdf** for PDF output
 5. **Save both PDF and PNG** versions
 6. **Organize** figures in dedicated directory
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Use `ggsave()` for ggplot2** - never use manual devices or Export button
+2. **Always specify dimensions explicitly**:
+   ```r
+   ggsave("plot.pdf", p, width = 7, height = 5, units = "in")
+   ```
+3. **Key parameters**:
+   - `width`, `height`, `units` - control size
+   - `dpi` - resolution for raster (300+ for print)
+   - `device` - format override (e.g., `cairo_pdf`)
+4. **Use `cairo_pdf` for PDFs** - better Unicode and font support
+5. **Save dual formats** - PDF for publication, PNG for presentations/emails
+6. **Batch saving workflow**:
+   - Create plotting function
+   - Use `walk()` or loops to save multiple plots
+   - Consistent naming scheme
+7. **Reproducibility** - scripted saving ensures consistent output
+8. **Organize output** - dedicated `figures/` directory with meaningful names
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a plot and save it using `ggsave()` with explicit parameters:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp)) + geom_point()
+   ggsave("my_plot.pdf", p, width = 7, height = 5, device = cairo_pdf)
+   ggsave("my_plot.png", p, width = 7, height = 5, dpi = 300)
+   ```
+2. Create a function that saves both PDF and PNG:
+   ```r
+   save_dual <- function(filename, plot, ...) {
+     ggsave(paste0(filename, ".pdf"), plot, device = cairo_pdf, ...)
+     ggsave(paste0(filename, ".png"), plot, dpi = 300, ...)
+   }
+   ```
+3. Use `purrr::walk()` to batch-save 5 different plots
+4. Compare file sizes between 72 DPI and 300 DPI PNG
+:::
+
+## Further Reading
+
+- [ggsave() documentation](https://ggplot2.tidyverse.org/reference/ggsave.html) - all parameters explained
+- [R Graphics Devices](https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/Devices.html) - comprehensive device reference
+- [Cairo graphics](https://www.cairographics.org/) - font rendering library
+- [purrr iteration](https://purrr.tidyverse.org/reference/map.html) - functional programming for batch operations
 :::

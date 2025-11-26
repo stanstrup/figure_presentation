@@ -2,6 +2,7 @@ project:
   type: default
   execute-dir: project
 
+# Default format is slides (for backward compatibility)
 format:
   revealjs:
     theme: dark

@@ -1,5 +1,22 @@
 # Rendering Issues {background-color="#c0392b"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+You create a perfect plot in R, save it as PDF, and open it on screen—only to find broken lines, missing elements, or weird artifacts. Before you panic and start debugging, understand this: **screen rendering of PDFs is often buggy, but the actual PDF content is fine.** This chapter explains the difference between rendering bugs and actual problems.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand the difference between PDF content and screen rendering
+- Know why PDFs may look broken on screen but print perfectly
+- Learn which PDF viewers have the most rendering bugs
+- Know when to worry (actual problems) vs. when to ignore (rendering artifacts)
+- Understand how to test if a problem is real: print preview or Illustrator
+- Learn best practices for avoiding real rendering issues
+:::
+
 ## What You See Isn't Always What You Get
 
 **Common scenario:**
@@ -341,4 +358,63 @@ If it prints well, it **is** well.
 
 ::: {.fragment}
 Don't obsess over screen artifacts!
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **PDF content ≠ PDF rendering** - what you see on screen is the viewer's interpretation, not the actual content
+2. **Common rendering bugs**:
+   - Lines appearing broken or missing
+   - Weird white lines between shapes
+   - Colors slightly off
+   - Gradients banding
+   - Text positioning issues
+3. **Most buggy viewers** (in order):
+   - Chrome/Edge PDF viewer - worst offenders
+   - Preview.app (macOS) - sometimes problematic
+   - Adobe Acrobat Reader - most accurate
+   - Adobe Illustrator - opens actual vector data
+4. **How to test if problem is real**:
+   - ✅ Check print preview (File > Print)
+   - ✅ Open in Adobe Illustrator or Inkscape
+   - ✅ Print on paper
+   - ❌ Don't trust screen display alone
+5. **Best practices to avoid real issues**:
+   - Use `cairo_pdf` device for better compatibility
+   - Avoid extremely thin lines (< 0.5 pt)
+   - Test final output in target environment
+6. **Golden rule**: **If it prints well, it IS well** - don't obsess over screen artifacts
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a plot with many thin lines:
+   ```r
+   p <- ggplot(economics_long, aes(date, value01, color = variable)) +
+     geom_line(linewidth = 0.3)
+   ggsave("test.pdf", p, device = cairo_pdf)
+   ```
+2. Open in different viewers:
+   - Chrome (File > Open)
+   - Adobe Acrobat Reader
+   - System default PDF viewer
+3. Compare rendering - do you see differences?
+4. Check print preview - does it look correct there?
+5. Try saving the same plot as PNG - does it have the same issues?
+:::
+
+## Further Reading
+
+- [PDF rendering differences explained](https://graphicssoft.about.com/od/aboutgraphics/a/pdfrendering.htm) - technical background
+- [Cairo graphics documentation](https://www.cairographics.org/) - why cairo_pdf helps
+- [R Graphics Cookbook - Output](http://www.cookbook-r.com/Graphs/Output_to_a_file/) - device comparison
+- [Adobe PDF specification](https://www.adobe.com/devnet/pdf/pdf_reference.html) - what PDFs actually contain
+- [Stack Overflow: PDF rendering bugs](https://stackoverflow.com/questions/tagged/pdf+rendering) - common issues
 :::

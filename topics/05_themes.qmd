@@ -1,5 +1,22 @@
 # ggplot2 Themes {background-color="#9b59b6"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+The default gray background theme in ggplot2 is iconic but completely inappropriate for publication. This chapter shows you the professional themes you should use instead, how to set a global theme for consistency, and which packages provide ready-made publication-quality themes.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand why `theme_gray()` is unsuitable for publications
+- Know the best built-in themes: `theme_classic()`, `theme_bw()`, `theme_minimal()`
+- Learn to set a global theme with `theme_set()`
+- Discover publication-ready themes from `hrbrthemes` and `ggthemes`
+- Know how to combine multiple plots with `patchwork` and `ggpubr`
+- Be able to match your target journal's style
+:::
+
 ```{r}
 #| label: setup-themes
 #| echo: false
@@ -654,5 +671,59 @@ p
    - `patchwork` for intuitive combining syntax
    - `ggpubr::ggarrange()` for automatic labeling
 
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Never use `theme_gray()`** for publications - gray background wastes ink
+2. **Best built-in themes**:
+   - `theme_classic()` - clean, no gridlines (recommended for most cases)
+   - `theme_bw()` - white background with gridlines
+   - `theme_minimal()` - minimal gridlines, modern look
+3. **Set global theme**: `theme_set(theme_classic())` for consistency across all plots
+4. **Publication-ready packages**:
+   - `hrbrthemes` - modern, professional themes
+   - `ggthemes` - journal-specific themes (e.g., `theme_economist()`)
+5. **Multi-panel combining**:
+   - `patchwork`: intuitive `+` and `/` syntax
+   - `ggpubr::ggarrange()`: automatic panel labeling (A, B, C)
+6. **Match your journal** - check published figures for style guidance
+7. **Consistency is key** - use the same theme throughout your manuscript
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a plot and compare all built-in themes:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp)) + geom_point()
+   p + theme_gray()      # default
+   p + theme_classic()   # recommended
+   p + theme_bw()
+   p + theme_minimal()
+   p + theme_void()
+   ```
+2. Set a global theme and create 3 different plots - notice they all inherit the theme
+3. Install `hrbrthemes` and try `theme_ipsum()`
+4. Combine 4 plots using `patchwork`:
+   ```r
+   (p1 + p2) / (p3 + p4) + plot_annotation(tag_levels = 'A')
+   ```
+5. Look at 3 recent papers in your target journal - which theme do they use?
+:::
+
+## Further Reading
+
+- [ggplot2 themes gallery](https://ggplot2.tidyverse.org/reference/ggtheme.html) - all built-in themes
+- [hrbrthemes package](https://github.com/hrbrmstr/hrbrthemes) - modern themes with proper fonts
+- [patchwork guide](https://patchwork.data-imaginist.com/) - comprehensive combining tutorial
+- [ggthemes package](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) - journal-specific themes
+- Wilke (2019). *Fundamentals of Data Visualization* - Chapter 22 on choosing themes
 :::
 

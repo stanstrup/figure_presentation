@@ -1,5 +1,22 @@
 # Text and Element Sizing {background-color="#1abc9c"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+One of the most common mistakes in figure preparation is manually adjusting text sizes element by element until they "look right." This approach is inefficient, inconsistent, and defeats the purpose of using themes. This chapter reveals the elegant solution: control text size by adjusting figure dimensions, not font sizes.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand how figure dimensions affect relative text size
+- Know the standard figure widths for journals (single vs. double column)
+- Learn to use `base_size` as the primary text sizing control
+- Understand when and how to adjust individual element sizes
+- Know the difference between DPI for vector vs. raster formats
+- Be able to create publication-ready figures at the correct size on the first try
+:::
+
 ```{r}
 #| label: setup-sizing
 #| echo: false
@@ -293,4 +310,49 @@ ggsave("plot.png", p,
        width = 5, height = 4, dpi = 72)
 ```
 :::
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Size figures to match final output** - not to match your screen
+2. **Standard journal widths**:
+   - Single column: ~3.5 inches (check specific journal!)
+   - Double column: ~7 inches
+   - Presentation: ~10 inches
+3. **Use `base_size` as primary control** - all theme elements scale proportionally
+4. **Smaller canvas = larger text** - text is fixed size, reducing plot area makes it relatively larger
+5. **Vector formats ignore DPI** - SVG/PDF scale infinitely, dimensions control proportions
+6. **Raster formats need high DPI** - PNG/TIFF at 300+ DPI for print quality
+7. **Manual adjustments last** - only customize individual elements if dimensions + base_size aren't enough
+8. **Test at final size** - view your saved figure at actual publication size to check readability
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a plot and save it at three different widths:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp)) + geom_point() + theme_classic()
+   ggsave("single_col.pdf", p, width = 3.5, height = 3)
+   ggsave("double_col.pdf", p, width = 7, height = 5)
+   ggsave("slide.pdf", p, width = 10, height = 6)
+   ```
+2. Open each PDF and compare text sizes - notice how smaller canvas makes text appear larger
+3. Try different `base_size` values (8, 11, 14, 18) at the same figure dimensions
+4. Create a PNG at the same dimensions but different DPI values (72, 150, 300)
+5. Look up your target journal's figure requirements - what are their single/double column widths?
+:::
+
+## Further Reading
+
+- [ggplot2 theme reference](https://ggplot2.tidyverse.org/reference/theme.html) - all theme elements
+- [Journal figure size requirements](https://www.elsevier.com/authors/policies-and-guidelines/artwork-and-media-instructions) - example from Elsevier
+- [Understanding DPI vs resolution](https://www.prepressure.com/library/file-formats/jpeg) - technical details
+- Wickham (2016). *ggplot2: Elegant Graphics for Data Analysis* - Chapter 8 on themes
 :::

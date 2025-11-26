@@ -1,5 +1,22 @@
 # Which image format for which purpose? {background-color="#3498db"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+Choosing the right image format is critical for scientific publications. Use the wrong format and your beautifully crafted plots will look pixelated, text will be blurry, and file sizes will balloon unnecessarily. This chapter explains the fundamental difference between raster and vector graphics, and provides a decision tree for choosing the optimal format for every situation.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand the fundamental difference between raster and vector graphics
+- Know when to use PNG, TIFF, PDF, SVG, and EPS formats
+- Understand DPI requirements for different publication contexts
+- Learn why you should never use JPEG for scientific figures
+- Be able to choose the optimal format based on content type (plots vs. photographs)
+- Know how to set appropriate resolution settings in R
+:::
+
 ```{r}
 #| label: setup-formats
 #| echo: false
@@ -490,4 +507,54 @@ flowchart LR
 * Composing your figures in Powerpoint is OK - but use high quality source-material
 * BioRender material is typically vector based
 
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Vector for plots** - use PDF/SVG for R-generated plots with text and lines
+2. **Raster for photos** - use PNG/TIFF at ≥300 DPI for photographs and microscopy
+3. **Never use JPEG** for scientific figures - lossy compression degrades quality
+4. **DPI requirements**:
+   - Print publications: 300-600 DPI
+   - Presentations: 150 DPI is sufficient
+   - Web/screen: 72-96 DPI
+5. **Format by destination**:
+   - Journal submission: PDF or TIFF
+   - Presentations: PNG (smaller files)
+   - Web: SVG (scalable) or PNG
+6. **Hybrid figures**: Use vector for plots + high-res raster for photographs
+7. **Check journal requirements** - some prefer TIFF, others accept PDF
+8. **Use appropriate ggsave() settings**: `device`, `dpi`, `width`, `height`
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a simple ggplot and save it in 4 formats:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp)) + geom_point()
+   ggsave("plot.pdf", p, width = 6, height = 4)
+   ggsave("plot.svg", p, width = 6, height = 4)
+   ggsave("plot.png", p, width = 6, height = 4, dpi = 300)
+   ggsave("plot_low.png", p, width = 6, height = 4, dpi = 72)
+   ```
+2. Open each file and zoom in to compare:
+   - Which formats remain sharp at any zoom level?
+   - Which show pixelation?
+   - Compare file sizes
+3. Try saving a figure with a photograph embedded (use `annotation_raster()`)
+4. Practice using the decision tree to choose formats for different scenarios
+:::
+
+## Further Reading
+
+- [R Graphics Cookbook - Output to Files](http://www.cookbook-r.com/Graphs/Output_to_a_file/) - comprehensive guide to saving plots
+- [Understanding DPI and resolution](https://en.wikipedia.org/wiki/Dots_per_inch) - technical background
+- [SVG vs PNG comparison](https://www.adobe.com/creativecloud/file-types/image/comparison/svg-vs-png.html) - visual examples
+- [Journal figure guidelines database](https://www.ncbi.nlm.nih.gov/pmc/pub/filespec-images/) - PMC requirements
+:::
 

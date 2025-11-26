@@ -1,5 +1,21 @@
 # PowerPoint Import {background-color="#8e44ad"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+One of the most common ways to ruin a perfectly good R plot is to copy-paste it into PowerPoint. This creates low-resolution bitmaps that look terrible when projected. This chapter teaches you the proper workflow for inserting high-quality plots into presentations.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand why copy-paste creates low-quality plots
+- Know the correct workflow: save first, insert second
+- Learn optimal formats for PowerPoint (PNG at 150 DPI, SVG)
+- Be able to ungroup SVG elements for editing in PowerPoint
+- Understand the trade-offs between PNG and SVG for presentations
+:::
+
 ## The Copy-Paste Problem
 
 **What happens when you copy from RStudio:**
@@ -82,4 +98,56 @@ Modern PowerPoint supports SVG editing:
 :::
 
 :::
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Never copy-paste from RStudio** - creates low-resolution bitmaps
+2. **Workflow**: Save → Insert
+   ```r
+   ggsave("plot.png", p, width = 10, height = 6, dpi = 150)
+   ```
+   Then Insert > Pictures in PowerPoint
+3. **Format recommendations for presentations**:
+   - **PNG at 150 DPI** - good quality, reasonable file size
+   - **SVG** - perfect quality, editable, but larger PowerPoint file
+   - **Never JPEG** - lossy compression
+4. **SVG in PowerPoint**:
+   - Can be ungrouped and edited
+   - Text becomes editable
+   - Colors/shapes can be changed
+   - Warning: complex plots may break when ungrouped
+5. **Sizing**:
+   - Create plots at ~10 inches width for full-screen slides
+   - 6-8 inches for half-screen
+   - Match slide aspect ratio (16:9 typically)
+6. **Quality hierarchy**: SVG > PNG 150+ DPI > PNG 72 DPI > copy-paste
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a plot and save two versions:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp, color = factor(cyl))) + geom_point(size = 3)
+   ggsave("plot.png", p, width = 10, height = 6, dpi = 150)
+   ggsave("plot.svg", p, width = 10, height = 6)
+   ```
+2. Insert both into PowerPoint and compare quality
+3. Try ungrouping the SVG (Right-click > Group > Ungroup)
+4. Change the color of one element in the ungrouped SVG
+5. Compare file sizes: copy-paste vs PNG vs SVG versions
+:::
+
+## Further Reading
+
+- [PowerPoint graphics best practices](https://support.microsoft.com/en-us/office/compress-images-in-office-7e0b28a6-d6a9-4d67-b4fa-6ebf49b36c95) - Microsoft guide
+- [SVG in PowerPoint](https://support.microsoft.com/en-us/office/edit-svg-images-in-office-365-69f29d39-194a-4072-8c35-dbe5e7ea528c) - editing capabilities
+- [Presentation design principles](https://www.darkhorseanalytics.com/portfolio-data-looks-better-naked) - minimalism in slides
 :::

@@ -1,5 +1,22 @@
 # Interactive Plots {background-color="#27ae60"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+While static figures are required for publication, interactive plots are invaluable for data exploration, presentations, and HTML reports. This chapter shows you how to convert ggplot2 plots to interactive versions with minimal code using `plotly`.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand when to use interactive vs. static plots
+- Learn to convert ggplot2 to plotly with `ggplotly()`
+- Know how to customize tooltips for better hover information
+- Be able to create linked plots with shared highlighting
+- Understand file size considerations for HTML widgets
+- Know how to save interactive plots as standalone HTML files
+:::
+
 ```{r}
 #| label: setup
 #| include: false
@@ -515,4 +532,69 @@ Hover to see tooltips, click to select!
 3. **Test thoroughly** - not all ggplot2 features convert
 4. **Consider ggiraph** if ggplotly doesn't preserve your styling
 5. **Use selfcontained = TRUE** for easy sharing
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **`ggplotly()` converts ggplot2 to interactive** - easiest path to interactivity
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp)) + geom_point()
+   ggplotly(p)
+   ```
+2. **Use cases**:
+   - ✅ Data exploration - zoom, pan, hover for exact values
+   - ✅ HTML presentations - engage your audience
+   - ✅ Interactive reports - let readers explore
+   - ❌ Publications - journals require static figures
+   - ❌ Print - obviously doesn't work
+3. **Customize tooltips**:
+   ```r
+   aes(text = paste("Name:", name, "\nValue:", value))
+   ggplotly(p, tooltip = "text")
+   ```
+4. **Linked plots** with `crosstalk` - highlight in one plot highlights in others
+5. **File size management**:
+   - Large datasets create huge HTML files
+   - Sample data or use `toWebGL()` for performance
+6. **Save standalone HTML**:
+   ```r
+   htmlwidgets::saveWidget(ggplotly(p), "plot.html", selfcontained = TRUE)
+   ```
+7. **Alternatives**: `ggiraph` for better ggplot2 compatibility
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Convert a ggplot to interactive:
+   ```r
+   p <- ggplot(mtcars, aes(mpg, hp, color = factor(cyl))) +
+     geom_point(size = 3) +
+     theme_bw()
+   ggplotly(p)
+   ```
+2. Add custom tooltips showing car names:
+   ```r
+   mtcars_named <- mtcars %>% rownames_to_column("car")
+   p <- ggplot(mtcars_named, aes(mpg, hp, text = car)) + geom_point()
+   ggplotly(p, tooltip = "text")
+   ```
+3. Try the zoom and pan tools - explore the data
+4. Save as HTML and share with a colleague
+5. Compare `ggplotly()` vs. `ggiraph::girafe()` on the same plot
+:::
+
+## Further Reading
+
+- [plotly for R book](https://plotly-r.com/) - comprehensive guide by Carson Sievert
+- [ggplotly documentation](https://plotly.com/ggplot2/) - official reference
+- [ggiraph package](https://davidgohel.github.io/ggiraph/) - alternative with better ggplot2 compatibility
+- [crosstalk](https://rstudio.github.io/crosstalk/) - linking multiple HTML widgets
+- [htmlwidgets](http://www.htmlwidgets.org/) - R interface to JavaScript libraries
 :::

@@ -1,5 +1,22 @@
 # Heatmap Scaling {background-color="#e67e22"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+Heatmaps are ubiquitous in omics research for visualizing large-scale data matrices. However, one of the most common mistakes is using default scaling, which allows outliers to compress all meaningful variation into an indistinguishable range of colors. This chapter shows you how to properly handle scaling and outliers in heatmaps, and reveals a critical bug in many R heatmap functions.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand how outliers compress color scales in heatmaps
+- Learn three robust scaling approaches: MAD scaling, quantile capping, and log transformation
+- Discover the hidden dendrogram scaling bug in base R heatmap functions
+- Know why scaling matters for clustering analysis
+- Be able to use `massageR::heat.clust()` for proper integrated scaling
+- Choose appropriate color scales for different data types
+:::
+
 ## The Outlier Problem
 
 **Scenario**: Metabolomics data (log2-transformed)
@@ -629,4 +646,44 @@ grid.arrange(p1[[4]], p2[[4]], ncol = 2)
 - Small datasets where each value matters
 - When you want to highlight extreme values
 
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Outliers compress color scales** - default scaling makes all non-outlier data invisible
+2. **Use robust MAD scaling** - `(x - median(x)) / mad(x)` is not affected by outliers
+3. **Cap at ±3 MAD** - retains ~99% of normal data while handling extremes
+4. **Alternative: quantile capping** - cap at 5-95 percentiles before range scaling
+5. **Log transform positive data** - metabolomics, RNA-seq, proteomics intensities
+6. **Beware the dendrogram bug** - base R heatmap functions don't scale before clustering!
+7. **Use `massageR::heat.clust()`** - handles scaling and dendrograms correctly in one step
+8. **Match color scales to data**:
+   - Diverging (RdBu) for centered data
+   - Sequential (magma/viridis) for positive-only data
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a heatmap with simulated data containing outliers (use `rnorm()` plus a few extreme values)
+2. Compare three approaches:
+   - Default scaling with `pheatmap(..., scale = "row")`
+   - MAD scaling with `scale_mad()` function and capping at ±3
+   - Quantile capping at 5-95 percentiles
+3. Check if your dendrograms change between methods
+4. Try `massageR::heat.clust()` and verify it produces consistent results
+:::
+
+## Further Reading
+
+- [massageR package documentation](https://github.com/stanstrup/massageR) - for `heat.clust()` function
+- [Why you should use MAD over SD](https://en.wikipedia.org/wiki/Median_absolute_deviation) - robust statistics
+- [ComplexHeatmap book](https://jokergoo.github.io/ComplexHeatmap-reference/book/) - advanced heatmap customization
+- Wilkinson & Friendly (2009). "The History of the Cluster Heat Map". *The American Statistician* - origins and best practices
 :::

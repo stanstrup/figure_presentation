@@ -1,5 +1,20 @@
 # Color Gradients {background-color="#e74c3c"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+Color choice is one of the most critical—and most commonly mishandled—aspects of data visualization. The rainbow color scale, despite its popularity, is fundamentally flawed and can mislead readers. This chapter explains why and shows you better alternatives.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand why rainbow color scales are problematic
+- Learn about perceptually uniform color scales
+- Know when to use viridis, ColorBrewer, and diverging scales
+- Be able to test your color choices for accessibility
+:::
+
 ## What is the Rainbow Scale?
 
 ```{r}
@@ -908,3 +923,38 @@ ggplot(data, aes(x, y, color = category)) +
   geom_point() +
   scale_color_brewer(palette = "Set2")  # or "Dark2", "Paired", etc.
 ```
+
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Never use rainbow or jet** for scientific figures - they create false boundaries
+2. **Use viridis family** as your default for continuous data (perceptually uniform, colorblind-safe)
+3. **Use diverging scales** when data has a meaningful center point (zero, neutral)
+4. **Test for colorblindness** using simulation tools before publishing
+5. **Check grayscale conversion** - your figures may be printed in black and white
+6. **Avoid yellow** in palettes for print and presentations (low contrast)
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Take one of your existing plots that uses rainbow colors
+2. Replace it with `scale_fill_viridis_c()`
+3. Use `colorspace::desaturate()` to check how it looks in grayscale
+4. Use [Coblis](https://www.coblis.com) to simulate colorblindness
+5. Compare the results - can you see the difference?
+:::
+
+## Further Reading
+
+- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7) - Crameri et al., Nature Communications
+- [What's wrong with the rainbow?](https://doi.org/10.1016/j.isprsjprs.2022.10.002) - Gołębiowska & Çöltekin, ISPRS Journal  
+- [Viridis package documentation](https://cran.r-project.org/package=viridis)
+- [ColorBrewer website](https://colorbrewer2.org)
+:::

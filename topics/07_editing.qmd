@@ -1,5 +1,22 @@
 # Post-Export Editing {background-color="#16a085"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+While everything should ideally be done in code for reproducibility, sometimes you need to edit exported figures manually—for example, to combine plots with photographs, add custom annotations, or achieve pixel-perfect alignment for publication. This chapter shows you the right tools and workflow for post-export editing while maintaining as much reproducibility as possible.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand when post-export editing is appropriate vs. avoidable
+- Know the best vector editing tools (Inkscape, Illustrator, Affinity Designer)
+- Learn proper workflow for maintaining reproducibility
+- Be able to edit PDFs and SVGs without quality loss
+- Know common pitfalls (converting text to paths, rasterizing vectors)
+- Understand when to use R code vs. manual editing
+:::
+
 ## Why Edit After Export?
 
 **Legitimate uses:**
@@ -430,5 +447,59 @@ ggsave("figure1.png", combined, width = 10, height = 8, dpi = 300)
 - Very complex custom layouts
 - Final publication polish only
 :::
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Prefer R code over manual editing** - reproducibility trumps convenience
+2. **Use R packages when possible**:
+   - `patchwork` or `cowplot` for combining plots
+   - `ggforce` for annotations and custom shapes
+   - `grid` for precise layout control
+3. **Best vector editing tools**:
+   - **Inkscape** - free, cross-platform, excellent for scientific figures
+   - **Adobe Illustrator** - industry standard (expensive)
+   - **Affinity Designer** - affordable alternative to Illustrator
+4. **Workflow for reproducibility**:
+   - Keep original R-generated plots
+   - Save Inkscape/Illustrator files (.svg, .ai) as intermediate
+   - Document manual edits in README
+   - Export final PDF from vector editor
+5. **Avoid common mistakes**:
+   - Don't convert text to paths (loses editability)
+   - Don't rasterize vectors
+   - Don't use image editing tools (Photoshop) for vector graphics
+6. **When to edit manually**:
+   - Combining plots with photographs/diagrams
+   - Pixel-perfect alignment requirements
+   - Adding custom illustrations
+   - Journal-specific layout requirements
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Install Inkscape (free) from https://inkscape.org
+2. Create two plots in R and save as PDFs
+3. Open both in Inkscape and arrange them side-by-side
+4. Add panel labels (A, B) using text tool
+5. Export as final PDF
+6. Compare this to using `patchwork` in R - which was easier?
+7. Practice editing text in an SVG without converting to paths
+:::
+
+## Further Reading
+
+- [Inkscape tutorials](https://inkscape.org/learn/tutorials/) - official guides
+- [patchwork package guide](https://patchwork.data-imaginist.com/) - R-based plot combining
+- [cowplot introduction](https://wilkelab.org/cowplot/articles/introduction.html) - alternative to patchwork
+- [ggforce package](https://ggforce.data-imaginist.com/) - extended geoms for annotations
+- Tufte (2001). *The Visual Display of Quantitative Information* - principles of effective graphics
 :::
 

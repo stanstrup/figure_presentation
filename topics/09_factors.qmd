@@ -1,5 +1,22 @@
 # Factor Ordering {background-color="#2980b9"}
 
+::: {.content-visible unless-format="revealjs"}
+## Introduction
+
+R's factor system is both powerful and treacherous. Alphabetical ordering makes categorical plots hard to read, and accidental conversion of numeric factors causes data corruption. This chapter teaches you how to control factor ordering and avoid common pitfalls.
+
+### Learning Objectives
+
+By the end of this chapter, you will:
+
+- Understand why alphabetical factor ordering is rarely useful
+- Learn to reorder factors by frequency, by another variable, or manually
+- Master the `forcats` package for factor manipulation
+- Know how to properly convert factors to numeric without data loss
+- Avoid the "numeric factor" trap (numbered categories vs. actual numbers)
+- Create publication-ready plots with meaningful orderings
+:::
+
 ```{r}
 #| label: setup-factors
 #| echo: false
@@ -866,4 +883,60 @@ class_char <- as.character(vehicle_class)
 - **Check factor order** before plotting with `str()` or `levels()`
 - **Convert via character**: `as.numeric(as.character(f))` not `as.numeric(f)`
 - **Think about your reader** - what order makes sense?
+:::
+
+::: {.content-visible unless-format="revealjs"}
+## Summary
+
+:::{.callout-tip}
+## Key Takeaways
+
+1. **Alphabetical order is rarely useful** - readers can't interpret patterns
+2. **forcats package** provides essential tools:
+   - `fct_reorder(category, value)` - order by another variable (most common!)
+   - `fct_infreq()` - order by frequency (highest first)
+   - `fct_rev()` - reverse current order
+   - `fct_relevel(f, "Control")` - move specific level first
+3. **Manual ordering** for logical sequences:
+   ```r
+   factor(x, levels = c("Low", "Medium", "High"))
+   factor(month, levels = month.name)  # built-in constant
+   ```
+4. **The numeric factor trap**:
+   - `as.numeric(factor(c("1", "2", "10")))` gives `1, 2, 3` (WRONG!)
+   - `as.numeric(as.character(factor(c("1", "2", "10"))))` gives `1, 2, 10` (correct)
+5. **Prefix numbered categories**: Use "Group_1" not "1" to prevent accidental conversion
+6. **Always check**: `str(data)` and `levels(variable)` before plotting
+7. **Think about your reader**: What ordering tells the story best?
+:::
+
+## Exercises
+
+:::{.callout-note}
+## Try It Yourself
+
+1. Create a dataset with unordered categories and fix the ordering:
+   ```r
+   df <- data.frame(
+     treatment = c("High", "Low", "Medium", "High", "Low"),
+     response = c(8.2, 3.1, 5.5, 9.1, 2.8)
+   )
+   # Fix: factor(treatment, levels = c("Low", "Medium", "High"))
+   ```
+2. Practice `fct_reorder()`:
+   ```r
+   starwars %>%
+     mutate(species = fct_reorder(species, height, .fun = median, na.rm = TRUE)) %>%
+     ggplot(aes(height, species)) + geom_boxplot()
+   ```
+3. Create a factor from numbers ("1", "2", "10") and practice safe conversion
+4. Compare plots with alphabetical vs. reordered factors - which is easier to read?
+:::
+
+## Further Reading
+
+- [forcats package documentation](https://forcats.tidyverse.org/) - comprehensive guide
+- [R for Data Science - Factors chapter](https://r4ds.hadley.nz/factors.html) - Hadley Wickham
+- [Factor ordering in ggplot2](https://ggplot2.tidyverse.org/reference/scale_discrete.html) - limits parameter
+- [The factor trap](https://www.r-bloggers.com/2020/02/factors-how-would-you-order-a-factor/) - common pitfalls
 :::
