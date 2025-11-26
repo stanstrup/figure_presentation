@@ -24,6 +24,13 @@ plots/*
 book/topics/plots/*
 public/
 .claude
-
 /.quarto/
 *.revealjs.md
+
+# Lychee link checker downloads
+lychee*
+
+# Quarto build artifacts
+site_libs/
+search.json
+topics/sources/
