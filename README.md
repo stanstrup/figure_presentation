@@ -133,13 +133,18 @@ The quiz contains **31 questions** with immediate feedback, performance-based gu
 
 ## CI/CD
 
-This project uses GitHub Actions to automatically build and deploy the presentation:
+This project uses GitHub Actions with a custom Docker image for fast builds:
 
-- **Build**: Renders the Quarto presentation
+- **Docker Image**: Pre-built with all R packages (~40 min build time saved)
+- **Build**: Renders presentation, book, and quiz (~5 minutes)
 - **Deploy**: Publishes to GitHub Pages
 - **Trigger**: Commits to `main` or `master` branch
 
-See `.github/workflows/deploy.yml` for configuration details.
+**Workflows:**
+- `build-docker-image.yml` - Rebuilds Docker image when packages change
+- `deploy.yml` - Renders and deploys using pre-built image
+
+See [`DOCKER.md`](DOCKER.md) for details on the Docker setup and how it speeds up builds.
 
 ## License
 

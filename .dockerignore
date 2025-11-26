@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Quarto build outputs
+_book
+_freeze
+_site
+.quarto
+
+# R/RStudio
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Rendered outputs
+*.html
+*.pdf
+presentation_files
+topics/*_files
+book/_book
+
+# Plots (will be regenerated)
+plots
+
+# Documentation
+README.md
+DOCKER.md
+QUIZ_README.md
+COPYRIGHT_NOTICES.md
+LICENSE
+
+# GitHub Actions (except install script)
+.github/workflows/*.yml
+
+# Only need install_packages.R for Docker build
+!.github/workflows/install_packages.R

@@ -20,7 +20,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: rocker/tidyverse:4.5
+      image: ghcr.io/${{ github.repository }}:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -31,27 +34,8 @@ jobs:
         with:
           version: 1.4.550
 
-      - name: Configure RSPM for binary packages
-        run: |
-          echo "options(repos = c(RSPM = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest', CRAN = 'https://cloud.r-project.org'))" >> ~/.Rprofile
-          cat ~/.Rprofile
-
-      - name: Install system dependencies
-        run: |
-          apt-get update
-          apt-get install -y libmagick++-dev librsvg2-dev cmake
-
-      - name: Cache R packages
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/lib/R/site-library
-          key: r-packages-${{ hashFiles('.github/workflows/install_packages.R') }}
-          restore-keys: |
-            r-packages-
-
-      - name: Install R packages
-        run: |
-          Rscript .github/workflows/install_packages.R
+      # No need to install R packages - they're already in the Docker image!
+      # This saves ~35-40 minutes per build
 
       - name: Render Quarto presentation (slides)
         run: |
