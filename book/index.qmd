@@ -30,11 +30,9 @@ Comprehensive tutorial with the same content plus:
 
 **Note:** This book uses a **single-source architecture**. The same source files (`topics/*.qmd`) generate both the slides and book chapters, ensuring perfect consistency between formats.
 
-[Take the quiz →](quiz.html){.btn .btn-success}
+### ✅ Interactive Quiz (Local Only)
 
-### ✅ Interactive Quiz
-
-Test your knowledge with 31 questions covering all topics, with immediate feedback and explanations.
+Test your knowledge with 31 questions covering all topics! The quiz runs as an interactive R Shiny app, so it only works locally (not on the web). See the [Quiz Information appendix](quiz-info.html) for instructions on running it.
 
 **Quiz features:**
 

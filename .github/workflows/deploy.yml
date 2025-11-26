@@ -57,9 +57,9 @@ jobs:
           # render as both slides (above) and book chapters (here)
           quarto render book
 
-      - name: Render interactive quiz
-        run: |
-          Rscript -e "rmarkdown::render('quiz.Rmd', output_file = 'quiz.html')"
+      # Note: quiz.html is NOT deployed because it requires Shiny server
+      # The quiz only works when run locally with rmarkdown::run("quiz.Rmd")
+      # See book/quiz-info.qmd for instructions
 
       - name: Organize output files for GitHub Pages
         run: |
