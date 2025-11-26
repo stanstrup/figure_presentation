@@ -232,8 +232,8 @@ for (file in pdf_files) {
 
 ## Batch Saving Multiple Plots
 
-::: {.columns}
-::: {.column width="60%"}
+:::: {.columns}
+:::: {.column width="60%"}
 
 
 **Make a plotting function**
@@ -282,9 +282,9 @@ walk2(plot_data$plot, plot_data$Species, ~ggsave(
 ))
 ```
 
-:::
+::::
 
-::: {.column width="40%"}
+:::: {.column width="40%"}
 
 ```{r}
 #| label: saving-batch-tbl
@@ -316,8 +316,8 @@ plot_data$plot[[1]]
 ```
 
 
-:::
-:::
+::::
+::::
 
 
 ## Recommendations
