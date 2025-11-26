@@ -70,13 +70,16 @@ jobs:
           # - index.html (book)
           # - presentation.html (slides)
           # - quiz.html (interactive quiz)
+          # - topics/*.html (book chapters - Quarto preserves directory structure)
 
       - name: List files for debugging
         run: |
           echo "=== Files in root ==="
           ls -la *.html .nojekyll 2>/dev/null || true
+          echo "=== Topics directory ==="
+          ls -la topics/ 2>/dev/null || echo "No topics directory found"
           echo "=== All HTML files ==="
-          find . -name "*.html" -type f | head -20
+          find . -name "*.html" -type f | head -30
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
