@@ -21,7 +21,7 @@ presentation.md
 presentation.revealjs.md
 *.knit.md
 plots/*
-topics/plots/*
+book/topics/plots/*
 public/
 .claude
 
