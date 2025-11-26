@@ -1,0 +1,623 @@
+---
+title: "Academic Figures Quiz"
+subtitle: "Test Your Knowledge of Figure Best Practices"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(shiny)
+knitr::opts_chunk$set(echo = FALSE)
+
+# Initialize a reactive value to track score
+# Note: learnr provides built-in progress tracking
+```
+
+## Introduction
+
+Welcome to the Academic Figures Quiz! This quiz tests your knowledge based on the "Academic Figures: Common Pitfalls and Best Practices" presentation.
+
+**Topics covered:**
+
+- Color gradients and palettes (7 questions)
+- Heatmap scaling (3 questions)
+- File formats (5 questions)
+- Text sizing (2 questions)
+- Themes and styling (2 questions)
+- Saving plots (3 questions)
+- Post-processing (2 questions)
+- Factor ordering (3 questions)
+- Interactive plots (4 questions)
+
+**Total: 31 questions**
+
+Good luck! 🎯
+
+---
+
+## Section 1: Color Gradients
+
+### Question 1
+
+```{r q1}
+quiz(
+  question("What is the main problem with rainbow color scales?",
+    answer("They are too colorful"),
+    answer("They are perceptually non-uniform", correct = TRUE, message = "Correct! Rainbow scales create false boundaries because colors are not perceived uniformly."),
+    answer("They use too many colors"),
+    answer("They are not available in R"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 2
+
+```{r q2}
+quiz(
+  question("Which color scale is recommended as the DEFAULT for continuous data?",
+    answer("Rainbow"),
+    answer("Jet"),
+    answer("Viridis", correct = TRUE, message = "Correct! Viridis is perceptually uniform, colorblind-safe, and prints well in grayscale."),
+    answer("Heat colors"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 3
+
+```{r q3}
+quiz(
+  question("What percentage of men have some form of color blindness (deuteranopia)?",
+    answer("~1%"),
+    answer("~4%"),
+    answer("~8%", correct = TRUE, message = "Correct! About 8% of men have deuteranopia (green-blind vision)."),
+    answer("~15%"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 4
+
+```{r q4}
+quiz(
+  question("Which of these color scales remain readable when desaturated (grayscale)?",
+    answer("Rainbow"),
+    answer("Jet"),
+    answer("Viridis", correct = TRUE),
+    answer("Magma", correct = TRUE),
+    answer("Cividis", correct = TRUE),
+    correct = "Excellent! Viridis family scales are designed to maintain information in grayscale.",
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 5
+
+```{r q5}
+quiz(
+  question("What medical consequence was found in Borkin et al.'s study on heart disease diagnosis?",
+    answer("Physicians using jet colormap made more errors and were slower", correct = TRUE, message = "Correct! The jet colormap caused physicians to misinterpret medical images, leading to diagnostic errors."),
+    answer("Rainbow scales improved diagnosis speed"),
+    answer("Color scales had no effect on diagnosis"),
+    answer("All color scales performed equally"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 6
+
+```{r q6}
+quiz(
+  question("Which viridis option is specifically optimized for colorblind viewers?",
+    answer("viridis"),
+    answer("magma"),
+    answer("plasma"),
+    answer("cividis", correct = TRUE, message = "Correct! Cividis was designed to be equally accessible to people with and without color vision deficiency."),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 7
+
+```{r q7}
+quiz(
+  question("When should you use diverging color scales?",
+    answer("For all continuous data"),
+    answer("When data has a meaningful center point (like zero)", correct = TRUE, message = "Correct! Diverging scales (like RdBu) are best for data with a meaningful midpoint, such as fold changes or correlations."),
+    answer("Only for categorical data"),
+    answer("Never use diverging scales"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 2: Heatmaps
+
+### Question 8
+
+```{r q8}
+quiz(
+  question("What happens when you have outliers in a heatmap?",
+    answer("The outlier compresses the color scale for all other values", correct = TRUE, message = "Correct! Extreme outliers dominate the color scale, making it hard to see patterns in the rest of the data."),
+    answer("Outliers have no effect on visualization"),
+    answer("Outliers improve contrast"),
+    answer("R automatically removes outliers"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 9
+
+```{r q9}
+quiz(
+  question("Which scaling method is most robust to outliers for heatmaps?",
+    answer("Z-score (mean ± SD)"),
+    answer("MAD scaling (median ± MAD)", correct = TRUE, message = "Correct! MAD (Median Absolute Deviation) scaling is robust to outliers since it uses median instead of mean."),
+    answer("No scaling"),
+    answer("Log transformation only"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 10
+
+```{r q10}
+quiz(
+  question("What is quantile capping in heatmaps?",
+    answer("Removing all data above the median"),
+    answer("Setting extreme values to specific percentile thresholds (e.g., 5th and 95th)", correct = TRUE, message = "Correct! Quantile capping limits extreme values to specific percentiles while preserving the overall distribution."),
+    answer("Deleting outlier samples entirely"),
+    answer("Converting all values to quantiles"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 3: File Formats
+
+### Question 11
+
+```{r q11}
+quiz(
+  question("Which format should you use for plots (lines, text, shapes)?",
+    answer("JPEG"),
+    answer("PNG"),
+    answer("PDF or SVG", correct = TRUE, message = "Correct! Vector formats (PDF/SVG) are perfect for plots because they scale infinitely without quality loss."),
+    answer("BMP"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 12
+
+```{r q12}
+quiz(
+  question("Which format should you use for actual photographs (camera/microscope images)?",
+    answer("PDF"),
+    answer("SVG"),
+    answer("PNG for web, TIFF for publication", correct = TRUE, message = "Correct! TIFF (300+ DPI) for publication quality, PNG/JPEG/WebP (150+ DPI) for presentations and web. Avoid JPEG for scientific images due to compression artifacts."),
+    answer("EPS"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 13
+
+```{r q13}
+quiz(
+  question("What is the main disadvantage of JPEG for scientific figures?",
+    answer("It's too large"),
+    answer("It uses lossy compression that creates artifacts", correct = TRUE, message = "Correct! JPEG's lossy compression can create visible artifacts around text and sharp edges."),
+    answer("It doesn't support color"),
+    answer("It can't be opened in most programs"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 14
+
+```{r q14}
+quiz(
+  question("You have a plot with a smooth color gradient generated in R. What format should you use?",
+    answer("PDF or SVG - keep it as vector if possible", correct = TRUE, message = "Correct! If you created it in code (R/Python), save as vector (PDF/SVG) for infinite scalability. Only use raster (TIFF) if the journal doesn't accept vector formats."),
+    answer("Always JPEG"),
+    answer("Always PNG"),
+    answer("BMP"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 15
+
+```{r q15}
+quiz(
+  question("What DPI (dots per inch) is recommended for high-quality print figures?",
+    answer("72 dpi"),
+    answer("150 dpi"),
+    answer("300 dpi or higher", correct = TRUE, message = "Correct! 300 dpi is the standard for print quality. 600 dpi is even better for critical publications."),
+    answer("1000 dpi"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 4: Text and Element Sizing
+
+### Question 16
+
+```{r q16}
+quiz(
+  question("What is the recommended way to make text appear larger in a plot?",
+    answer("Increase font size for every element manually"),
+    answer("Use smaller figure dimensions so text appears larger relative to plot", correct = TRUE, message = "Correct! Reducing canvas size makes text appear proportionally larger without manual adjustments."),
+    answer("Always use 24pt font"),
+    answer("Zoom in on the plot"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 17
+
+```{r q17}
+quiz(
+  question("What does the base_size parameter control in ggplot2 themes?",
+    answer("The size of the entire plot"),
+    answer("The base font size (all text scales relative to this)", correct = TRUE, message = "Correct! base_size controls the base font size, and all other text elements scale relative to it."),
+    answer("Only the title size"),
+    answer("The point size in scatter plots"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 5: Themes and Styling
+
+### Question 18
+
+```{r q18}
+quiz(
+  question("How do you set a default theme for all plots in your R session?",
+    answer("ggplot2::set_theme()"),
+    answer("theme_set(theme_bw())", correct = TRUE, message = "Correct! theme_set() applies a theme to all subsequent plots in the session."),
+    answer("options(ggplot.theme = theme_bw())"),
+    answer("You can't set a default theme"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 19
+
+```{r q19}
+quiz(
+  question("What is the advantage of using the ggpubr package?",
+    answer("It provides publication-ready themes and statistical comparisons", correct = TRUE, message = "Correct! ggpubr offers clean themes and easy-to-add statistical comparisons for publication."),
+    answer("It makes plots render faster"),
+    answer("It's required for all ggplot2 plots"),
+    answer("It only works with base R plots"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 6: Saving Plots
+
+### Question 20
+
+```{r q20}
+quiz(
+  question("What is the recommended function for saving ggplot2 plots?",
+    answer("pdf() ... dev.off()"),
+    answer("ggsave()", correct = TRUE, message = "Correct! ggsave() is the modern, user-friendly way to save ggplot2 plots."),
+    answer("save()"),
+    answer("write.plot()"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 21
+
+```{r q21}
+quiz(
+  question("Why should you specify the plot object explicitly in ggsave()?",
+    answer("It's required by R"),
+    answer("To ensure you save the intended plot, not the last one displayed", correct = TRUE, message = "Correct! Explicitly specifying the plot prevents accidentally saving the wrong plot."),
+    answer("It makes the file smaller"),
+    answer("It's faster"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 22
+
+```{r q22}
+quiz(
+  question("What is the advantage of using Cairo devices (device = 'cairo_pdf')?",
+    answer("Files are smaller"),
+    answer("Better font embedding and Unicode support", correct = TRUE, message = "Correct! Cairo devices provide better font handling and support for special characters."),
+    answer("Plots render faster"),
+    answer("Required for all PDFs"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 7: Post-Processing
+
+### Question 23
+
+```{r q23}
+quiz(
+  question("What is the recommended approach for making small edits to plots?",
+    answer("Edit in PowerPoint and save"),
+    answer("Make changes in R code and re-export", correct = TRUE, message = "Correct! Always maintain R scripts as the source of truth for reproducibility."),
+    answer("Edit in Photoshop"),
+    answer("Edit the PDF directly"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 24
+
+```{r q24}
+quiz(
+  question("What is the problem with 'Copy as Metafile' from RStudio?",
+    answer("It's not a vector format"),
+    answer("It corrupts plot symbols", correct = TRUE, message = "Correct! Copy as Metafile often distorts plot symbols (e.g., round points become crosses with rings)."),
+    answer("It only works on Windows"),
+    answer("It compresses the image"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 8: Factor Ordering
+
+### Question 25
+
+```{r q25}
+quiz(
+  question("What is the danger of factors that look numeric (like 'var1', 'var10', 'var2')?",
+    answer("They can't be plotted"),
+    answer("They sort alphabetically ('var1', 'var10', 'var2') instead of numerically", correct = TRUE, message = "Correct! Alphanumeric sorting gives wrong order. Use gtools::mixedsort() to fix this."),
+    answer("R will give an error"),
+    answer("They automatically convert to numbers"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 26
+
+```{r q26}
+quiz(
+  question("What does forcats::fct_inorder() do?",
+    answer("Sorts factors alphabetically"),
+    answer("Sets factor levels in the order they first appear in data", correct = TRUE, message = "Correct! fct_inorder() preserves the order of first appearance, useful for pre-sorted data."),
+    answer("Sorts factors numerically"),
+    answer("Randomizes factor order"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 27
+
+```{r q27}
+quiz(
+  question("Which forcats function should you use to order factors based on another variable (like median)?",
+    answer("fct_inorder()"),
+    answer("fct_reorder()", correct = TRUE, message = "Correct! fct_reorder() orders factor levels based on a summary of another variable."),
+    answer("fct_relevel()"),
+    answer("fct_inseq()"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Section 9: Interactive Plots
+
+### Question 28
+
+```{r q28}
+quiz(
+  question("What is the easiest way to convert a ggplot2 plot to interactive?",
+    answer("Use shiny"),
+    answer("ggplotly()", correct = TRUE, message = "Correct! ggplotly() from the plotly package instantly converts ggplot2 objects to interactive HTML widgets."),
+    answer("plot.ly()"),
+    answer("interactive_plot()"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 29
+
+```{r q29}
+quiz(
+  question("How do you save an interactive plot for sharing?",
+    answer("ggsave()"),
+    answer("htmlwidgets::saveWidget()", correct = TRUE, message = "Correct! saveWidget() saves interactive plots as self-contained HTML files."),
+    answer("save()"),
+    answer("You can't save interactive plots"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 30
+
+```{r q30}
+quiz(
+  question("What does selfcontained = TRUE do in saveWidget()?",
+    answer("Deletes the plot after saving"),
+    answer("Bundles all JavaScript/CSS into one HTML file", correct = TRUE, message = "Correct! selfcontained = TRUE creates a single file that can be easily shared via email."),
+    answer("Compresses the HTML file"),
+    answer("Requires internet to view"),
+    allow_retry = TRUE
+  )
+)
+```
+
+### Question 31
+
+```{r q31}
+quiz(
+  question("What is an advantage of ggiraph over ggplotly?",
+    answer("It's faster"),
+    answer("Better ggplot2 compatibility and theme preservation", correct = TRUE, message = "Correct! ggiraph is built specifically for ggplot2 and preserves themes better than ggplotly's conversion approach."),
+    answer("It creates smaller files"),
+    answer("It works with base R plots"),
+    allow_retry = TRUE
+  )
+)
+```
+
+---
+
+## Quiz Complete! 🎉
+
+### How to Check Your Score
+
+**Learnr tracks your progress automatically!**
+
+Look at the **sidebar on the left** - you'll see:
+
+- ✅ Green checkmarks for completed sections
+- A progress indicator showing how many questions you've answered
+
+To see which questions you got right or wrong:
+
+- Scroll back through the quiz
+- Questions with correct answers will show in **green**
+- Questions with incorrect answers will show in **red** (if you attempted them)
+
+### Score Interpretation Guide
+
+**Estimate your performance based on the feedback you received:**
+
+#### 🌟 Excellent (25-31 correct / 80%+)
+
+You have a strong grasp of figure best practices! You're ready to apply these principles to your own work.
+
+**Next steps:**
+
+- Start implementing these practices in your projects
+- Share this knowledge with your colleagues
+- Bookmark the presentation as a reference
+
+---
+
+#### ✅ Good (19-24 correct / 60-79%)
+
+You understand most concepts! A few areas need reinforcement.
+
+**Next steps:**
+
+- Review the sections where you missed questions
+- Re-read the presentation slides for those topics
+- Try the quiz again to reinforce learning
+
+---
+
+#### 📚 Needs Work (13-18 correct / 40-59%)
+
+You're learning, but several concepts need more study.
+
+**Next steps:**
+
+- **Review the full presentation carefully**
+- Focus on one topic at a time (colors, formats, etc.)
+- **Retake the quiz** after reviewing
+- Practice with your own data/plots
+
+---
+
+#### ⚠️ Please Retake (<13 correct / <40%)
+
+These concepts are crucial for creating good scientific figures!
+
+**What to do:**
+
+1. **Take your time** - Don't rush through the presentation
+2. **Review all slides** at [stanstrup.github.io/figure_presentation](https://stanstrup.github.io/figure_presentation/)
+3. **Focus on understanding WHY** each principle matters (not just memorizing)
+4. **Try applying concepts** to a real plot you've created
+5. **Retake this quiz** once you've reviewed the material
+
+**Important topics to master:**
+
+- Why rainbow scales are problematic
+- Vector vs raster formats
+- When to use which file format
+- How to save plots properly in R
+
+### Key Takeaways
+
+Remember the core principles:
+
+1. **Colors**: Use viridis family, avoid rainbow
+2. **Formats**: Vector (PDF/SVG) for plots, raster (PNG/TIFF) for photos
+3. **Sizing**: Use smaller dimensions to make text larger
+4. **Saving**: Use `ggsave()` with explicit dimensions and DPI
+5. **Reproducibility**: Keep R scripts as source of truth
+6. **Factors**: Watch out for alphanumeric sorting issues
+7. **Interactive**: Use `ggplotly()` and save with `saveWidget()`
+
+### What's Next?
+
+**📚 Review the full presentation:**
+
+[stanstrup.github.io/figure_presentation](https://stanstrup.github.io/figure_presentation/)
+
+**🔄 Retake the quiz:**
+
+Refresh this page or run `rmarkdown::run("quiz.Rmd")` again
+
+**📖 Additional resources:**
+
+- [ColorBrewer](https://colorbrewer2.org) - Color palette selection
+- [Fundamentals of Data Visualization](https://clauswilke.com/dataviz) - Claus Wilke
+- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7)
+
+---
+
+### Feedback
+
+Found an issue with the quiz? Have suggestions? Let us know!

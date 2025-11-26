@@ -88,11 +88,61 @@ render_presentation()
 4. Text Sizing
 5. Themes & Styling
 6. Saving Plots
-7. Factor Ordering
-8. Post-Processing
-9. PowerPoint Import
-10. Rendering Issues
-11. Interactive Plots
+7. Post-Processing
+8. PowerPoint Import
+9. Factor Ordering
+10. Interactive Plots
+11. Rendering Issues
+
+## Interactive Quiz
+
+Test your knowledge with an interactive quiz covering all topics!
+
+### Running the Quiz
+
+```r
+# Install learnr if needed
+if (!requireNamespace("learnr", quietly = TRUE)) {
+  install.packages("learnr")
+}
+
+# Run the quiz
+rmarkdown::run("quiz.Rmd")
+```
+
+The quiz will open in your web browser with **31 questions** covering:
+
+- Color gradients and palettes (7 questions)
+- Heatmap scaling (3 questions)
+- File formats (5 questions)
+- Text sizing (2 questions)
+- Themes and styling (2 questions)
+- Saving plots (3 questions)
+- Post-processing (2 questions)
+- Factor ordering (3 questions)
+- Interactive plots (4 questions)
+
+### Quiz Features
+
+- ✅ Progressive format (one section at a time)
+- ✅ Immediate feedback with explanations
+- ✅ Retry functionality for learning
+- ✅ Performance-based guidance (score interpretation)
+- ✅ Clean, interactive interface
+
+### Troubleshooting
+
+If you encounter a namespace error, restart your R session first:
+
+```r
+# In RStudio
+.rs.restartR()
+
+# Then run the quiz
+rmarkdown::run("quiz.Rmd")
+```
+
+See `QUIZ_README.md` for detailed instructions and troubleshooting.
 
 ## CI/CD
 
