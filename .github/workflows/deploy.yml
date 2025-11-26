@@ -63,11 +63,13 @@ jobs:
 
       - name: Organize output files for GitHub Pages
         run: |
-          # Move book HTML files to root (book becomes index.html)
+          # Move book HTML files to root (book's index.html becomes main page)
           mv book/_book/* .
-          cp book.html index.html
           # quiz.html and presentation.html already in root
-          # All three formats now accessible from GitHub Pages
+          # All three formats now accessible from GitHub Pages:
+          # - index.html (book)
+          # - presentation.html (slides)
+          # - quiz.html (interactive quiz)
 
       - name: List files for debugging
         run: |
