@@ -13,11 +13,12 @@ This material is available in multiple formats to suit different learning styles
 ### 📊 Presentation Slides
 
 Concise, visual presentation format perfect for:
+
 - Quick reference during analysis
 - Presentations and workshops
 - Getting an overview of key concepts
 
-[View the slides →](../presentation.html){.btn .btn-primary}
+[View the slides →](presentation.html){.btn .btn-primary}
 
 ### 📖 Book Format (You're Here!)
 
@@ -29,11 +30,44 @@ Comprehensive tutorial with the same content plus:
 
 **Note:** This book uses a **single-source architecture**. The same source files (`topics/*.qmd`) generate both the slides and book chapters, ensuring perfect consistency between formats.
 
-[Take the quiz →](../quiz.html){.btn .btn-success}
+[Take the quiz →](quiz.html){.btn .btn-success}
 
 ### ✅ Interactive Quiz
 
 Test your knowledge with 31 questions covering all topics, with immediate feedback and explanations.
+
+**Quiz features:**
+
+- Progressive format (one section at a time)
+- Immediate feedback with explanations
+- Retry functionality for learning
+- Clean, interactive interface
+
+**Quiz content coverage:**
+
+1. **Color Gradients** (7 questions) - Rainbow problems, viridis, colorblindness
+2. **Heatmaps** (3 questions) - Outliers, scaling methods
+3. **File Formats** (5 questions) - Vector vs raster, photos vs generated plots, DPI
+4. **Text Sizing** (2 questions) - Canvas size, base_size
+5. **Themes** (2 questions) - theme_set(), ggpubr
+6. **Saving Plots** (3 questions) - ggsave(), Cairo devices
+7. **Post-Processing** (2 questions) - Reproducibility, metafile issues
+8. **Factor Ordering** (3 questions) - Sorting issues, forcats functions
+9. **Interactive Plots** (4 questions) - ggplotly, saveWidget, ggiraph
+
+**Running locally:**
+
+```r
+# Install learnr if needed
+if (!requireNamespace("learnr", quietly = TRUE)) {
+  install.packages("learnr")
+}
+
+# Run the interactive quiz
+rmarkdown::run("quiz.Rmd")
+```
+
+The quiz will open in your web browser. If you encounter namespace errors, restart your R session and try again.
 
 ## What You'll Learn
 
@@ -81,17 +115,18 @@ This guide covers 11 essential topics:
 ## Prerequisites
 
 Basic familiarity with:
+
 - R programming
 - ggplot2 plotting
 - Data manipulation with dplyr/tidyr
 
 ## Getting Started
 
-Navigate using the sidebar on the left, or start with [Chapter 1: Color Gradients](../topics/01_colors.qmd). Each chapter is self-contained with code examples you can run yourself.
+Navigate using the sidebar on the left, or start with [Chapter 1: Color Gradients](01_colors.html). Each chapter is self-contained with code examples you can run yourself.
 
 ## About the Author
 
-Jan Stanstrup is a researcher with expertise in data visualization and reproducible research practices.
+Jan Stanstrup is a researcher in metabolomics with expertise in data visualization.
 
 ## License
 

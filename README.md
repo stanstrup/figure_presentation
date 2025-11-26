@@ -1,21 +1,12 @@
 # Academic Figures: Common Pitfalls and Best Practices
 
-A Quarto RevealJS presentation about common pitfalls in creating academic figures using R.
+A comprehensive guide about common pitfalls in creating academic figures using R.
 
-## Viewing the Materials
+## View the Guide
 
-The materials are automatically built and deployed to GitHub Pages on every commit to the main branch.
+**📖 https://stanstrup.github.io/figure_presentation/**
 
-**📖 Book (Comprehensive Guide):** https://stanstrup.github.io/figure_presentation/
-
-**📊 Presentation Slides:** https://stanstrup.github.io/figure_presentation/presentation.html
-
-**✅ Interactive Quiz:** https://stanstrup.github.io/figure_presentation/quiz.html
-
-Choose the format that works best for you:
-- **Book**: In-depth tutorials with detailed explanations
-- **Slides**: Quick reference and presentations
-- **Quiz**: Test your knowledge (31 questions)
+The guide is available in three formats (book, slides, and interactive quiz). Visit the link above to get started!
 
 ## Local Development
 
@@ -119,17 +110,6 @@ Conditional content blocks using `::: {.content-visible unless-format="revealjs"
 9. Factor Ordering
 10. Interactive Plots
 11. Rendering Issues
-
-## Interactive Quiz
-
-Test your knowledge with an interactive quiz covering all topics! See [`QUIZ_README.md`](QUIZ_README.md) for full instructions.
-
-**Quick start:**
-```r
-rmarkdown::run("quiz.Rmd")
-```
-
-The quiz contains **31 questions** with immediate feedback, performance-based guidance, and full explanations.
 
 ## CI/CD
 
