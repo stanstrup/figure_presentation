@@ -53,25 +53,27 @@ jobs:
         run: |
           Rscript .github/workflows/install_packages.R
 
-      - name: Render Quarto presentation
+      - name: Render Quarto presentation (slides)
         run: |
           quarto render presentation.qmd
 
       - name: Render Quarto book
         run: |
+          # Book uses single-source architecture: same topics/*.qmd files
+          # render as both slides (above) and book chapters (here)
           quarto render book
 
-      - name: Render quiz
+      - name: Render interactive quiz
         run: |
           Rscript -e "rmarkdown::render('quiz.Rmd', output_file = 'quiz.html')"
 
-      - name: Organize output files
+      - name: Organize output files for GitHub Pages
         run: |
-          # Keep presentation.html as main file, create index that redirects to book
+          # Move book HTML files to root (book becomes index.html)
           mv book/_book/* .
           cp book.html index.html
-          # Keep quiz in root
-          # Keep presentation slides accessible
+          # quiz.html and presentation.html already in root
+          # All three formats now accessible from GitHub Pages
 
       - name: List files for debugging
         run: |
