@@ -67,6 +67,9 @@ jobs:
           # Topics are now inside book/, so book/_book/topics/*.html is created
           # and moved to root/topics/*.html automatically
           mv book/_book/* . 2>/dev/null || true
+          # Copy static assets needed by topics and presentation
+          cp -r sources . 2>/dev/null || true
+          cp -r presentation_files . 2>/dev/null || true
           # quiz.html and presentation.html already in root
           # All three formats now accessible from GitHub Pages:
           # - index.html (book)

@@ -122,7 +122,7 @@ Basic familiarity with:
 
 ## Getting Started
 
-Navigate using the sidebar on the left, or start with [Chapter 1: Color Gradients](01_colors.html). Each chapter is self-contained with code examples you can run yourself.
+Navigate using the sidebar on the left, or start with [Chapter 1: Color Gradients](topics/01_colors.html). Each chapter is self-contained with code examples you can run yourself.
 
 ## About the Author
 
