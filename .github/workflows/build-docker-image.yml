@@ -26,7 +26,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check if image already exists
+        id: check-image
+        run: |
+          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Docker image already exists, skipping build"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "🔨 Docker image not found, will build"
+          fi
+
       - name: Log in to GitHub Container Registry
+        if: steps.check-image.outputs.exists == 'false'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -34,6 +46,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
+        if: steps.check-image.outputs.exists == 'false'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -43,6 +56,7 @@ jobs:
             type=sha,prefix={{branch}}-
 
       - name: Build and push Docker image
+        if: steps.check-image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -52,7 +66,12 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-to: type=inline
 
-      - name: Image built successfully
+      - name: Image status
         run: |
-          echo "✅ Docker image built and pushed to ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-          echo "This image will be used by the deploy workflow for fast builds"
+          if [ "${{ steps.check-image.outputs.exists }}" == "true" ]; then
+            echo "✅ Docker image already exists at ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+            echo "Skipped build - image is ready to use"
+          else
+            echo "✅ Docker image built and pushed to ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+            echo "This image will be used by the deploy workflow for fast builds"
+          fi

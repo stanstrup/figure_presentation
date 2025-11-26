@@ -17,33 +17,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Check if custom Docker image exists, build it if not
-  check-docker-image:
-    runs-on: ubuntu-latest
-    outputs:
-      image-exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if Docker image exists
-        id: check
-        run: |
-          if docker manifest inspect ghcr.io/${{ github.repository }}:latest >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ Custom Docker image exists"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️  Custom Docker image not found - will trigger build"
-          fi
-
-  # Build Docker image if it doesn't exist
-  build-docker-if-needed:
-    needs: check-docker-image
-    if: needs.check-docker-image.outputs.image-exists == 'false'
+  # Build Docker image if it doesn't exist (this runs first and blocks)
+  ensure-docker-image:
     uses: ./.github/workflows/build-docker-image.yml
     secrets: inherit
 
   build:
-    needs: [check-docker-image, build-docker-if-needed]
-    if: always() && !cancelled()
+    needs: ensure-docker-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/${{ github.repository }}:latest
