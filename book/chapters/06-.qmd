@@ -1,0 +1,12 @@
+# Saving Plots
+
+::: {.callout-note}
+## Coming Soon
+This chapter is being developed.
+:::
+
+For now, refer to the [presentation slides](../../presentation.html) for this content.
+
+---
+
+**Previous:** [← Themes & Styling](05-*.qmd) | **Next:** [Post-Processing →](07-*.qmd)

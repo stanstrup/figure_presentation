@@ -373,6 +373,10 @@ This is the graphical abstract
 
 ![](../sources/1-s2.0-S0003267012000062-fx1.jpg)
 
+::: {.aside}
+*Figure from published paper. Used under fair use for educational criticism.*
+:::
+
 :::
 
 ::: {.column width="50%"}
@@ -380,6 +384,10 @@ This is the graphical abstract
 This was one of the figures
 
 ![](../sources/1-s2.0-S0003267012000062-gr4.jpg)
+
+::: {.aside}
+*Figure from published paper. Used under fair use for educational criticism.*
+:::
 
 :::
 ::::
