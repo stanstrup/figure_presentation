@@ -86,17 +86,25 @@ render_presentation()
 ```
 .
 ├── presentation.qmd          # Main presentation file (slides)
-├── topics/*.qmd              # Individual slide topics (modular)
-├── book/                     # Quarto Book (comprehensive guide)
-│   ├── _quarto.yml          # Book configuration
+├── topics/*.qmd              # Source files for BOTH slides and book chapters
+├── book/                     # Quarto Book configuration
+│   ├── _quarto.yml          # Book configuration (includes ../topics/*.qmd)
 │   ├── index.qmd            # Book homepage
-│   ├── chapters/*.qmd       # Expanded tutorial chapters
 │   └── references.qmd       # Bibliography
 ├── quiz.Rmd                  # Interactive learnr quiz
 ├── plots/                    # Generated plots (auto-created)
 ├── sources/                  # Static source images
 └── custom.css                # Custom styling
 ```
+
+### Single-Source Architecture
+
+This project uses a **single-source approach** where the same `.qmd` files in `topics/` render as:
+
+- **Slides** (RevealJS format) - via `presentation.qmd`
+- **Book chapters** (HTML book) - via `book/_quarto.yml`
+
+Conditional content blocks using `::: {.content-visible unless-format="revealjs"}` add book-specific sections (introductions, summaries, exercises) while keeping slide content unchanged. This eliminates content duplication and ensures consistency.
 
 ## Topics Covered
 
