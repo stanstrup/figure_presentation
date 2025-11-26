@@ -28,21 +28,21 @@ book:
     - index.qmd
     - part: "Core Principles"
       chapters:
-        - ../topics/01_colors.qmd
-        - ../topics/02_heatmaps.qmd
-        - ../topics/03_formats.qmd
+        - topics/01_colors.qmd
+        - topics/02_heatmaps.qmd
+        - topics/03_formats.qmd
     - part: "Practical Workflow"
       chapters:
-        - ../topics/04_sizing.qmd
-        - ../topics/05_themes.qmd
-        - ../topics/06_saving.qmd
-        - ../topics/07_editing.qmd
+        - topics/04_sizing.qmd
+        - topics/05_themes.qmd
+        - topics/06_saving.qmd
+        - topics/07_editing.qmd
     - part: "Advanced Topics"
       chapters:
-        - ../topics/08_powerpoint.qmd
-        - ../topics/09_factors.qmd
-        - ../topics/10_interactive.qmd
-        - ../topics/11_rendering.qmd
+        - topics/08_powerpoint.qmd
+        - topics/09_factors.qmd
+        - topics/10_interactive.qmd
+        - topics/11_rendering.qmd
     - references.qmd
 
   appendices:
