@@ -39,7 +39,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update
-          apt-get install -y libmagick++-dev librsvg2-dev
+          apt-get install -y libmagick++-dev librsvg2-dev cmake
 
       - name: Cache R packages
         uses: actions/cache@v3
