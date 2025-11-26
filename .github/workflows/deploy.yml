@@ -83,6 +83,25 @@ jobs:
           echo "=== All HTML files ==="
           find . -name "*.html" -type f | head -30
 
+      - name: Check internal links
+        run: |
+          # Install lychee (fast link checker in Rust)
+          curl -sSL https://github.com/lycheeverse/lychee/releases/download/v0.14.3/lychee-v0.14.3-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          chmod +x lychee
+          # Check all HTML files for broken internal links
+          # --offline: only check local links (not external URLs)
+          # --no-progress: simpler output for CI
+          # --format markdown: readable output format
+          ./lychee --offline --no-progress --format markdown \
+            --exclude 'mailto:*' --exclude 'javascript:*' \
+            --exclude '#' --exclude-path '.git' \
+            --exclude-path '_book' --exclude-path '.quarto' \
+            ./*.html ./topics/*.html || {
+              echo "❌ Link check failed! Found broken internal links."
+              exit 1
+            }
+          echo "✅ All internal links are valid!"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
