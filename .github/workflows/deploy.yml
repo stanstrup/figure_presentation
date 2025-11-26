@@ -64,13 +64,20 @@ jobs:
       - name: Organize output files for GitHub Pages
         run: |
           # Move book HTML files to root (book's index.html becomes main page)
-          mv book/_book/* .
+          mv book/_book/* . 2>/dev/null || true
+          # Copy topics HTML files to topics/ directory
+          # (Quarto renders these to book/topics/*.html, but topics/ already
+          # exists with source .qmd files, so we copy HTML over source files)
+          if [ -d "book/topics" ]; then
+            cp -r book/topics/* topics/
+            echo "Copied book/topics HTML files to topics/"
+          fi
           # quiz.html and presentation.html already in root
           # All three formats now accessible from GitHub Pages:
           # - index.html (book)
           # - presentation.html (slides)
           # - quiz.html (interactive quiz)
-          # - topics/*.html (book chapters - Quarto preserves directory structure)
+          # - topics/*.html (book chapters)
 
       - name: List files for debugging
         run: |
