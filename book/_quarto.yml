@@ -13,9 +13,9 @@ book:
     search: true
     right:
       - text: "Slides"
-        href: ../presentation.html
+        href: presentation.html
       - text: "Quiz"
-        href: ../quiz.html
+        href: quiz.html
       - icon: github
         href: https://github.com/stanstrup/figure_presentation
 

@@ -30,7 +30,7 @@ The quiz contains **31 questions** organized into 9 sections:
 
 The quiz is available as part of the presentation website:
 
-[Take the Quiz Online →](../../quiz.html){.btn .btn-success}
+[Take the Quiz Online →](quiz.html){.btn .btn-success}
 
 ### Local Version
 
