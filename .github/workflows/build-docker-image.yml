@@ -9,6 +9,7 @@ on:
       - 'Dockerfile'
       - '.github/workflows/build-docker-image.yml'
   workflow_dispatch:
+  workflow_call:  # Allow calling from other workflows
 
 env:
   REGISTRY: ghcr.io
