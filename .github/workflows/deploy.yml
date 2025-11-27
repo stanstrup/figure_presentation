@@ -80,8 +80,6 @@ jobs:
           cp -r book/sources slides/ 2>/dev/null || true  # slides/sources/ for presentation
           # Copy custom.css for presentation
           cp custom.css slides/ 2>/dev/null || true
-          # Fix navbar links in topics: change ../slides/ to slides/ (topics moved to root)
-          find topics/ -name "*.html" -type f -exec sed -i 's|href="../slides/|href="slides/|g' {} \;
           # Deployed structure:
           # - index.html (book homepage)
           # - topics/*.html (book chapters with topics/plots/)
