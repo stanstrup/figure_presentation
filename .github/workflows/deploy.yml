@@ -65,7 +65,9 @@ jobs:
         run: |
           # Move book HTML files to root (book's index.html becomes main page)
           # Topics are now inside book/, so book/_book/topics/*.html is created
-          # and moved to root/topics/*.html automatically
+          # Remove presentation-generated topics/ to avoid conflicts with book version
+          rm -rf topics/ sources/ site_libs/ 2>/dev/null || true
+          # Now move book output (includes topics with plots subdirectory)
           mv book/_book/* . 2>/dev/null || true
           # Copy static assets needed by topics and presentation
           cp -r book/sources . 2>/dev/null || true  # Root-level sources/ for presentation
@@ -76,8 +78,7 @@ jobs:
           # All three formats now accessible from GitHub Pages:
           # - index.html (book)
           # - presentation.html (slides)
-          # - quiz.html (interactive quiz)
-          # - topics/*.html (book chapters)
+          # - topics/*.html (book chapters with plots/)
 
       - name: List files for debugging
         run: |

@@ -50,8 +50,8 @@ book:
 format:
   html:
     theme:
-      light: [cosmo, custom.css]
-      dark: [darkly, custom.css]
+      light: cosmo
+      dark: darkly
     code-copy: true
     code-overflow: wrap
     toc: true
