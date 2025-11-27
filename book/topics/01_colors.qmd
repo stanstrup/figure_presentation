@@ -145,12 +145,8 @@ ggplot(correct_data, aes(x = x, y = y)) +
 ![](sources/1-s2.0-S0924271622002659-gr1_lrg.jpg)
 
 ::: {.aside}
-*Figure from Gołębiowska & Çöltekin (2022), ISPRS Journal. Used under fair use for educational purposes.*
+*Figure from @golebiowska2022rainbow. Used under fair use for educational purposes.*
 :::
-:::
-
-::: {.notes}
-Gołębiowska, I., & Çöltekin, A. (2022). What's wrong with the rainbow? An interdisciplinary review of empirical evidence for and against the rainbow color scheme in visualizations. ISPRS Journal of Photogrammetry and Remote Sensing, 194, 195–208. https://doi.org/10.1016/j.isprsjprs.2022.10.002
 :::
 
 
@@ -384,7 +380,7 @@ p3 <- base_plot +
 
 ## Real world consequences
 
-![](sources/file-20211005-30173-hog6m.avif)
+![](sources/file-20211005-30173-hog6m.avif){width=60%}
 
 ::: {.aside}
 *Image from The Conversation. Licensed under CC BY-ND 4.0.*
@@ -415,11 +411,7 @@ https://theconversation.com/how-rainbow-colour-maps-can-distort-data-and-be-misl
 </div>
 
 ::: {.aside}
-*Figure from Haseneyer et al. (2011), BMC Plant Biology. Licensed under CC BY 2.0.*
-:::
-
-::: {.notes}
-Haseneyer, G., Schmutzer, T., Seidel, M. et al. From RNA-seq to large-scale genotyping - genomics resources for rye (Secale cereale L.). BMC Plant Biol 11, 131 (2011). https://doi.org/10.1186/1471-2229-11-131
+*Figure from @haseneyer2011rna. Licensed under CC BY 2.0.*
 :::
 
 
@@ -445,7 +437,7 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 - But dark red represents **higher values** (more critical condition)
 - Perceptual bias leads to misdiagnosis
 
-**Reference:** Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
+**Reference:** @borkin2011evaluation
 
 :::
 
@@ -457,7 +449,7 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 ![](sources/borkin.png)
 
 ::: {.aside}
-*Figure from Borkin et al. (2011), IEEE. Used under fair use for educational purposes.*
+*Figure from @borkin2011evaluation. Used under fair use for educational purposes.*
 :::
 
 ::::
@@ -953,8 +945,8 @@ ggplot(data, aes(x, y, color = category)) +
 
 ## Further Reading
 
-- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7) - Crameri et al., Nature Communications
-- [What's wrong with the rainbow?](https://doi.org/10.1016/j.isprsjprs.2022.10.002) - Gołębiowska & Çöltekin, ISPRS Journal  
+- @crameri2020misuse - The misuse of colour in science communication
+- @golebiowska2022rainbow - What's wrong with the rainbow?
 - [Viridis package documentation](https://cran.r-project.org/package=viridis)
 - [ColorBrewer website](https://colorbrewer2.org)
 :::

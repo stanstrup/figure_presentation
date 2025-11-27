@@ -724,6 +724,6 @@ p
 - [hrbrthemes package](https://github.com/hrbrmstr/hrbrthemes) - modern themes with proper fonts
 - [patchwork guide](https://patchwork.data-imaginist.com/) - comprehensive combining tutorial
 - [ggthemes package](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) - journal-specific themes
-- Wilke (2019). *Fundamentals of Data Visualization* - Chapter 22 on choosing themes
+- @wilke2019fundamentals - Chapter 22 on choosing themes
 :::
 

@@ -419,7 +419,7 @@ This was one of the figures
 
 ::: notes
 
-Barri, T., Holmer-Jensen, J., Hermansen, K., & Dragsted, L. O. (2012). Metabolic fingerprinting of high-fat plasma samples processed by centrifugation- and filtration-based protein precipitation delineates significant differences in metabolite information coverage. Analytica Chimica Acta, 718, 47–57. https://doi.org/10.1016/j.aca.2011.12.065
+@barri2012metabolic
 
 :::
 

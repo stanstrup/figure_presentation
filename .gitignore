@@ -32,8 +32,8 @@ lychee*
 site_libs/
 search.json
 # Copied during deployment, not source
-topics/sources/
-sources/
-topics/
+/topics/sources/
+/sources/
+/topics/
 # Presentation output directory
 slides/
