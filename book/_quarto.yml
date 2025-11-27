@@ -13,7 +13,7 @@ book:
     search: true
     right:
       - text: "Slides"
-        href: presentation.html
+        href: slides/presentation.html
       - icon: github
         href: https://github.com/stanstrup/figure_presentation
 

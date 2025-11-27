@@ -50,6 +50,7 @@ jobs:
       - name: Render Quarto presentation (slides)
         run: |
           quarto render presentation.qmd
+          # Presentation renders to slides/ directory (configured in _quarto.yml)
 
       - name: Render Quarto book
         run: |
@@ -63,22 +64,28 @@ jobs:
 
       - name: Organize output files for GitHub Pages
         run: |
-          # Move book HTML files to root (book's index.html becomes main page)
-          # Topics are now inside book/, so book/_book/topics/*.html is created
-          # Remove presentation-generated topics/ to avoid conflicts with book version
-          rm -rf topics/ sources/ site_libs/ 2>/dev/null || true
-          # Now move book output (includes topics with plots subdirectory)
-          mv book/_book/* . 2>/dev/null || true
-          # Copy static assets needed by topics and presentation
-          cp -r book/sources . 2>/dev/null || true  # Root-level sources/ for presentation
+          # Keep book output structure intact (book/_book/topics/ stays together)
+          # Move only root-level book files to deployment root
+          mv book/_book/index.html . 2>/dev/null || true
+          mv book/_book/quiz-info.html . 2>/dev/null || true
+          mv book/_book/references.html . 2>/dev/null || true
+          mv book/_book/resources.html . 2>/dev/null || true
+          mv book/_book/topics . 2>/dev/null || true  # Move topics/ directory to root
+          mv book/_book/site_libs . 2>/dev/null || true  # Move shared libs
+          mv book/_book/search.json . 2>/dev/null || true
+          # Slides are already in slides/ directory
+          # Copy sources for all formats (topics/ and slides/ both at root now)
+          cp -r book/sources . 2>/dev/null || true  # Root sources/ for potential use
           cp -r book/sources topics/ 2>/dev/null || true  # topics/sources/ for book chapters
-          cp -r presentation_files . 2>/dev/null || true
-          cp custom.css . 2>/dev/null || true  # CSS for presentation
-          # quiz.html and presentation.html already in root
-          # All three formats now accessible from GitHub Pages:
-          # - index.html (book)
-          # - presentation.html (slides)
-          # - topics/*.html (book chapters with plots/)
+          cp -r book/sources slides/ 2>/dev/null || true  # slides/sources/ for presentation
+          # Copy custom.css for presentation
+          cp custom.css slides/ 2>/dev/null || true
+          # Fix navbar links in topics: change ../slides/ to slides/ (topics moved to root)
+          find topics/ -name "*.html" -type f -exec sed -i 's|href="../slides/|href="slides/|g' {} \;
+          # Deployed structure:
+          # - index.html (book homepage)
+          # - topics/*.html (book chapters with topics/plots/)
+          # - slides/presentation.html (slides with slides/sources/)
 
       - name: List files for debugging
         run: |
@@ -95,19 +102,21 @@ jobs:
           wget -q https://github.com/lycheeverse/lychee/releases/download/v0.14.3/lychee-v0.14.3-x86_64-unknown-linux-gnu.tar.gz
           tar -xzf lychee-v0.14.3-x86_64-unknown-linux-gnu.tar.gz
           chmod +x lychee
-          # Check all HTML files for broken internal links
+          # Check all HTML files for broken internal links AND images
           # --offline: only check local links (not external URLs)
           # --no-progress: simpler output for CI
           # --format markdown: readable output format
+          # --include-verbatim: check ALL links including images, CSS, JS
           ./lychee --offline --no-progress --format markdown \
+            --include-verbatim \
             --exclude 'mailto:*' --exclude 'javascript:*' \
             --exclude '#' --exclude-path '.git' \
             --exclude-path '_book' --exclude-path '.quarto' \
-            ./*.html ./topics/*.html || {
-              echo "❌ Link check failed! Found broken internal links."
+            ./*.html ./topics/*.html ./slides/*.html || {
+              echo "❌ Link check failed! Found broken internal links or missing images."
               exit 1
             }
-          echo "✅ All internal links are valid!"
+          echo "✅ All internal links and images are valid!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

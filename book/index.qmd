@@ -18,7 +18,7 @@ Concise, visual presentation format perfect for:
 - Presentations and workshops
 - Getting an overview of key concepts
 
-[View the slides →](presentation.html){.btn .btn-primary}
+[View the slides →](slides/presentation.html){.btn .btn-primary}
 
 ### 📖 Book Format (You're Here!)
 

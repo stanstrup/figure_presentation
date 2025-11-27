@@ -1,6 +1,7 @@
 project:
   type: default
   execute-dir: project
+  output-dir: slides
 
 # Default format is slides (for backward compatibility)
 format:
