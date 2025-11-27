@@ -9,23 +9,55 @@ if (!require("quarto", quietly = TRUE)) {
 library(quarto)
 
 # ============================================================
-# Option 1: Render the full presentation
+# Option 1: Render the full presentation (slides)
 # ============================================================
 render_presentation <- function() {
-  cat("Rendering full presentation...\n")
+  cat("Rendering full presentation (slides)...\n")
   quarto_render("presentation.qmd")
-  cat("✓ Done! Open presentation.html to view\n")
+  cat("✓ Done! Open slides/presentation.html to view\n")
+}
+
+# ============================================================
+# Option 1b: Render the book
+# ============================================================
+render_book <- function() {
+  cat("Rendering book...\n")
+  quarto_render("book")
+  cat("✓ Done! Open book/_book/index.html to view\n")
+}
+
+# ============================================================
+# Option 1c: Render both presentation and book
+# ============================================================
+render_all <- function() {
+  cat("Rendering both presentation and book...\n")
+  cat(strrep("=", 60), "\n")
+
+  # Render presentation
+  cat("\n[1/2] Rendering presentation (slides)...\n")
+  quarto_render("presentation.qmd")
+  cat("✓ Presentation complete\n")
+
+  # Render book
+  cat("\n[2/2] Rendering book...\n")
+  quarto_render("book")
+  cat("✓ Book complete\n")
+
+  cat(strrep("=", 60), "\n")
+  cat("✓ All done!\n")
+  cat("  - Slides: slides/presentation.html\n")
+  cat("  - Book:   book/_book/index.html\n")
 }
 
 # ============================================================
 # Option 2: Test a single topic
 # ============================================================
 render_topic <- function(topic_number, as_slides = TRUE) {
-  topic_file <- sprintf("topics/%02d_*.qmd", topic_number)
-  topic_files <- list.files("topics", pattern = sprintf("^%02d_.*\\.qmd$", topic_number), full.names = TRUE)
+  # Topics are in book/topics/ directory
+  topic_files <- list.files("book/topics", pattern = sprintf("^%02d_.*\\.qmd$", topic_number), full.names = TRUE)
 
   if (length(topic_files) == 0) {
-    cat("❌ Topic", topic_number, "not found\n")
+    cat("❌ Topic", topic_number, "not found in book/topics/\n")
     return(FALSE)
   }
 
@@ -53,7 +85,7 @@ render_topic <- function(topic_number, as_slides = TRUE) {
 # Option 3: Test ALL topics in PARALLEL (FASTER!)
 # ============================================================
 test_all_topics_parallel <- function(n_cores = NULL) {
-  topic_files <- list.files("topics", pattern = "\\.qmd$", full.names = TRUE)
+  topic_files <- list.files("book/topics", pattern = "\\.qmd$", full.names = TRUE)
   topic_files <- sort(topic_files)
 
   # Determine number of cores
@@ -137,7 +169,7 @@ test_all_topics_parallel <- function(n_cores = NULL) {
 # Option 4: Test ALL topics SEQUENTIALLY (slower but shows progress)
 # ============================================================
 test_all_topics <- function() {
-  topic_files <- list.files("topics", pattern = "\\.qmd$", full.names = TRUE)
+  topic_files <- list.files("book/topics", pattern = "\\.qmd$", full.names = TRUE)
   topic_files <- sort(topic_files)  # Alphabetical order
 
   results <- data.frame(
@@ -216,8 +248,10 @@ Academic Figures Presentation Renderer
 
 Available commands:
 
-1. Render full presentation:
-   render_presentation()
+1. Render outputs:
+   render_presentation()              # Render slides only
+   render_book()                      # Render book only
+   render_all()                       # Render both slides and book
 
 2. Test a single topic (by number):
    render_topic(2)                    # Test topic 02 as slides
@@ -247,8 +281,12 @@ Example workflow:
   # Fix any errors, then test specific topic
   render_topic(1)
 
-  # When all pass, render full presentation
-  render_presentation()
+  # When all pass, render everything
+  render_all()                       # Renders both slides and book
+
+Output locations:
+  - Slides: slides/presentation.html
+  - Book:   book/_book/index.html
 
 Parallel vs Sequential:
   - Parallel: FASTER (uses multiple CPU cores)
