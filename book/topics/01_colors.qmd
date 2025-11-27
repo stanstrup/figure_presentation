@@ -807,6 +807,9 @@ seq_wrap / div_wrap / qual_wrap +
 
 ## Yellow Color Warning
 
+:::: {.columns}
+::: {.column width="50%"}
+
 ::: {.callout-warning}
 ## The Yellow Problem
 
@@ -825,6 +828,10 @@ Even though ColorBrewer includes yellow in some palettes (e.g., "YlOrRd", "RdYlB
 - For print: Use darker yellows or oranges instead
 - For text: **NEVER** use yellow text on light backgrounds
 :::
+
+:::
+
+::: {.column width="50%"}
 
 **Removing yellow from Set1:**
 
@@ -846,6 +853,9 @@ set1_no_yellow <- set1_colors[-6]
 # Use in ggplot2
 scale_color_manual(values = set1_no_yellow)
 ```
+
+:::
+::::
 
 
 ## Recommendations Summary
