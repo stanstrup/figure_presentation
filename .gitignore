@@ -31,7 +31,9 @@ lychee*
 # Quarto build artifacts
 site_libs/
 search.json
-topics/sources/  # Copied during deployment, not source
+# Copied during deployment, not source
+topics/sources/
 sources/
 topics/
-slides/  # Presentation output directory
+# Presentation output directory
+slides/
