@@ -393,7 +393,7 @@ This is the graphical abstract
 ![](../sources/1-s2.0-S0003267012000062-fx1.jpg){width=100%}
 
 ::: {.aside}
-*Figure from @barri2012metabolic. Used under fair use for educational criticism.*
+*Figure from @barri2012metabolic*
 :::
 
 :::
@@ -402,10 +402,10 @@ This is the graphical abstract
 
 This was one of the figures
 
-![](../sources/1-s2.0-S0003267012000062-gr4.jpg)
+![](../sources/1-s2.0-S0003267012000062-gr4.jpg){width=100%}
 
 ::: {.aside}
-*Figure from @barri2012metabolic. Used under fair use for educational criticism.*
+*Figure from @barri2012metabolic*
 :::
 
 :::

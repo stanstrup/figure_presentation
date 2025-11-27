@@ -145,7 +145,7 @@ ggplot(correct_data, aes(x = x, y = y)) +
 ![](sources/1-s2.0-S0924271622002659-gr1_lrg.jpg)
 
 ::: {.aside}
-*Figure from @golebiowska2022rainbow. Used under fair use for educational purposes.*
+*Figure from @golebiowska2022rainbow*
 :::
 :::
 
@@ -383,7 +383,7 @@ p3 <- base_plot +
 ![](sources/file-20211005-30173-hog6m.avif){width=65%}
 
 ::: {.aside}
-*Image from @heron2021rainbow. Licensed under CC BY-ND 4.0.*
+*Image from @heron2021rainbow*
 :::
 
 
@@ -413,9 +413,7 @@ p3 <- base_plot +
 
 ::: {.column width="25%"}
 
-::: {.aside}
-*Figure from @haseneyer2011rna. Licensed under CC BY 2.0.*
-:::
+*Figure from @haseneyer2011rna*
 
 :::
 ::::
@@ -455,7 +453,7 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 ![](sources/borkin.png)
 
 ::: {.aside}
-*Figure from @borkin2011evaluation. Used under fair use for educational purposes.*
+*Figure from @borkin2011evaluation*
 :::
 
 ::::
