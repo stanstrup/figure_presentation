@@ -26,15 +26,11 @@ The quiz contains **31 questions** organized into 9 sections:
 
 ## Taking the Quiz
 
-### Online Version
+The quiz requires an R Shiny server to run, so it's only available locally (not on the website).
 
-The quiz is available as part of the presentation website:
+### Running Locally
 
-[Take the Quiz Online →](quiz.html){.btn .btn-success}
-
-### Local Version
-
-If you have the repository cloned, you can run the quiz locally:
+Clone the repository and run the quiz on your machine:
 
 ```r
 # Install learnr if needed
