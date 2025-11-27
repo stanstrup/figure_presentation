@@ -380,14 +380,10 @@ p3 <- base_plot +
 
 ## Real world consequences
 
-![](sources/file-20211005-30173-hog6m.avif){width=60%}
+![](sources/file-20211005-30173-hog6m.avif){width=65%}
 
 ::: {.aside}
-*Image from The Conversation. Licensed under CC BY-ND 4.0.*
-:::
-
-::: {.notes}
-https://theconversation.com/how-rainbow-colour-maps-can-distort-data-and-be-misleading-167159
+*Image from @heron2021rainbow. Licensed under CC BY-ND 4.0.*
 :::
 
 

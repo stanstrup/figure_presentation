@@ -3,6 +3,8 @@ project:
   execute-dir: project
   output-dir: slides
 
+bibliography: book/references.bib
+
 # Default format is slides (for backward compatibility)
 format:
   revealjs:
