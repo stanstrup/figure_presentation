@@ -27,10 +27,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check if image already exists
+      - name: Check if image should be built
         id: check-image
         run: |
-          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest >/dev/null 2>&1; then
+          # If triggered by push to paths (Dockerfile, install_packages.R changed), always rebuild
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "🔨 Dockerfile or dependencies changed, will rebuild image"
+          # If triggered by workflow_call or workflow_dispatch, check if image exists
+          elif docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
             echo "✅ Docker image already exists, skipping build"
           else
