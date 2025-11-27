@@ -397,6 +397,9 @@ p3 <- base_plot +
 
 ## Not just spatial data
 
+:::: {.columns}
+::: {.column width="75%"}
+
 <div class="image-container" style="--max-width: 1200px; --img-scale: 0.7; position: relative;">
 <div class="cropped fragment fade-out" data-fragment-index="1" style="--crop-width: 62%; position: absolute;">
 ![](sources/12870_2011_Article_914_Fig2_HTML.webp)
@@ -406,9 +409,16 @@ p3 <- base_plot +
 </div>
 </div>
 
+:::
+
+::: {.column width="25%"}
+
 ::: {.aside}
 *Figure from @haseneyer2011rna. Licensed under CC BY 2.0.*
 :::
+
+:::
+::::
 
 
 ## Medical Consequences
