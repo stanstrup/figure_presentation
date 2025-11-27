@@ -4,17 +4,7 @@ Test your knowledge with an interactive quiz covering all topics from this guide
 
 ## About the Quiz
 
-The quiz contains **31 questions** organized into 9 sections:
-
-- Color gradients and palettes (7 questions)
-- Heatmap scaling (3 questions)
-- File formats (5 questions)
-- Text sizing (2 questions)
-- Themes and styling (2 questions)
-- Saving plots (3 questions)
-- Post-processing (2 questions)
-- Factor ordering (3 questions)
-- Interactive plots (4 questions)
+The quiz contains **31 questions** covering key concepts from the guide.
 
 ## Features
 
