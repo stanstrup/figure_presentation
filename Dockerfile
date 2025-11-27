@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libmagick++-dev \
     librsvg2-dev \
     cmake \
+    git-lfs \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure RSPM for binary packages (faster installation)
