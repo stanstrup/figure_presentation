@@ -1,33 +1,113 @@
 # References {.unnumbered}
 
-::: {#refs}
-:::
+## Key Papers
 
-## Online Resources
+Essential research on color use, perception, and data visualization:
 
-### Color Tools
+- @crameri2020misuse - The misuse of color in science communication
+- @borkin2011evaluation - Evaluation of visualization effectiveness
+- @golebiowska2022rainbow - Problems with rainbow color schemes
+- @heron2021rainbow - Rainbow colormaps and their issues
 
-- **ColorBrewer**: https://colorbrewer2.org - Interactive color palette selection
-- **Coblis**: https://www.coblis.com - Colorblind vision simulator
-- **Viridis package**: https://cran.r-project.org/package=viridis
+## Books
 
-### Documentation
+- @wilke2019fundamentals - [Fundamentals of Data Visualization](https://clauswilke.com/dataviz) - Comprehensive guide to visualization principles (free online)
+- **[R Graphics Cookbook](https://r-graphics.org)** by Winston Chang - Practical recipes for ggplot2 (free online)
+- **[Data Visualization: A Practical Introduction](https://socviz.co)** by Kieran Healy - Social science perspective (free online)
 
-- **ggplot2 documentation**: https://ggplot2.tidyverse.org
-- **Quarto documentation**: https://quarto.org
-- **plotly for R**: https://plotly.com/r/
+## Example Studies
 
-### Tutorials
+Examples of good visualization practices in scientific publications:
 
-- **Heatmaps guide**: https://stanstrup.github.io/heatmaps.html - Jan Stanstrup
-- **R Graphics Cookbook**: https://r-graphics.org - Winston Chang
+- @haseneyer2011rna - RNA-Seq analysis example
+- @barri2012metabolic - Metabolomics visualization
+- @wikimedia2006raster - Technical image format information
+
+## Color Resources
+
+### Tools
+
+- **[ColorBrewer](https://colorbrewer2.org)** - Interactive tool for selecting color palettes for maps and data visualization
+- **[Coblis](https://www.coblis.com)** - Color Blindness Simulator - Upload images to see how they appear with different types of color vision deficiency
+- **[Adobe Color](https://color.adobe.com)** - Create and explore color palettes
+- **[Coolors](https://coolors.co)** - Fast color scheme generator
+
+### R Packages
+
+- **viridis** - Perceptually uniform color scales - https://cran.r-project.org/package=viridis
+- **RColorBrewer** - ColorBrewer palettes for R
+- **colorspace** - Color manipulation and assessment
+- **dichromat** - Simulate color blindness
+- **paletteer** - Collection of 2000+ palettes
+
+## Documentation
+
+- **[ggplot2 Reference](https://ggplot2.tidyverse.org/reference/)** - Complete function reference
+- **[Quarto Documentation](https://quarto.org/docs/guide/)** - Publishing system for reproducible documents
+- **[R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/)** - Tips and tricks
+- **[plotly for R](https://plotly.com/r/)** - Interactive plotting library
+
+## Community
+
+### Getting Help
+
+- **[Stack Overflow](https://stackoverflow.com/questions/tagged/ggplot2)** - Q&A for ggplot2 questions
+- **[RStudio Community](https://community.rstudio.com/)** - Friendly discussion forum
+- **[R4DS Online Learning Community](https://www.rfordatasci.com/)** - Book club and Slack workspace
+
+### Staying Updated
+
+- **[R-bloggers](https://www.r-bloggers.com/)** - Aggregator of R blog posts
+- **[RWeekly](https://rweekly.org/)** - Weekly newsletter of R news
+- **[#rstats on Twitter/X](https://twitter.com/hashtag/rstats)** - Active community
 
 ## Software
 
-- **R**: https://www.r-project.org
-- **RStudio**: https://posit.co/products/open-source/rstudio/
-- **Quarto**: https://quarto.org
+### Essential Tools
+
+- **[R](https://www.r-project.org)** - The R programming language
+- **[RStudio](https://posit.co/products/open-source/rstudio/)** - Integrated development environment
+- **[Quarto](https://quarto.org)** - Scientific and technical publishing system
+
+### Helpful Extensions
+
+- **[RStudio Addins](https://github.com/daattali/addinslist)** - Collection of useful RStudio addins
+- **[esquisse](https://dreamrs.github.io/esquisse/)** - Interactive ggplot2 builder
+- **[ggThemeAssist](https://github.com/calligross/ggthemeassist)** - Visual theme customization
+
+## Inspiration
+
+### Example Galleries
+
+- **[R Graph Gallery](https://r-graph-gallery.com/)** - Hundreds of ggplot2 examples with code
+- **[From Data to Viz](https://www.data-to-viz.com/)** - Decision tree for choosing chart types
+- **[TidyTuesday](https://github.com/rfordatascience/tidytuesday)** - Weekly data viz challenges
+
+### Outstanding Examples
+
+- **[BBC Visual and Data Journalism](https://bbc.github.io/rcookbook/)** - BBC's ggplot2 cookbook
+- **[Financial Times Visual Vocabulary](https://github.com/Financial-Times/chart-doctor/tree/main/visual-vocabulary)** - Guide to chart types
 
 ## Related Presentations
 
-This guide is based on the presentation "Academic Figures: Common Pitfalls and Best Practices" available at https://stanstrup.github.io/figure_presentation/
+- **This presentation**: https://stanstrup.github.io/figure_presentation/
+- **Heatmaps guide**: https://stanstrup.github.io/heatmaps.html
+
+## Contributing
+
+Found a useful resource not listed here? Contributions are welcome!
+
+- **GitHub**: https://github.com/stanstrup/figure_presentation
+- **Issues**: Report problems or suggest additions
+- **Pull Requests**: Contribute improvements
+
+## Citation
+
+If you find this guide useful in your work, please cite:
+
+```
+Stanstrup, J. (2025). Academic Figures: Common Pitfalls and Best Practices.
+https://stanstrup.github.io/figure_presentation/
+```
+
+Or use the BibTeX entry from the repository.

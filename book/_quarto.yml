@@ -45,7 +45,6 @@ book:
 
   appendices:
     - quiz-info.qmd
-    - resources.qmd
 
 format:
   html:

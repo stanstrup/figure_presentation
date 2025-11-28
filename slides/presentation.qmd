@@ -93,4 +93,4 @@
 {{< include ../book/topics/10_interactive.qmd >}}
 
 
-{{< include ../book/resources.qmd >}}
+{{< include ../book/references.qmd >}}
