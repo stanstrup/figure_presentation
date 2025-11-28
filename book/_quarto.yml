@@ -60,3 +60,4 @@ format:
     link-external-newwindow: true
 
 bibliography: references.bib
+suppress-bibliography: true
