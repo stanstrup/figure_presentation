@@ -11,42 +11,224 @@ library(quarto)
 # ============================================================
 # Option 1: Render the full presentation (slides)
 # ============================================================
-render_presentation <- function() {
+render_presentation <- function(cleanup = TRUE) {
   cat("Rendering full presentation (slides)...\n")
-  quarto_render("presentation.qmd")
-  cat("✓ Done! Open slides/presentation.html to view\n")
+  quarto_render("slides/presentation.qmd")
+
+  # Copy sources and custom.css to public/
+  if (!dir.exists("public/sources")) {
+    dir.create("public/sources", recursive = TRUE, showWarnings = FALSE)
+  }
+  file.copy("sources/", "public/", recursive = TRUE, overwrite = TRUE)
+  if (file.exists("custom.css")) {
+    file.copy("custom.css", "public/custom.css", overwrite = TRUE)
+  }
+
+  if (cleanup) {
+    cat("Cleaning up render artifacts...\n")
+    unlink("slides/plots", recursive = TRUE)
+    unlink("slides/presentation_files", recursive = TRUE)
+    if (file.exists("slides/presentation.revealjs.md")) {
+      file.remove("slides/presentation.revealjs.md")
+    }
+  }
+
+  cat("✓ Done! Open public/slides/presentation.html to view\n")
 }
 
 # ============================================================
 # Option 1b: Render the book
 # ============================================================
-render_book <- function() {
+render_book <- function(cleanup = TRUE) {
   cat("Rendering book...\n")
   quarto_render("book")
-  cat("✓ Done! Open book/_book/index.html to view\n")
+
+  # Copy book output to public/ root
+  cat("Copying book output to public/...\n")
+  if (dir.exists("public")) unlink("public", recursive = TRUE)
+  dir.create("public", showWarnings = FALSE)
+  book_files <- list.files("book/_book", full.names = TRUE, all.files = TRUE, no.. = TRUE)
+  file.copy(book_files, "public/", recursive = TRUE, overwrite = TRUE)
+
+  # Copy sources and custom.css to public/
+  file.copy("sources/", "public/", recursive = TRUE, overwrite = TRUE)
+  if (file.exists("custom.css")) {
+    file.copy("custom.css", "public/custom.css", overwrite = TRUE)
+  }
+
+  if (cleanup) {
+    cat("Cleaning up render artifacts...\n")
+    unlink("book/_book", recursive = TRUE)
+    unlink("book/topics/plots", recursive = TRUE)
+    unlink("book/plots", recursive = TRUE)
+    # Clean up any *_files directories in book root
+    book_files_dirs <- list.files("book", pattern = "_files$", full.names = TRUE)
+    for (d in book_files_dirs) {
+      unlink(d, recursive = TRUE)
+    }
+  }
+
+  cat("✓ Done! Open public/index.html to view\n")
 }
 
 # ============================================================
 # Option 1c: Render both presentation and book
 # ============================================================
-render_all <- function() {
+render_all <- function(parallel = TRUE, cleanup = TRUE) {
   cat("Rendering both presentation and book...\n")
   cat(strrep("=", 60), "\n")
 
-  # Render presentation
-  cat("\n[1/2] Rendering presentation (slides)...\n")
-  quarto_render("presentation.qmd")
-  cat("✓ Presentation complete\n")
+  if (!parallel) {
+    # Clean public directory first (sequential mode)
+    if (dir.exists("public")) unlink("public", recursive = TRUE)
+    dir.create("public", showWarnings = FALSE)
+    dir.create("public/slides", showWarnings = FALSE)
+    cat("\n[1/2] Rendering presentation (slides)...\n")
+    quarto_render("slides/presentation.qmd")
+    cat("✓ Presentation complete\n")
 
-  # Render book
-  cat("\n[2/2] Rendering book...\n")
-  quarto_render("book")
-  cat("✓ Book complete\n")
+    cat("\n[2/2] Rendering book...\n")
+    quarto_render("book")
+    cat("✓ Book complete\n")
+
+    # Copy book output to public/ root
+    cat("Organizing output to public/...\n")
+    book_files <- list.files("book/_book", full.names = TRUE, all.files = TRUE, no.. = TRUE)
+    file.copy(book_files, "public/", recursive = TRUE, overwrite = TRUE)
+  } else {
+    # Parallel mode - do NOT touch public directory yet
+    # Let each render go to its default location first
+    cat("\nRendering in PARALLEL using 2 cores...\n\n")
+    start_time <- Sys.time()
+
+    render_one <- function(target, working_dir) {
+      tryCatch({
+        # Set working directory in the worker
+        setwd(working_dir)
+
+        # Create unique temp directory for this worker to avoid conflicts
+        temp_base <- tempdir()
+        unique_temp <- file.path(temp_base, paste0("quarto_", target, "_", Sys.getpid()))
+        dir.create(unique_temp, showWarnings = FALSE, recursive = TRUE)
+        Sys.setenv(TMPDIR = unique_temp)
+        Sys.setenv(TEMP = unique_temp)
+        Sys.setenv(TMP = unique_temp)
+
+        if (target == "presentation") {
+          quarto::quarto_render("slides/presentation.qmd", quiet = FALSE)
+          return(list(target = "Presentation (slides)", status = "PASS", error = NULL))
+        } else {
+          quarto::quarto_render("book", quiet = FALSE)
+          return(list(target = "Book", status = "PASS", error = NULL))
+        }
+      }, error = function(e) {
+        full_error <- paste(conditionMessage(e), "\n",
+                           paste(capture.output(traceback()), collapse = "\n"))
+        return(list(target = target, status = "FAIL", error = full_error))
+      })
+    }
+
+    targets <- c("presentation", "book")
+    current_dir <- getwd()
+
+    if (.Platform$OS.type == "windows") {
+      cl <- parallel::makeCluster(2, outfile = "")
+
+      # Get critical environment variables
+      r_home <- Sys.getenv("R_HOME")
+      path_var <- Sys.getenv("PATH")
+
+      parallel::clusterExport(cl, c("render_one", "current_dir", "r_home", "path_var"),
+                             envir = environment())
+
+      # Set up environment in each worker
+      parallel::clusterEvalQ(cl, {
+        library(quarto)
+        # Ensure R_HOME and PATH are set
+        if (nchar(r_home) > 0) Sys.setenv(R_HOME = r_home)
+        if (nchar(path_var) > 0) Sys.setenv(PATH = path_var)
+      })
+
+      results_list <- parallel::parLapply(cl, targets, render_one, working_dir = current_dir)
+      parallel::stopCluster(cl)
+    } else {
+      results_list <- parallel::mclapply(targets, render_one,
+                                         working_dir = current_dir,
+                                         mc.cores = 2)
+    }
+
+    end_time <- Sys.time()
+    elapsed <- round(as.numeric(difftime(end_time, start_time, units = "secs")), 2)
+
+    cat("Results:\n")
+    cat(strrep("-", 60), "\n")
+    for (result in results_list) {
+      symbol <- if (result$status == "PASS") "✓" else "❌"
+      cat(sprintf("%s %-40s %s\n", symbol, result$target, result$status))
+      if (!is.null(result$error)) cat("  Error:", result$error, "\n")
+    }
+    cat(strrep("-", 60), "\n")
+    cat(sprintf("Completed in %.2f seconds\n", elapsed))
+
+    failed <- sapply(results_list, function(r) r$status == "FAIL")
+    if (any(failed)) {
+      cat("\n❌ Some renders failed!\n")
+      return(invisible(FALSE))
+    }
+
+    # Now organize output to public/ (after both renders complete)
+    cat("\nOrganizing output to public/...\n")
+
+    # Save slides output temporarily (it rendered to public/slides)
+    temp_slides <- tempdir()
+    if (dir.exists("public/slides")) {
+      file.copy("public/slides", temp_slides, recursive = TRUE)
+    }
+
+    # Clean and create public directory
+    if (dir.exists("public")) unlink("public", recursive = TRUE)
+    dir.create("public", showWarnings = FALSE)
+
+    # Copy book output to public/ root
+    book_files <- list.files("book/_book", full.names = TRUE, all.files = TRUE, no.. = TRUE)
+    file.copy(book_files, "public/", recursive = TRUE, overwrite = TRUE)
+
+    # Restore slides output
+    if (dir.exists(file.path(temp_slides, "slides"))) {
+      file.copy(file.path(temp_slides, "slides"), "public/", recursive = TRUE)
+      unlink(file.path(temp_slides, "slides"), recursive = TRUE)
+    }
+  }
+
+  # Copy sources and custom.css to public/
+  cat("Copying sources and assets to public/...\n")
+  file.copy("sources/", "public/", recursive = TRUE, overwrite = TRUE)
+  if (file.exists("custom.css")) {
+    file.copy("custom.css", "public/custom.css", overwrite = TRUE)
+  }
+
+  if (cleanup) {
+    cat("Cleaning up render artifacts...\n")
+    unlink("book/_book", recursive = TRUE)
+    unlink("book/topics/plots", recursive = TRUE)
+    unlink("book/plots", recursive = TRUE)
+    # Clean up any *_files directories in book root
+    book_files_dirs <- list.files("book", pattern = "_files$", full.names = TRUE)
+    for (d in book_files_dirs) {
+      unlink(d, recursive = TRUE)
+    }
+    unlink("slides/plots", recursive = TRUE)
+    unlink("slides/presentation_files", recursive = TRUE)
+    if (file.exists("slides/presentation.revealjs.md")) {
+      file.remove("slides/presentation.revealjs.md")
+    }
+  }
 
   cat(strrep("=", 60), "\n")
   cat("✓ All done!\n")
-  cat("  - Slides: slides/presentation.html\n")
-  cat("  - Book:   book/_book/index.html\n")
+  cat("  - Slides: public/slides/presentation.html\n")
+  cat("  - Book:   public/index.html\n")
+  return(invisible(TRUE))
 }
 
 # ============================================================
@@ -221,7 +403,7 @@ test_all_topics <- function() {
 preview_presentation <- function() {
   cat("Starting preview server...\n")
   cat("Press Ctrl+C to stop\n")
-  quarto_preview("presentation.qmd")
+  quarto_preview("slides/presentation.qmd")
 }
 
 # ============================================================
@@ -251,7 +433,11 @@ Available commands:
 1. Render outputs:
    render_presentation()              # Render slides only
    render_book()                      # Render book only
-   render_all()                       # Render both slides and book
+   render_all()                       # Render both in PARALLEL (default)
+   render_all(parallel = FALSE)       # Render both sequentially
+
+   Cleanup option (default TRUE):
+   render_all(cleanup = FALSE)        # Keep render artifacts for debugging
 
 2. Test a single topic (by number):
    render_topic(2)                    # Test topic 02 as slides
@@ -285,8 +471,8 @@ Example workflow:
   render_all()                       # Renders both slides and book
 
 Output locations:
-  - Slides: slides/presentation.html
-  - Book:   book/_book/index.html
+  - Book:   public/index.html
+  - Slides: public/slides/presentation.html
 
 Parallel vs Sequential:
   - Parallel: FASTER (uses multiple CPU cores)

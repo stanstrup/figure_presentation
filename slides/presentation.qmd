@@ -56,47 +56,47 @@
 
 
 
-{{< include book/topics/01_colors.qmd >}}
+{{< include ../book/topics/01_colors.qmd >}}
 
 
 
-{{< include book/topics/02_heatmaps.qmd >}}
+{{< include ../book/topics/02_heatmaps.qmd >}}
 
 
 
-{{< include book/topics/03_formats.qmd >}}
+{{< include ../book/topics/03_formats.qmd >}}
 
 
 
-{{< include book/topics/04_sizing.qmd >}}
+{{< include ../book/topics/04_sizing.qmd >}}
 
 
 
-{{< include book/topics/05_themes.qmd >}}
+{{< include ../book/topics/05_themes.qmd >}}
 
 
 
-{{< include book/topics/06_saving.qmd >}}
+{{< include ../book/topics/06_saving.qmd >}}
 
 
 
-{{< include book/topics/07_editing.qmd >}}
+{{< include ../book/topics/07_editing.qmd >}}
 
 
 
-{{< include book/topics/08_powerpoint.qmd >}}
+{{< include ../book/topics/08_powerpoint.qmd >}}
 
 
 
-{{< include book/topics/09_factors.qmd >}}
+{{< include ../book/topics/09_factors.qmd >}}
 
 
 
-{{< include book/topics/10_interactive.qmd >}}
+{{< include ../book/topics/10_interactive.qmd >}}
 
 
 
-{{< include book/topics/11_rendering.qmd >}}
+{{< include ../book/topics/11_rendering.qmd >}}
 
 
 

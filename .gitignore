@@ -2,8 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-topics/*.html
-topics/*_files
+book/topics/*.html
+book/topics/*_files
+book/topics/plots
+book/plots
+book/*_files
 *_files
 *.html
 topics/*.png
@@ -21,19 +24,12 @@ presentation.md
 presentation.revealjs.md
 *.knit.md
 plots/*
-book/topics/plots/*
-public/
 .claude
 /.quarto/
 *.revealjs.md
 # Lychee link checker downloads
 lychee*
-# Quarto build artifacts
-site_libs/
-search.json
-# Copied during deployment, not source
-/topics/sources/
-/sources/
-/topics/
-# Presentation output directory
-slides/
+# All rendered output goes to public/
+public/
+# Book renders to _book first, then gets copied
+book/_book/

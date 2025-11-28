@@ -1,15 +1,14 @@
 project:
   type: default
   execute-dir: project
-  output-dir: slides
+  output-dir: ../public/slides
 
-bibliography: book/references.bib
+bibliography: ../book/references.bib
 
-# Default format is slides (for backward compatibility)
 format:
   revealjs:
     theme: dark
-    css: custom.css
+    css: ../custom.css
     slide-number: true
     chalkboard: true
     preview-links: auto
