@@ -425,7 +425,7 @@ p3 <- base_plot +
 
 ## Medical Consequences
 
-
+::: {.content-visible when-format="revealjs"}
 :::: {.columns}
 :::: {.column width="50%"}
 
@@ -461,9 +461,38 @@ Studied **physicians diagnosing heart disease** using medical imaging:
 :::
 
 ::::
-
-
 ::::
+:::
+
+::: {.content-visible unless-format="revealjs"}
+
+::: {.callout-important}
+## Lives at Stake
+
+**Borkin et al. (2011)** - *IEEE Visualization*
+
+Studied **physicians diagnosing heart disease** using medical imaging:
+
+- Physicians using **jet colormap**: More errors, slower diagnosis
+- Physicians using **perceptually uniform colormaps**: Fewer errors, faster
+
+**Why?**
+
+- Bright yellow appears more "intense" than dark red
+- But dark red represents **higher values** (more critical condition)
+- Perceptual bias leads to misdiagnosis
+
+**Reference:** @borkin2011evaluation
+
+:::
+
+![](../sources/borkin.png){width=70%}
+
+::: {.aside}
+*Figure from @borkin2011evaluation*
+:::
+
+:::
 
 
 
