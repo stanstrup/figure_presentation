@@ -56,6 +56,15 @@ render_book <- function(cleanup = TRUE) {
     file.copy("custom.css", "public/custom.css", overwrite = TRUE)
   }
 
+  # Copy plots and *_files from book root to public/topics/ (for 03, 04, etc.)
+  if (dir.exists("book/plots")) {
+    file.copy("book/plots", "public/topics/", recursive = TRUE)
+  }
+  book_files_dirs <- list.files("book", pattern = "_files$", full.names = TRUE)
+  for (d in book_files_dirs) {
+    file.copy(d, "public/topics/", recursive = TRUE)
+  }
+
   if (cleanup) {
     cat("Cleaning up render artifacts...\n")
     unlink("book/_book", recursive = TRUE)
@@ -205,6 +214,15 @@ render_all <- function(parallel = TRUE, cleanup = TRUE) {
   file.copy("sources/", "public/", recursive = TRUE, overwrite = TRUE)
   if (file.exists("custom.css")) {
     file.copy("custom.css", "public/custom.css", overwrite = TRUE)
+  }
+
+  # Copy plots and *_files from book root to public/topics/ (for 03, 04, etc.)
+  if (dir.exists("book/plots")) {
+    file.copy("book/plots", "public/topics/", recursive = TRUE)
+  }
+  book_files_dirs <- list.files("book", pattern = "_files$", full.names = TRUE)
+  for (d in book_files_dirs) {
+    file.copy(d, "public/topics/", recursive = TRUE)
   }
 
   if (cleanup) {

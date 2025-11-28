@@ -49,8 +49,6 @@
 9. [Factor Ordering](#factor-ordering)
 10. [Interactive Plots](#interactive-plots)
 
-11. [Rendering Issues](#rendering-issues)
-
 :::
 ::::
 
@@ -95,35 +93,4 @@
 {{< include ../book/topics/10_interactive.qmd >}}
 
 
-
-{{< include ../book/topics/11_rendering.qmd >}}
-
-
-
-# Summary {background-color="#2c3e50"}
-
-## Key Takeaways
-
-::: {.incremental}
-- **Format**: Vector for plots (PDF/SVG), high-res raster for photos (PNG/TIFF)
-- **Colors**: Avoid rainbow, use viridis/ColorBrewer, test for colorblindness
-- **Sizing**: Set text sizes explicitly for final dimensions
-- **Saving**: Use `ggsave()` with proper DPI and dimensions
-- **Reproducibility**: Keep R scripts as source of truth
-:::
-
-## Resources
-
-**Color Tools:**
-- [ColorBrewer](https://colorbrewer2.org) - Color palette selection
-- [Coblis](https://www.coblis.com) - Colorblind simulator
-
-**Books & Guides:**
-- [Fundamentals of Data Visualization](https://clauswilke.com/dataviz) - Claus Wilke
-- [ggplot2 documentation](https://ggplot2.tidyverse.org)
-
-**Papers & Tutorials:**
-- [The misuse of colour in science communication](https://www.nature.com/articles/s41467-020-19160-7) - Nature Communications
-- [Heatmaps guide](https://stanstrup.github.io/heatmaps.html) - Jan Stanstrup
-
-**These slides:** [stanstrup.github.io/figure_presentation](https://stanstrup.github.io/figure_presentation/)
+{{< include ../book/resources.qmd >}}

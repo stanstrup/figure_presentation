@@ -33,3 +33,6 @@ lychee*
 public/
 # Book renders to _book first, then gets copied
 book/_book/
+slides/plots/
+book/site_libs
+book/topics/*.rmarkdown

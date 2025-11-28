@@ -1,18 +1,7 @@
 # References {.unnumbered}
 
-## Key Papers
-
-- Borkin, M. A., et al. (2011). Evaluation of artery visualizations for heart disease diagnosis. *IEEE Transactions on Visualization and Computer Graphics*, 17(12), 2479-2488.
-
-- Crameri, F., Shephard, G. E., & Heron, P. J. (2020). The misuse of colour in science communication. *Nature Communications*, 11, 5444. https://doi.org/10.1038/s41467-020-19160-7
-
-- Gołębiowska, I., & Çöltekin, A. (2022). What's wrong with the rainbow? An interdisciplinary review of empirical evidence for and against the rainbow color scheme in visualizations. *ISPRS Journal of Photogrammetry and Remote Sensing*, 194, 195-208. https://doi.org/10.1016/j.isprsjprs.2022.10.002
-
-## Books
-
-- Wilke, C. O. (2019). *Fundamentals of Data Visualization*. O'Reilly Media. Available online: https://clauswilke.com/dataviz
-
-- Healy, K. (2018). *Data Visualization: A Practical Introduction*. Princeton University Press.
+::: {#refs}
+:::
 
 ## Online Resources
 

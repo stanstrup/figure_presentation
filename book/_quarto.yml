@@ -41,7 +41,6 @@ book:
         - topics/08_powerpoint.qmd
         - topics/09_factors.qmd
         - topics/10_interactive.qmd
-        - topics/11_rendering.qmd
     - references.qmd
 
   appendices:
