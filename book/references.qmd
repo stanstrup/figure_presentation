@@ -1,7 +1,8 @@
 # References {.unnumbered}
 
-## Key Papers
+## Key Papers and Books
 
+### Key Papers
 Essential research on color use, perception, and data visualization:
 
 - @crameri2020misuse - The misuse of color in science communication
@@ -9,7 +10,7 @@ Essential research on color use, perception, and data visualization:
 - @golebiowska2022rainbow - Problems with rainbow color schemes
 - @heron2021rainbow - Rainbow colormaps and their issues
 
-## Books
+### Books
 
 - @wilke2019fundamentals - [Fundamentals of Data Visualization](https://clauswilke.com/dataviz) - Comprehensive guide to visualization principles (free online)
 - **[R Graphics Cookbook](https://r-graphics.org)** by Winston Chang - Practical recipes for ggplot2 (free online)
@@ -30,14 +31,14 @@ Essential research on color use, perception, and data visualization:
 - **dichromat** - Simulate color blindness
 - **paletteer** - Collection of 2000+ palettes
 
-## Documentation
+## Getting help
+
+### Documentation
 
 - **[ggplot2 Reference](https://ggplot2.tidyverse.org/reference/)** - Complete function reference
 - **[plotly for R](https://plotly.com/r/)** - Interactive plotting library
 
-## Community
-
-### Getting Help
+### Community
 
 - **[Stack Overflow](https://stackoverflow.com/questions/tagged/ggplot2)** - Q&A for ggplot2 questions
 
@@ -61,7 +62,7 @@ Essential research on color use, perception, and data visualization:
 - **[BBC Visual and Data Journalism](https://bbc.github.io/rcookbook/)** - BBC's ggplot2 cookbook
 - **[Financial Times Visual Vocabulary](https://github.com/Financial-Times/chart-doctor/tree/main/visual-vocabulary)** - Guide to chart types
 
-## Related Presentations
+### Related Presentations
 
 - **This presentation**: https://stanstrup.github.io/figure_presentation/
 - **Heatmaps guide**: https://stanstrup.github.io/heatmaps.html
