@@ -2,6 +2,12 @@
 
 This comprehensive guide covers common pitfalls and best practices for creating academic figures, with a focus on R and ggplot2.
 
+::: {.callout-note}
+## Originally a Presentation
+
+This material was originally created as a presentation, so some sections may be more concise or visually oriented than typical book chapters. The book format adds context, exercises, and additional explanations, but the core content prioritizes visual examples and practical demonstrations.
+:::
+
 ## About This Guide
 
 Scientific figures are often the first—and sometimes the only—thing readers look at in a paper. Poor quality figures not only look unprofessional but can also mislead readers and undermine your research. This guide will help you create clear, accurate, and publication-ready figures.
