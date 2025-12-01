@@ -4,6 +4,7 @@ project:
   output-dir: ../public/slides
 
 bibliography: ../book/references.bib
+suppress-bibliography: true
 
 format:
   revealjs:
